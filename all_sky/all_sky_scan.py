@@ -17,8 +17,16 @@ from skylab.ps_injector import PointSourceInjector
 from skylab.ps_model import ClassicLLH, EnergyLLH
 
 if __name__ == "__main__":
-
-    pf = '/data/user/zgriffith/datasets/'
+    p = argparse.ArgumentParser(
+            description='Create an all sky TS map',
+            formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--prefix', dest='prefix', type = str,
+                   default = '/data/user/zgriffith/pev_photons/all_sky/',
+                   help    = 'base directory for file storing')
+    p.add_argument('--outFile', dest='outFile', type = str,
+                   default = 'skymap.npy',
+                   help    = 'file name')
+    args = p.parse_args()
 
     dec_bins    = np.arange(-1., -0.799, 0.01)
     energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
@@ -37,9 +45,9 @@ if __name__ == "__main__":
     for i, year in enumerate(years): 
         livetime    = livetimes(year)*1.157*10**-5  #Seconds to Days
         exp = np.load('/data/user/zgriffith/datasets/'+year+'_exp_ps.npy')
-        exp = exp[(exp['sinDec']<-0.8)&(np.degrees(np.arcsin(exp['sinDec']))>-85.)]
+        exp = exp[(exp['sinDec']<-0.8)]
         mc  = np.load('/data/user/zgriffith/datasets/'+year+'_mc_ps.npy')
-        mc  = mc[(mc['sinDec']<-0.8)&(np.degrees(np.arcsin(mc['sinDec']))>-85.)]
+        mc  = mc[(mc['sinDec']<-0.8)]
         llh_model[year] = EnergyLLH(twodim_bins  = energy_bins,
                                     twodim_range = [[5.5,8.5],[-1,-0.8]],
                                     sinDec_bins  = dec_bins, sinDec_range=[-1,-0.8])
@@ -62,4 +70,4 @@ if __name__ == "__main__":
             break
 
     #Stores the skymap in a standard directory
-    np.save('/data/user/zgriffith/pev_photons/all_sky/skymap.npy', m)
+    np.save(args.prefix+args.outFile, m)
