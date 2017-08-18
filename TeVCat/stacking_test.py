@@ -49,7 +49,7 @@ if __name__ == "__main__":
         exp = np.load('/data/user/zgriffith/datasets/'+year+'_exp_ps.npy')
         exp = exp[(exp['sinDec']<-0.8)]
         mc  = np.load('/data/user/zgriffith/datasets/'+year+'_mc_ps.npy')
-        mc = mc[(mc['sinDec']<-0.8)]
+        mc  = mc[(mc['sinDec']<-0.8)]
         llh_model[year] = EnergyLLH(twodim_bins  = energy_bins,
                                     twodim_range = [energy_range,sinDec_range],
                                     sinDec_bins  = sinDec_bins, sinDec_range=sinDec_range)
@@ -62,7 +62,8 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    pos = np.load('/data/user/zgriffith/TevCat/hess_sources.npz')
+    pos = np.load(args.prefix+'hess_sources.npz')
+
     ra  = []
     dec = []
     for i, deci in enumerate(pos['dec']):
@@ -71,6 +72,7 @@ if __name__ == "__main__":
         else:
             ra.append(pos['ra'][i])
             dec.append(pos['dec'][i])
+
     if args.runTrial:
         stack_trials = np.zeros(args.nTrials)
         for trial in range(args.nTrials):
