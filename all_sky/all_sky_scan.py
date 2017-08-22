@@ -21,10 +21,10 @@ if __name__ == "__main__":
             description='Create an all sky TS map',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/all_sky/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--outFile', dest='outFile', type = str,
-                   default = 'skymap.npy',
+                   default = 'all_sky/skymap.npy',
                    help    = 'file name')
     args = p.parse_args()
 

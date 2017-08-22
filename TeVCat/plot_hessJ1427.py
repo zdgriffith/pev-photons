@@ -97,7 +97,7 @@ if __name__ == "__main__":
             description='Plot a skymap',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/TeVCat/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--addFermi', dest='addFermi', action = 'store_true',
             default = False, help='if True, plot Fermi data and fit as well')
@@ -106,11 +106,11 @@ if __name__ == "__main__":
     fig,ax = plt.subplots(1)
 
     #Data points
-    hess_data = np.loadtxt(args.prefix+'hessJ1427_data.txt') 
+    hess_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_data.txt') 
     plot_data(hess_data, 'H.E.S.S. Data', args.addFermi)
     gamma          = plot_fit('H.E.S.S. Best Fit', args.addFermi)
     if args.addFermi:
-        fermi_data = np.loadtxt(args.prefix+'hessJ1427_fermi_data.txt') 
+        fermi_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_fermi_data.txt') 
         plot_data(fermi_data, 'Fermi Data', args.addFermi)
         combined_gamma = plot_fit('H.E.S.S.+Fermi Best Fit', args.addFermi)
 

@@ -49,10 +49,10 @@ if __name__ == "__main__":
             description='Plot a skymap',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/all_sky/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--mapFile', dest='mapFile', type = str,
-                   default = 'p_value_skymap.npy',
+                   default = 'all_sky/p_value_skymap.npy',
                    help    = 'file containing the skymap to plot')
     p.add_argument('--outFile', dest='outFile', type = str,
                    default = 'all_sky_scan.png',

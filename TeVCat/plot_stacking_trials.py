@@ -15,7 +15,7 @@ if __name__ == "__main__":
             description='plot scrambled trials',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/TeVCat/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--chi2_ndf', dest='chi2_ndf', type = int, nargs='*',
                    help = 'chi2 ndf values to plot')
@@ -24,8 +24,8 @@ if __name__ == "__main__":
                    help = 'width of bin in TS space')
     args = p.parse_args()
 
-    stack_true = np.load(args.prefix+'/stacking_TS.npy') # observed TS
-    job_list   = glob.glob(args.prefix+'/stacking_trials/*') # background trials
+    stack_true = np.load(args.prefix+'/TeVCat/stacking_TS.npy') # observed TS
+    job_list   = glob.glob(args.prefix+'/TeVCat/stacking_trials/*') # background trials
 
     bg_trials = []
     for job in job_list:
