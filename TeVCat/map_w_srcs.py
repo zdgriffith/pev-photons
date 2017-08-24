@@ -141,6 +141,7 @@ if __name__ == "__main__":
 
     #Load HESS Sources
     f    = np.load(args.prefix+'TeVCat/hess_sources.npz')
+    print(f['name'])
     ras  = np.append(f['ra'][0], f['ra'][3:])
     decs = np.append(f['dec'][0], f['dec'][3:])
     sc   = map1.scatter(180+ras, decs, latlon=True, marker = 'x',
