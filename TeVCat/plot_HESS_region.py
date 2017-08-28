@@ -4,7 +4,7 @@
 # File Name     : plot_HESS_region.py
 # Description   : plot a rectangular box centered on galactic plane with HESS sources
 # Creation Date : 08-24-2017
-# Last Modified : Thu 24 Aug 2017 03:37:44 PM CDT
+# Last Modified : Mon 28 Aug 2017 10:30:46 AM CDT
 # Created By    : Zach Griffith 
 #==============================================================================
 
@@ -68,7 +68,7 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
         if src['plot']:
             ax.scatter(src['x'],src['y'], marker=src['marker'],
                        zorder=src['zorder'],
-                       color=src['bkgcolor'],
+                       color='none',
                        facecolors=src['color'],
                        alpha=src['alpha'],
                        s=src['markersize'])
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     ax.set_aspect(1.)
 
     defaultsource = {'marker': 'o',
-                     'markersize': 50.,
+                     'markersize': 35.,
                      'zorder': 2,
                      'color': 'k',
                      'bkgcolor': 'w',
