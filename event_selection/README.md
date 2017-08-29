@@ -1,8 +1,5 @@
-# event_selection
+# all_sky
 
-Scripts related to event selection
+The scripts used to create the event selection and produce files at the final cut level
 
-data_mc_check.py: Plots the gamma-ray probability of a random forest for MC and data to verify agreement
-eff_area_comp.py: Plots the effective area to gamma rays vs. energy for each year of detector data
-ang_res.py:       Plots the angular resolution vs. energy for different years.
-passing_fraction.py:  Plots the fraction of events passing the gamma/hadron separation cut as a function of energy
+exp_mc_writer.py:  writes exp and mc files in the format that skylab takes at the final cut level
