@@ -19,7 +19,7 @@ if __name__ == "__main__":
             description='Stacking Test',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/TeVCat/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--runTrial', dest='runTrial', action = 'store_true',
                    default = False, help='if True, run as a background trial')
@@ -46,10 +46,8 @@ if __name__ == "__main__":
 
     for i, year in enumerate(years): 
         livetime    = livetimes(year)*1.157*10**-5  #Seconds to Days
-        exp = np.load('/data/user/zgriffith/datasets/'+year+'_exp_ps.npy')
-        exp = exp[(exp['sinDec']<-0.8)]
-        mc  = np.load('/data/user/zgriffith/datasets/'+year+'_mc_ps.npy')
-        mc  = mc[(mc['sinDec']<-0.8)]
+        exp = np.load(args.prefix+'/datasets/'+year+'_exp_ps.npy')
+        mc  = np.load(args.prefix+'/datasets/'+year+'_mc_ps.npy')
         llh_model[year] = EnergyLLH(twodim_bins  = energy_bins,
                                     twodim_range = [energy_range,sinDec_range],
                                     sinDec_bins  = sinDec_bins, sinDec_range=sinDec_range)
@@ -62,7 +60,7 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    pos = np.load(args.prefix+'hess_sources.npz')
+    pos = np.load(args.prefix+'/TeVCat/hess_sources.npz')
 
     ra  = []
     dec = []
@@ -79,8 +77,8 @@ if __name__ == "__main__":
             if args.verbose:
                 print(trial)
             stack_trials[trial] = psllh.fit_source(np.radians(ra),np.radians(dec), scramble = True)[0]
-        np.save(args.prefix+'/stacking_trials/job_%s.npy' % args.job, stack_trials)
+        np.save(args.prefix+'/TeVCat/stacking_trials/job_%s.npy' % args.job, stack_trials)
     else:
         stack_true = psllh.fit_source(np.radians(ra),np.radians(dec), scramble=False)[0]
         print('True Stacking TS: '+str(stack_true))
-        np.save(args.prefix+'stacking_TS.npy', stack_true)
+        np.save(args.prefix+'TeVCat/stacking_TS.npy', stack_true)

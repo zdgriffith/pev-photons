@@ -77,5 +77,10 @@ if __name__ == "__main__":
             else:
                 cut_data = data[np.greater(data['alpha_3.0'], args.cut_val)]
             exp, mc  = construct_arr(cut_data, cut_sim, testing_fraction = gamma_ratio, sim = ang_res_sim[year])
+
+            #ensure no events are below declination threshold, tiny shifts can cause binning errors
+            exp = exp[exp['sinDec']<-0.8]
+            mc  = mc[mc['sinDec']<-0.8]
+
             np.save(args.prefix+'/datasets/'+year+'_exp_'+selection+'.npy', exp)
             np.save(args.prefix+'/datasets/'+year+'_mc_'+selection+'.npy', mc)

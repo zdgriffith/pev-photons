@@ -43,11 +43,10 @@ if __name__ == "__main__":
     years = ['2011', '2012', '2013', '2014','2015']
 
     for i, year in enumerate(years): 
-        livetime    = livetimes(year)*1.157*10**-5  #Seconds to Days
-        exp = np.load('/data/user/zgriffith/datasets/'+year+'_exp_ps.npy')
-        exp = exp[(exp['sinDec']<-0.8)]
-        mc  = np.load('/data/user/zgriffith/datasets/'+year+'_mc_ps.npy')
-        mc  = mc[(mc['sinDec']<-0.8)]
+        livetime = livetimes(year)*1.157*10**-5  #Seconds to Days
+        exp      = np.load(args.prefix+'/datasets/'+year+'_exp_ps.npy')
+        mc       = np.load(args.prefix+'/datasets/'+year+'_mc_ps.npy')
+
         llh_model[year] = EnergyLLH(twodim_bins  = energy_bins,
                                     twodim_range = [[5.5,8.5],[-1,-0.8]],
                                     sinDec_bins  = dec_bins, sinDec_range=[-1,-0.8])
