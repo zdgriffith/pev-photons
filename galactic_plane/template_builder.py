@@ -57,7 +57,7 @@ def template_builder(prefix, inFile, year, mcBackground, alpha):
                    gamma            = alpha,       # spectral index of signal dN/dE = A (E / E0)^-gamma
                    E0               = 1000,
                    Ecut             = None,
-                   nside_out        = 1024,
+                   nside_out        = 512,
                    smoothings       = np.arange(0.45, 1.05, 0.05),
                    selection        = [-180,180,-90,90],
                    selection_coords = 'galactic')

@@ -4,7 +4,7 @@
 # File Name     : plot_HESS_region.py
 # Description   : plot a rectangular box centered on galactic plane with HESS sources
 # Creation Date : 08-24-2017
-# Last Modified : Mon 28 Aug 2017 10:30:46 AM CDT
+# Last Modified : Thu 31 Aug 2017 07:28:06 PM CDT
 # Created By    : Zach Griffith 
 #==============================================================================
 
@@ -93,7 +93,7 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                 xx = src['x']+dra*(xmax-xmin)
                 yy = src['y']+ddec*(ymax-ymin)
             
-                # Draw a line between pointLabal and pointSource
+                # Draw a line between pointLabel and pointSource
                 # Keep a little distance to the source.
                 def DrawLine(pl,ps,ax,toskip=0.015*(ymax-ymin)):
                     linelength = np.sqrt(np.power(ps[1]-pl[1],2) +
