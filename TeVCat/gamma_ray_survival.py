@@ -4,7 +4,7 @@
 # File Name     : gamma_ray_survival.py
 # Description   : Plots the survival function(s) for gamma rays 
 # Creation Date : 09-07-2017
-# Last Modified : Mon 11 Sep 2017 11:33:07 AM CDT
+# Last Modified : Mon 11 Sep 2017 12:02:48 PM CDT
 # Created By    : Zach Griffith 
 #==============================================================================
 
@@ -18,19 +18,38 @@ plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
 
 def survival_vs_energy(args):
-    surv = np.loadtxt(args.prefix+'TeVCat/survival.txt')
+    surv = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_energy.txt')
     surv = surv.T
     spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0], surv[1], k=2)
     x = 10**np.arange(12,17, 0.01)
     plt.scatter(surv[0],surv[1])
     plt.plot(x,spline(x), label = 'spline fit')
 
+    plt.xlim([10**12,10**17])
+    plt.ylim([0,1])
     plt.legend()
     plt.xlabel('Energy [eV]', fontweight='bold')
     plt.ylabel('Survival Probability', fontweight='bold')
     plt.xscale('log')
     plt.tight_layout()
-    plt.savefig(fig_dir+'survival.pdf')
+    plt.savefig(fig_dir+'survival_vs_energy.pdf')
+    plt.close()
+
+def survival_vs_distance(args):
+    surv = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_distance.txt')
+    surv = surv.T
+    spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0], surv[1], k=2)
+    x = np.arange(0,30, 0.01)
+    plt.scatter(surv[0],surv[1])
+    plt.plot(x,spline(x), label = 'spline fit')
+
+    plt.xlim([0,30])
+    plt.ylim([0,1])
+    plt.legend()
+    plt.xlabel('Distance to Sun [kpc]', fontweight='bold')
+    plt.ylabel('Survival Probability', fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(fig_dir+'survival_vs_distance.pdf')
     plt.close()
 
 if __name__ == "__main__":
@@ -43,3 +62,4 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     survival_vs_energy(args)
+    survival_vs_distance(args)

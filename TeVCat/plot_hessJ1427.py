@@ -80,7 +80,7 @@ def plot_fit(label, args):
     if args.no_absorption:
         ratio  = [1]*len(E)
     else:
-        surv   = np.loadtxt(args.prefix+'TeVCat/survival.txt')
+        surv   = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_energy.txt')
         surv   = surv.T
         spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12, surv[1], k=2)
         ratio  = spline(E)
@@ -112,7 +112,6 @@ if __name__ == "__main__":
             default = False, help='if True, plot Fermi data and fit as well')
     p.add_argument('--no_absorption', dest='no_absorption', action = 'store_true',
             default = False, help='if True, flux extrapolations have no absorption')
-    args = p.parse_args()
     args = p.parse_args()
 
     fig,ax = plt.subplots(1)
