@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import argparse
+import argparse, scipy
 import numpy as np
 import matplotlib.pyplot as plt
 from support_functions import get_fig_dir, plot_setter
@@ -33,12 +33,15 @@ def sens_plot(args):
                      ls    = linestyle[j],
                      label = 'E$^{-%s}$ %s' % (alpha, kind_labels[j]))
 
+    sources   = np.load(args.prefix+'TeVCat/hess_sources.npz')
     if args.no_absorption:
         ratio = 1
     else:
-        ratio = 0.33
+        surv   = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_distance.txt')
+        surv   = surv.T
+        spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0], surv[1], k=2)
+        ratio  = spline(sources['distance'])
 
-    sources   = np.load(args.prefix+'TeVCat/hess_sources.npz')
     upper_err = (sources['flux']+sources['flux_stat']+sources['flux_sys'])*1000**(-sources['alpha']+sources['alpha_stat']+sources['alpha_sys'])*1e-12
     lower_err = (sources['flux']-sources['flux_stat']-sources['flux_sys'])*1000**(-sources['alpha']-sources['alpha_stat']-sources['alpha_sys'])*1e-12
     middle    = sources['flux']*1000**(-sources['alpha'])*1e-12
