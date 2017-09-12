@@ -77,6 +77,11 @@ def plot_fit(label, args):
         phi_high  = (phi0+phi_unc)*(E0**(-(gamma-gamma_unc))*(E/E0)**-(gamma-gamma_unc))
         phi_low   = (phi0-phi_unc)*(E0**(-(gamma+gamma_unc))*(E/E0)**-(gamma+gamma_unc))
 
+    if args.Ecut is not None:
+        phi      *= np.exp(-E/args.Ecut)
+        phi_high *= np.exp(-E/args.Ecut)
+        phi_low  *= np.exp(-E/args.Ecut)
+
     if args.no_absorption:
         ratio  = [1]*len(E)
     else:
@@ -112,6 +117,8 @@ if __name__ == "__main__":
             default = False, help='if True, plot Fermi data and fit as well')
     p.add_argument('--no_absorption', dest='no_absorption', action = 'store_true',
             default = False, help='if True, flux extrapolations have no absorption')
+    p.add_argument('--Ecut', dest='Ecut', type = float, default = None,
+            help='Option for an exponential cut-off in the flux predictions')
     args = p.parse_args()
 
     fig,ax = plt.subplots(1)
