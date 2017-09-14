@@ -135,7 +135,7 @@ if __name__ == "__main__":
     #IceCube Upper limit
     b  = np.array([0.712*10**3,3.84*10**3]) #5% and 95% containment values in energy
     x  = 10**np.mean(np.log10(b)) #Center point in log space to put the arrow
-    y0 = 4.28e-20 
+    y0 = 4.7e-20 
     if args.addFermi:
         y0 *= 10**6
         y  = y0*((x/(10**3))**(2-gamma))
