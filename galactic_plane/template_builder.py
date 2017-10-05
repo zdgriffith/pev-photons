@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 
 ########################################################################
-## Build template maps for use in Skylab.
-## Credit for the script goes to Josh Wood.
+# Build template maps for use in Skylab.
+# Credit for the script goes to Josh Wood.
 ########################################################################
 
 import os
 import re
-import argparse
+import argparse as ap
 import numpy as np
 
 from skylab_comp.template import Template
 
+
 def template_builder(args):
     """Build the template for a given year."""
     rad2deg = 180./np.pi
-    deg2rad = 1./rad2deg
 
-    exp = np.load(args.prefix+'/datasets/'+args.year+'_exp_diffuse.npy')
+    exp = np.load(args.prefix + '/datasets/' + args.year + '_exp_diffuse.npy')
     mc  = np.load(args.prefix+'/datasets/'+args.year+'_mc_diffuse.npy')
 
     if args.mcBackground:
@@ -30,18 +30,12 @@ def template_builder(args):
       weights = None
 
     output = (args.prefix + '/galactic_plane/' + args.year + '/' 
-              + re.split('/|\.', args.inFile)[-2] + ext)
+              + args.inFile + ext)
 
     os.system('mkdir -p ' + output)
-
-    nbin = 20
     sinDec_min = -1
     sinDec_max = -0.8
-    bin_width  = (sinDec_max - sinDec_min)/nbin
-    sinDec_bins = np.arange(sinDec_min,
-                            sinDec_max + 0.1*bin_width,
-                            bin_width,
-                            dtype=float)
+    sinDec_bins            = np.arange(-1., -0.799, 0.01)
 
     mask = (mc['sinDec'] > sinDec_min) & (mc['sinDec'] < sinDec_max)
     mc = mc[mask]
@@ -50,9 +44,11 @@ def template_builder(args):
 
     template = Template()
 
-    template.build(map_in=args.prefix+args.inFile, nside_out=512,
-                   coords='galactic',
+    template.build(map_in=(args.prefix+'/galactic_plane/source_templates/'
+                           + args.inFile + '.npy'),
+                   nside_out=512,
                    mc=mc, exp=exp,
+                   coords='galactic',
                    spline=True,
                    sinDec_bins=sinDec_bins,
                    weights=weights, # Set to None to use data in bg PDF.
@@ -65,9 +61,9 @@ def template_builder(args):
     template.write(output + '.npy')
 
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(description='Build template maps.',
-                                formatter_class=argparse.RawTextHelpFormatter)
-    p.add_argument('--prefix', type = str,
+    p = ap.ArgumentParser(description='Build template maps.',
+                          formatter_class=ap.RawTextHelpFormatter)
+    p.add_argument('--prefix', type=str,
                    default='/data/user/zgriffith/pev_photons/',
                    help='Base directory for file storing.')
     p.add_argument('--mcBackground', action='store_true',
@@ -77,7 +73,7 @@ if __name__ == '__main__':
                    help=('Year of analyis to build. '
                          '"all" runs all years.'))
     p.add_argument('--inFile', type=str,
-                   default='/galactic_plane/source_templates/fermi_pi0.npy',
+                   default='fermi_pi0',
                    help=('File containing the template '
                          'to use in healpix format.'))
     p.add_argument('--alpha', type=float, default=3.0,
