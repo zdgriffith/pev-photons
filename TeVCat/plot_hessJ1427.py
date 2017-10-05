@@ -37,7 +37,6 @@ def plot_data(data, label, args):
 #Plot fits
 def plot_fit(label, args):
 
-    bound = 50. # Energy in TeV to switch from "known" HESS fit to "extrapolated"
     E0    = 1
 
     if 'Fermi' in label:
@@ -46,8 +45,10 @@ def plot_fit(label, args):
         phi_unc   = 0.2*10**-12
         gamma     = 2.02
         gamma_unc = 0.03
+        phi_sys   = 0
+        gamma_sys = 0
         E         = 10**(np.arange(-3.01, 4.01, 0.001))
-        mask      = (E<bound)
+        mask      = (E<100000)
         color     = 'r'
         cfill     = [1, 0, 0, 0.5] #red
     else:
@@ -55,27 +56,37 @@ def plot_fit(label, args):
         phi0      = 1.3*10**-12
         phi_unc   = 0.4*10**-12
         gamma     = 2.2
-        gamma_unc = 0.3
+        gamma_unc = 0.1
+        phi_sys   = 0.2*1.3*10**-12
+        gamma_sys = 0.2
         E         = 10**(np.arange(-0.01, 4.01, 0.0001))
-        mask      = (E>=1)&(E<bound)
+        mask      = (E>=1)
         color     = colors[3]
         cfill     = [253/256., 174/256., 97/256., 0.5] #burnt orange
 
     if args.addFermi:
         phi_high = np.zeros(len(E))
         phi_low  = np.zeros(len(E))
+        phi_sys_high = np.zeros(len(E))
+        phi_sys_low  = np.zeros(len(E))
         phi = phi0*(E0**(-gamma))*(E/E0)**(2-gamma)
         for i, Ei in enumerate(E):
             if Ei < E0:
                 phi_high[i] += (phi0+phi_unc)*(Ei/E0)**(2-(gamma+gamma_unc))
                 phi_low[i]  += (phi0-phi_unc)*(Ei/E0)**(2-(gamma-gamma_unc))
+                phi_sys_high[i] += (phi0+phi_sys)*(Ei/E0)**(2-(gamma+gamma_sys))
+                phi_sys_low[i]  += (phi0-phi_sys)*(Ei/E0)**(2-(gamma-gamma_sys))
             else:
                 phi_high[i] += (phi0+phi_unc)*(Ei/E0)**(2-(gamma-gamma_unc))
                 phi_low[i]  += (phi0-phi_unc)*(Ei/E0)**(2-(gamma+gamma_unc))
+                phi_sys_high[i] += (phi0+phi_sys)*(Ei/E0)**(2-(gamma-gamma_sys))
+                phi_sys_low[i]  += (phi0-phi_sys)*(Ei/E0)**(2-(gamma+gamma_sys))
     else:
         phi = phi0*(E0**(-gamma))*(E/E0)**(-gamma)
         phi_high  = (phi0+phi_unc)*(E0**(-(gamma-gamma_unc))*(E/E0)**-(gamma-gamma_unc))
         phi_low   = (phi0-phi_unc)*(E0**(-(gamma+gamma_unc))*(E/E0)**-(gamma+gamma_unc))
+        phi_sys_high  = (phi0+phi_sys)*(E0**(-(gamma-gamma_sys))*(E/E0)**-(gamma-gamma_sys))
+        phi_sys_low   = (phi0-phi_sys)*(E0**(-(gamma+gamma_sys))*(E/E0)**-(gamma+gamma_sys))
 
     if args.Ecut is not None:
         phi      *= np.exp(-E/args.Ecut)
@@ -91,19 +102,16 @@ def plot_fit(label, args):
         ratio  = spline(E)
 
     plt.plot(E[mask],ratio[mask]*phi[mask], label = label, color = color, linestyle='-') #center line
-    mask = (E>bound)
-    plt.plot(E[mask],ratio[mask]*phi[mask], color = color, linestyle='-.') #center line in extrap. region
 
-    #Shade uncertainty region
-    mask = E<(bound+0.5)
+    #Shade statistical uncertainty
     plt.fill_between(E[mask], ratio[mask]*phi_low[mask],ratio[mask]*phi_high[mask],
                      color = cfill, edgecolor = 'none')
 
-    #Shade with lighter color in extrap. region
-    cfill[3] = 0.15
-    mask = E>bound
-    plt.fill_between(E[mask], ratio[mask]*phi_low[mask],ratio[mask]*phi_high[mask],
-                     color = cfill, edgecolor = 'none')
+    #Shade with lighter color for systematic error
+    if 'Fermi' not in label:
+        cfill[3] = 0.15
+        plt.fill_between(E[mask], ratio[mask]*phi_sys_low[mask],ratio[mask]*phi_sys_high[mask],
+                         color = cfill, edgecolor = 'none')
     return gamma
 
 if __name__ == "__main__":
