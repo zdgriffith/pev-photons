@@ -30,7 +30,9 @@ def error(f, label, x, x_bins, **kwargs):
     for val in vals:
         sigmas.append(bin_sigmas[find_nearest(bin_center, val)]) 
     
-    plt.step(bin_edges, np.append(bin_sigmas[0], bin_sigmas), label = label+r', $\langle\sigma\rangle$ = %.2f$^{\circ}$' %np.average(sigmas, weights = f['weights']*f['primary_E']**-2.0))
+    plt.step(bin_edges,
+             np.append(bin_sigmas[0], bin_sigmas),
+             label=label+r', $\langle\sigma\rangle$ = %.2f$^{\circ}$' % np.average(sigmas, weights = f['weights']*f['primary_E']**-2.0))
     return np.radians(sigmas)
 
 
@@ -51,11 +53,12 @@ if __name__ == "__main__":
         if i in [0,4]:
             error(f, labels[i], 'primary_E', E_bins, **kwargs)
 
-    plt.xlabel(r'log(E$_{\textrm{true}}$/GeV)')
+    plt.xlabel(r'log(E$_{\textrm{MC}}$/GeV)')
     plt.xlim([5.7,8])
     plt.ylabel('Angular Resolution [$^{\circ}$]')
     l = plt.legend()
     plot_setter(plt.gca(), l)
     plt.tight_layout()
     plt.savefig(fig_dir+'ang_res_years.png', facecolor='none', dpi=300)
+    plt.savefig('/home/zgriffith/public_html/paper/ang_res_years.pdf')
     plt.close()
