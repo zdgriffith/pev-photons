@@ -66,4 +66,5 @@ if __name__ == "__main__":
     plot_setter(plt.gca(), l)
     plt.tight_layout()
     plt.savefig(fig_dir+'ang_res_years.png', facecolor='none', dpi=300)
+    plt.savefig('/home/zgriffith/public_html/paper/ang_res_years.pdf')
     plt.close()
