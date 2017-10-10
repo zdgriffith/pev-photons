@@ -1,4 +1,4 @@
-# all_sky
+# event_selection
 
 The scripts used to create the event selection and produce files at the final cut level
 

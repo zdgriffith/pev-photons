@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-######################################
-###  Plot a skymap projected to a  ###
-###  rectangular view of the HESS  ###
-###  source region                 ###
-######################################
+########################################################################
+# Plot a skymap projected to a rectangular view of the HESS source region               
+########################################################################
 
 import argparse, math
 import sky

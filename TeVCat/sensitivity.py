@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+########################################################################
+# Plots the sensitivity and discovery potential
+# as a function of declination, with HESS source fluxes extrapolated
+########################################################################
+
 import argparse, scipy
 import numpy as np
 import matplotlib.pyplot as plt

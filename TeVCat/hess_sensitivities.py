@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+########################################################################
+# Calculates the sensitivity to each HESS source's
+# declination and spectral index 
+########################################################################
+
+
 import argparse
 import numpy as np
 import pandas as pd

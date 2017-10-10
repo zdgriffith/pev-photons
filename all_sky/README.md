@@ -5,7 +5,6 @@ The scripts used to produce the all-sky-scan and related results.
 all_sky_scan.py:  perform an unbinned LLH test over each point
 of a grid in the sky
 
-ts_to_pvalue.py:  convert a TS map to a p-value map.
-
 plot_p_value.py:  plot the pre-trial p-values produced from the all sky scan
 
+ts_to_pvalue.py:  convert a TS map to a p-value map.

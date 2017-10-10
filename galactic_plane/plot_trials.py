@@ -1,5 +1,9 @@
 #!/usr/bin/env/python
 
+########################################################################
+# Plot the TS distribution of background trials.
+########################################################################
+
 import argparse
 import glob
 import matplotlib as mpl

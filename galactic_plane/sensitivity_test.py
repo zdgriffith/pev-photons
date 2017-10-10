@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Test of Galactic Plane Sensitivity   
+# Test the sensitivity to a galactic plane flux template. 
 ########################################################################
 
 import re

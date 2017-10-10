@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+########################################################################
+# Calculates the true TS for each HESS source
+########################################################################
+
 import argparse
 import numpy as np
 import pandas as pd
@@ -63,5 +67,4 @@ if __name__ == "__main__":
     for i, dec in enumerate(sources['dec']):
         ts_list.append(psllh.fit_source(np.radians(sources['ra'][i]),np.radians(dec), scramble = False)[0])
 
-    #Stores the skymap in a standard directory
     np.save(args.prefix+args.outFile, ts_list)

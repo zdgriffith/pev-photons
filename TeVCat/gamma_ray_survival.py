@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-#==============================================================================
-# File Name     : gamma_ray_survival.py
-# Description   : Plots the survival function(s) for gamma rays 
-# Creation Date : 09-07-2017
-# Last Modified : Mon 11 Sep 2017 12:02:48 PM CDT
-# Created By    : Zach Griffith 
-#==============================================================================
+########################################################################
+# Plots the survival function(s) for gamma rays 
+########################################################################
 
 import argparse, scipy
 import numpy as np
