@@ -1,82 +1,105 @@
 #!/usr/bin/env python
-import sys, os
-sys.path.append(os.path.expandvars("$HOME"))
-import dashi
-dashi.visual()
 
+########################################################################
+# Plots the passing fraction as a function of energy for all years
+# of the analysis, for a given spectral assumption of gamma rays.
+########################################################################
+
+import argparse
 import numpy as np
-import matplotlib.pyplot as plt
-plt.style.use('stefan')
 import matplotlib as mpl
-colors = mpl.rcParams['axes.color_cycle']
+import matplotlib.pyplot as plt
 
-from support_functions import cut_maker, get_fig_dir, hits_llh_cutter, plot_setter
+import dashi
+from support_functions import get_fig_dir, plot_setter
 from support_pandas import load_all_folds
+
+dashi.visual()
+plt.style.use('stefan')
+colors = mpl.rcParams['axes.color_cycle']
 fig_dir = get_fig_dir()
        
 def passing_fraction(args):
+    if 'all' in args.years:
+        args.years = ['2011','2012','2013','2014','2015']
 
-
-    labels    = ['Data', 'Gamma Ray MC (E$^{-2.0}$ weighted)']
+    labels = ['Data', 'Gamma Ray MC (E$^{-2.0}$ weighted)']
+    set_names = ['data', 'gammas']
     bin_width = 0.1
+    bin_vals = np.arange(5.7,8.1,bin_width)
 
-    index = 0
+    energies = {'data':[], 'gammas':[]}
+    kept_energies = {'data':[], 'gammas':[]}
+    weights = {'data':[], 'gammas':[]}
+    kept_weights = {'data':[], 'gammas':[]}
     for year in args.years:
         l3_data, l3_sim = load_all_folds(year = year, or_cut = 0)
-        if year == '2015':
-            l4_data, l4_sim = load_all_folds(year = year, or_cut = 0.72)
-        else:
-            l4_data, l4_sim = load_all_folds(year = year, or_cut = 0.7)
-        for j, label in enumerate(labels):
-            if 'Data' in label:
-                l3 = l3_data
-                l4 = l4_data
-            else:
-                l3 = l3_sim
-                l4 = l4_sim
+        l4_data, l4_sim = load_all_folds(year = year, or_cut = 0.7)
 
-            bin_vals         = np.arange(5.7,8.1,bin_width)
-            energy_hist      = dashi.factory.hist1d(np.log10(l3['laputop_E']), bin_vals)
-            energy_kept_hist = dashi.factory.hist1d(np.log10(l4['laputop_E']), bin_vals)
-            bin_num          = len(bin_vals) - 1
-            passed           = energy_hist.bincontent-energy_kept_hist.bincontent
-            energy_percent   = np.zeros(bin_num)
-            error            = np.zeros(bin_num)
+        energies['data'].extend(l3_data['laputop_E'])
+        kept_energies['data'].extend(l4_data['laputop_E'])
+        energies['gammas'].extend(l3_sim['laputop_E'])
+        kept_energies['gammas'].extend(l4_sim['laputop_E'])
+        weights['data'].extend([1.]*len(l3_data['laputop_E']))
+        kept_weights['data'].extend([1.]*len(l4_data['laputop_E']))
+        weights['gammas'].extend((l3_sim['primary_E']**-2.0)
+                                 *l3_sim['weights'])
+        kept_weights['gammas'].extend((l4_sim['primary_E']**-2.0)
+                                      *l4_sim['weights'])
 
-            #error formulation which avoids forbidden space - see Ullrich and Xu 2008
-            #"Treatment of Errors in Efficiency Calculations" eqn 19.
-            for i in range(bin_num):
-                k = np.float(passed[i])
-                n = np.float(energy_hist.bincontent[i])
-                energy_percent[i] = energy_kept_hist.bincontent[i]/float(energy_hist.bincontent[i])
-                error[i]          = np.sqrt(((k+1)*(k+2))/((n+2)*(n+3)) - ((k+1)**2)/((n+2)**2))
+    for j, name in enumerate(set_names):
+        hist = dashi.factory.hist1d(np.log10(energies[name]),
+                                    bin_vals, weights = weights[name])
+        kept_hist = dashi.factory.hist1d(np.log10(kept_energies[name]),
+                                         bin_vals,
+                                         weights = kept_weights[name])
+        passed = hist.bincontent-kept_hist.bincontent
 
-            plt.step(energy_hist.binedges, np.append(energy_percent[0],energy_percent), color = colors[index], label = year+' '+label, ls = '-')
-            plt.errorbar(energy_hist.binedges[:-1]+bin_width/2., energy_percent, yerr = error, fmt = 'none', color = colors[index], ecolor = colors[index], ms = 0)
-            index += 1
+        # An error formulation which avoids forbidden space.
+        # See Ullrich and Xu 2008:
+        # "Treatment of Errors in Efficiency Calculations" eqn 19.
+        bin_num = len(passed)
+        error = np.zeros(bin_num)
+        percent = np.zeros(bin_num)
+        for i in range(bin_num):
+            k = np.float(passed[i])
+            n = np.float(hist.bincontent[i])
+            percent[i] = kept_hist.bincontent[i]/float(hist.bincontent[i])
+            error[i] = np.sqrt(((k+1)*(k+2)) / ((n+2)*(n+3))
+                               - ((k+1)**2) / ((n+2)**2))
+
+        plt.step(hist.binedges, np.append(percent[0],percent),
+                 color=colors[j], label=labels[j], ls='-')
+        plt.errorbar(hist.binedges[:-1]+bin_width/2., percent,
+                     yerr=error, fmt='none', color=colors[j],
+                     ecolor=colors[j], ms=0)
+
+    l = plt.legend(loc='lower left')
+    plot_setter(plt.gca(),l)
 
     plt.xlim([5.7,8])
-    plt.xlabel('log(E/GeV)',fontweight='bold', fontsize = 24)
-    plt.yscale('log', fontsize='24')
-    plt.ylabel('Passing Fraction',fontweight='bold')
-    l = plt.legend(loc = 'lower left', fontsize = 18, prop={'weight':'bold'})
-    plot_setter(plt.gca(),l)
+    plt.ylim([10**-4,1])
+    plt.yscale('log')
+    plt.xlabel('log(E/GeV)')
+    plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(fig_dir+'/passing_vs_energy.png', facecolor = 'none', dpi=300)
+    plt.savefig(fig_dir+'/passing_vs_energy_all_years.png',
+                facecolor='none', dpi=300)
     plt.close()
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Create an all sky TS map',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/',
-                   help    = 'base directory for file storing')
-    p.add_argument('--outFile', dest='outFile', type = str,
-                   default = 'passing_vs_energy.png',
-                   help    = 'file name')
-    p.add_argument('--years', dest='years', type = str, nargs='+',
-                   help='Year(s) to plot.  If \"all\", will plot the combination', default = ['2012'])
+    p.add_argument('--prefix', type=str,
+                   default='/data/user/zgriffith/pev_photons/',
+                   help='base directory for file storing')
+    p.add_argument('--outFile', type=str,
+                   default='passing_vs_energy.png',
+                   help='file name')
+    p.add_argument('--years', type=str, nargs='+', default=['2012'],
+                   help=('Year(s) to plot.  If "all", '
+                         'will plot the combination'))
     args = p.parse_args()
 
     passing_fraction(args)
