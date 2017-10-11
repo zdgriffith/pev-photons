@@ -16,6 +16,7 @@ import sky
 from mpl_toolkits.basemap import Basemap
 from support_functions import get_fig_dir
 
+plt.style.use('stefan')
 # Custom color map in the style of
 # the all-sky neutrino point source analysis.
 ps_map = {'blue' : ((0.0, 0.0, 1.0),
@@ -81,13 +82,13 @@ if __name__ == "__main__":
                            fontsize=16)
 
         x,y = map1(45,-80)
-        plt.text(x, y, '-80$\degree$', fontsize=16)
+        plt.text(x, y, '-80$^{\circ}$', fontsize=16)
         x,y = map1(45,-70)
-        plt.text(x, y, '-70$\degree$', fontsize=16)
+        plt.text(x, y, '-70$^{\circ}$', fontsize=16)
         x,y = map1(45,-60)
-        plt.text(x, y, '-60$\degree$', fontsize=16)
+        plt.text(x, y, '-60$^{\circ}$', fontsize=16)
         x,y = map1(45,-50)
-        plt.text(x, y, '-50$\degree$', fontsize=16)
+        plt.text(x, y, '-50$^{\circ}$', fontsize=16)
 
     # Draw the galactic plane.
     if not args.noPlane:
@@ -113,7 +114,7 @@ if __name__ == "__main__":
                        c=-np.log10(m),
                        vmin=0, vmax=4.5,
                        cmap=ps_map,
-                       s=2, lw=0, zorder=0)
+                       s=2, lw=0, zorder=0, rasterized=True)
     clb = f.colorbar(sc, orientation='vertical')
     clb.set_label('-log$_{10}$p', fontsize=20)
     
@@ -130,4 +131,5 @@ if __name__ == "__main__":
     plt.savefig(get_fig_dir()+args.outFile,
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
+    plt.savefig('/home/zgriffith/public_html/paper/all_sky_scan.pdf')
     plt.close()
