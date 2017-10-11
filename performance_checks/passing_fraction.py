@@ -19,11 +19,11 @@ plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
 fig_dir = get_fig_dir()
        
-def passing_fraction(args):
+def passing_fraction(args, alpha=False, suffix=''):
     if 'all' in args.years:
         args.years = ['2011','2012','2013','2014','2015']
 
-    labels = ['Data', 'Gamma Ray MC (E$^{-2.0}$ weighted)']
+    labels = ['Data', 'Gamma-ray MC']
     set_names = ['data', 'gammas']
     bin_width = 0.1
     bin_vals = np.arange(5.7,8.1,bin_width)
@@ -33,8 +33,8 @@ def passing_fraction(args):
     weights = {'data':[], 'gammas':[]}
     kept_weights = {'data':[], 'gammas':[]}
     for year in args.years:
-        l3_data, l3_sim = load_all_folds(year = year, or_cut = 0)
-        l4_data, l4_sim = load_all_folds(year = year, or_cut = 0.7)
+        l3_data, l3_sim = load_all_folds(year=year, or_cut=0, alpha=alpha)
+        l4_data, l4_sim = load_all_folds(year=year, or_cut=0.7, alpha=alpha)
 
         energies['data'].extend(l3_data['laputop_E'])
         kept_energies['data'].extend(l4_data['laputop_E'])
@@ -68,24 +68,13 @@ def passing_fraction(args):
             error[i] = np.sqrt(((k+1)*(k+2)) / ((n+2)*(n+3))
                                - ((k+1)**2) / ((n+2)**2))
 
-        plt.step(hist.binedges, np.append(percent[0],percent),
-                 color=colors[j], label=labels[j], ls='-')
+        lines = plt.step(hist.binedges, np.append(percent[0],percent),
+                         label=labels[j]+suffix, ls='-')
+        lc = lines[0].get_color()
         plt.errorbar(hist.binedges[:-1]+bin_width/2., percent,
-                     yerr=error, fmt='none', color=colors[j],
-                     ecolor=colors[j], ms=0)
+                     yerr=error, fmt='none', color=lc,
+                     ecolor=lc, ms=0, capthick=2)
 
-    l = plt.legend(loc='lower left')
-    plot_setter(plt.gca(),l)
-
-    plt.xlim([5.7,8])
-    plt.ylim([10**-4,1])
-    plt.yscale('log')
-    plt.xlabel('log(E/GeV)')
-    plt.ylabel('Passing Fraction')
-    plt.tight_layout()
-    plt.savefig(fig_dir+'/passing_vs_energy_all_years.png',
-                facecolor='none', dpi=300)
-    plt.close()
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -102,4 +91,20 @@ if __name__ == "__main__":
                          'will plot the combination'))
     args = p.parse_args()
 
-    passing_fraction(args)
+    labels = [' (point source selection)', ' (galactic plane selection)']
+    for i, alpha in enumerate([False,3.0]):
+        passing_fraction(args, alpha=alpha, suffix=labels[i])
+
+    l = plt.legend(loc='center left', fontsize=12)
+    plot_setter(plt.gca(),l)
+
+    plt.xlim([5.7,8])
+    plt.ylim([10**-4,1])
+    plt.yscale('log')
+    plt.xlabel('log(E$_{reco}$/GeV)')
+    plt.ylabel('Passing Fraction')
+    plt.tight_layout()
+    plt.savefig(fig_dir+'/passing_vs_energy_all_years.png',
+                facecolor='none', dpi=300)
+    plt.savefig('/home/zgriffith/public_html/paper/passing_fraction.pdf')
+    plt.close()
