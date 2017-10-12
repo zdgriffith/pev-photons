@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-##############################
-## Plot the energy spectrum ##
-## of HESS J1427-608 and    ##
-## our upper limit          ##
-##############################
+########################################################################
+# Plot the energy spectrum of HESS J1427-608
+# with this analysis' upper limit.
+########################################################################
 
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import scipy
+
 from support_functions import get_fig_dir, plot_setter
+from gamma_ray_survival import absorption_spline
+
 fig_dir = get_fig_dir()
 plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
@@ -19,9 +21,9 @@ colors = mpl.rcParams['axes.color_cycle']
 #Plot data points
 def plot_data(data, label, args):
     if 'Fermi' in label:
-        color     = 'k'
+        color = 'k'
     else:
-        color     = colors[3]
+        color = colors[3]
 
     #Convert data from ergs to eV and from E^2*Flux to Flux
     data.T[1:] *= 0.624
@@ -30,156 +32,153 @@ def plot_data(data, label, args):
     if not args.addFermi:
         data.T[1:] /= data.T[0]**2
 
-    plt.errorbar(data.T[0], data.T[1], yerr = [data.T[1] - data.T[2], data.T[3] - data.T[2]],
-                 color = color, fmt='o', capthick = 0, mec=color, label = label)
+    plt.errorbar(data.T[0], data.T[1],
+                 yerr=[data.T[1] - data.T[2], data.T[3] - data.T[2]],
+                 color=color, fmt='o', capthick=0, capsize=0,
+                 mec=color, label=label, zorder=5)
     return
 
-#Plot fits
-def plot_fit(label, args):
+#Calculate upper and lower flux bounds
+def flux_calc(E, E0, phi0, phi_unc, gamma, gamma_unc):
+    flip = np.greater(E, E0)  # Flip the index unc. below normalization.
+    return ((phi0 + phi_unc)*(E0**(-gamma))
+           *(E/E0)**(2 - (gamma + gamma_unc*(-1)**flip)))
 
-    E0    = 1
+#Plot the best fits to the source flux.
+def plot_fit(label, args, index):
 
+    E0 = 1
     if 'Fermi' in label:
-        #HESS+Fermi fit information
-        phi0      = 0.624*1.515*10**-12
-        phi_unc   = 0.2*10**-12
-        gamma     = 2.02
-        gamma_unc = 0.03
-        phi_sys   = 0
+        # HESS+Fermi fit information
+        phi0 = 0.624 * 1.515e-12
+        phi_stat = 0.2e-12
+        gamma = 2.02
+        gamma_stat = 0.03
+        phi_sys = 0
         gamma_sys = 0
-        E         = 10**(np.arange(-3.01, 4.01, 0.001))
-        mask      = (E<100000)
-        color     = 'r'
-        cfill     = [1, 0, 0, 0.5] #red
+        E = 10**(np.arange(-3.01, 4.01, 0.001))
+        color = colors[0]
+        cfill = [43/256.,131/256.,186/256., 0.5]
     else:
-        #HESS fit information
-        phi0      = 1.3*10**-12
-        phi_unc   = 0.4*10**-12
-        gamma     = 2.2
-        gamma_unc = 0.1
-        phi_sys   = 0.2*1.3*10**-12
+        # HESS fit information
+        phi0 = 1.3e-12
+        phi_stat = 0.4e-12
+        gamma = 2.2
+        gamma_stat = 0.1
+        phi_sys = 0.2 * 1.3e-12
         gamma_sys = 0.2
-        E         = 10**(np.arange(-0.01, 4.01, 0.0001))
-        mask      = (E>=1)
-        color     = colors[3]
-        cfill     = [253/256., 174/256., 97/256., 0.5] #burnt orange
+        E = 10**(np.arange(-3.01, 4.01, 0.0001))
+        color = colors[3]
+        cfill = [253/256., 174/256., 97/256., 0.5] #burnt orange
 
-    if args.addFermi:
-        phi_high = np.zeros(len(E))
-        phi_low  = np.zeros(len(E))
-        phi_sys_high = np.zeros(len(E))
-        phi_sys_low  = np.zeros(len(E))
-        phi = phi0*(E0**(-gamma))*(E/E0)**(2-gamma)
-        for i, Ei in enumerate(E):
-            if Ei < E0:
-                phi_high[i] += (phi0+phi_unc)*(Ei/E0)**(2-(gamma+gamma_unc))
-                phi_low[i]  += (phi0-phi_unc)*(Ei/E0)**(2-(gamma-gamma_unc))
-                phi_sys_high[i] += (phi0+phi_sys)*(Ei/E0)**(2-(gamma+gamma_sys))
-                phi_sys_low[i]  += (phi0-phi_sys)*(Ei/E0)**(2-(gamma-gamma_sys))
-            else:
-                phi_high[i] += (phi0+phi_unc)*(Ei/E0)**(2-(gamma-gamma_unc))
-                phi_low[i]  += (phi0-phi_unc)*(Ei/E0)**(2-(gamma+gamma_unc))
-                phi_sys_high[i] += (phi0+phi_sys)*(Ei/E0)**(2-(gamma-gamma_sys))
-                phi_sys_low[i]  += (phi0-phi_sys)*(Ei/E0)**(2-(gamma+gamma_sys))
-    else:
-        phi = phi0*(E0**(-gamma))*(E/E0)**(-gamma)
-        phi_high  = (phi0+phi_unc)*(E0**(-(gamma-gamma_unc))*(E/E0)**-(gamma-gamma_unc))
-        phi_low   = (phi0-phi_unc)*(E0**(-(gamma+gamma_unc))*(E/E0)**-(gamma+gamma_unc))
-        phi_sys_high  = (phi0+phi_sys)*(E0**(-(gamma-gamma_sys))*(E/E0)**-(gamma-gamma_sys))
-        phi_sys_low   = (phi0-phi_sys)*(E0**(-(gamma+gamma_sys))*(E/E0)**-(gamma+gamma_sys))
+    phi = flux_calc(E, E0,
+                    phi0, 0,
+                    gamma, 0)
+    phi_stat_high = flux_calc(E, E0,
+                              phi0, phi_stat,
+                              gamma, gamma_stat)
+    phi_stat_low = flux_calc(E, E0,
+                             phi0, -phi_stat,
+                             gamma, -gamma_stat)
+    phi_sys_high = flux_calc(E, E0,
+                             phi0, phi_sys,
+                             gamma, gamma_sys)
+    phi_sys_low = flux_calc(E, E0,
+                            phi0, -phi_sys,
+                            gamma, -gamma_sys)
 
-    if args.Ecut is not None:
-        phi      *= np.exp(-E/args.Ecut)
-        phi_high *= np.exp(-E/args.Ecut)
-        phi_low  *= np.exp(-E/args.Ecut)
+    for flux in [phi, phi_stat_high, phi_stat_low,
+                 phi_sys_high, phi_sys_low]:
+            if args.Ecut is not None:
+                flux *= np.exp(-E/args.Ecut)
+            if not args.no_absorption:
+                flux *= absorption_spline(args, E)
 
-    if args.no_absorption:
-        ratio  = [1]*len(E)
-    else:
-        surv   = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_energy.txt')
-        surv   = surv.T
-        spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12, surv[1], k=2)
-        ratio  = spline(E)
+    # The center line of the flux fit.
+    plt.plot(E, phi, label=label, color=color, linestyle='-', zorder=index)
 
-    plt.plot(E[mask],ratio[mask]*phi[mask], label = label, color = color, linestyle='-') #center line
+    #The statistical uncertainty bound.
+    plt.fill_between(E, phi_stat_low, phi_stat_high,
+                     color=cfill, edgecolor='none', zorder=index,
+                     rasterized = True)
 
-    #Shade statistical uncertainty
-    plt.fill_between(E[mask], ratio[mask]*phi_low[mask],ratio[mask]*phi_high[mask],
-                     color = cfill, edgecolor = 'none')
+    #The systematic uncertainty bound.
+    cfill[3] = 0.15
+    plt.plot(E, phi_sys_low, color=color, linestyle='--', zorder=index)
+    plt.plot(E, phi_sys_high, color=color, linestyle='--', zorder=index)
 
-    #Shade with lighter color for systematic error
-    if 'Fermi' not in label:
-        cfill[3] = 0.15
-        plt.fill_between(E[mask], ratio[mask]*phi_sys_low[mask],ratio[mask]*phi_sys_high[mask],
-                         color = cfill, edgecolor = 'none')
     return gamma
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-            description='Plot a skymap',
+            description='Plot the SED of HESS J1427-608',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/',
-                   help    = 'base directory for file storing')
-    p.add_argument('--addFermi', dest='addFermi', action = 'store_true',
-            default = False, help='if True, plot Fermi data and fit as well')
-    p.add_argument('--no_absorption', dest='no_absorption', action = 'store_true',
-            default = False, help='if True, flux extrapolations have no absorption')
-    p.add_argument('--Ecut', dest='Ecut', type = float, default = None,
-            help='Option for an exponential cut-off in the flux predictions')
+    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
+                   help='The base directory for file storing.')
+    p.add_argument('--addFermi', action='store_true', default=False,
+                   help='If True, plot Fermi data and combined fit.')
+    p.add_argument('--no_absorption', action='store_true', default=False,
+                   help='If True, fluxes have no absorption.')
+    p.add_argument('--Ecut', type=float, default=None,
+                   help='Option for an exponential cut-off.')
     args = p.parse_args()
 
     fig,ax = plt.subplots(1)
 
     #Data points
     hess_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_data.txt') 
-    plot_data(hess_data, 'H.E.S.S. Data', args)
-    gamma     = plot_fit('H.E.S.S. Best Fit', args)
+    plot_data(hess_data, 'H.E.S.S. data', args)
+    gamma = plot_fit('Best fit (H.E.S.S. data only)', args, 0)
     if args.addFermi:
         fermi_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_fermi_data.txt') 
-        plot_data(fermi_data, 'Fermi Data', args)
-        combined_gamma = plot_fit('H.E.S.S.+Fermi Best Fit', args)
+        plot_data(fermi_data, 'Fermi data', args)
+        combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)', args, 1)
 
     #IceCube Upper limit
-    b  = np.array([0.712*10**3,3.84*10**3]) #5% and 95% containment values in energy
-    x  = 10**np.mean(np.log10(b)) #Center point in log space to put the arrow
+    b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
+    x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
     y0 = 4.7e-20 
     if args.addFermi:
         y0 *= 10**6
-        y  = y0*((x/(10**3))**(2-gamma))
-        plt.plot(b, y0*((b/(10**3))**(2-gamma)), color = colors[4],label="IceCube 5 year 90$\%$ U.L.")
+        y = y0*((x/(10**3))**(2-gamma))
+        plt.plot(b, y0*((b/(10**3))**(2 - gamma)),
+                 color=colors[4],label="IceCube 5-year 90$\%$ upper limit")
     else:
-        y  = y0*(x/(10**3))**-gamma
-        plt.plot(b, y0*((b/(10**3))**(-gamma)), color = colors[4],label="IceCube 5 year 90$\%$ U.L.")
+        y = y0*(x/(10**3))**-gamma
+        plt.plot(b, y0*((b/(10**3))**(-gamma)),
+                 color=colors[4],label="IceCube 5-year 90$\%$ upper limit")
 
 
     #Arrow
-    plt.plot([x,x], [y,0.6*y],linewidth=2.,color=colors[4])
-    plt.scatter(x,0.6*y,marker="v",color=colors[4],s=10)
+    plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[4])
+    plt.scatter(x, 0.6*y, marker="v", color=colors[4], s=10)
 
     #Reorder legend and make the lines thicker
     handles,labels = ax.get_legend_handles_labels()
-    #handles = [handles[3], handles[0], handles[1], handles[2]]
-    #labels  = [labels[3], labels[0], labels[1], labels[2]]
+    handles = [handles[4], handles[3], handles[0], handles[1], handles[2]]
+    labels  = [labels[4], labels[3], labels[0], labels[1], labels[2]]
 
     if args.addFermi:
         plt.xlim([10**-3, 10**4])
         plt.ylim([10**-14, 10**-11])
         plt.ylabel(r'E$^2$dN/dE [cm$^{-2}$s$^{-1}$TeV]', fontweight='bold')
         outFile = 'hessJ1427_with_fermi_and_abs.pdf'
-        l       = ax.legend(handles,labels, loc='lower left', fontsize = 16, prop={'weight':'bold'})
+        l = ax.legend(handles, labels, loc='lower left',
+                      fontsize=16, prop={'weight':'bold'})
     else:
         plt.xlim([5*10**-1, 10**4])
         plt.ylim([10**-21, 0.5*10**-11])
         plt.ylabel(r'dN/dE [cm$^{-2}$s$^{-1}$TeV$^{-1}$]', fontweight='bold')
         outFile = 'hessJ1427.pdf'
-        l       = ax.legend(handles,labels, loc='upper right', fontsize = 16, prop={'weight':'bold'})
+        l = ax.legend(handles,labels, loc='upper right',
+                      fontsize=16, prop={'weight':'bold'})
 
     plot_setter(plt.gca(),l)
     plt.xlabel('Energy [TeV]', fontweight='bold')
-    plt.text(1,10**-20, 'IceCube Preliminary', color = 'r', fontsize=14) # unpublished disclaimer
+    plt.text(1,10**-20, 'IceCube Preliminary', color='r', fontsize=14)
     plt.xscale('log')
     plt.yscale('log')
     plt.tight_layout()
     plt.savefig(fig_dir+outFile)
+    plt.savefig('/home/zgriffith/public_html/paper/hess_J1427.pdf')
     plt.close()

@@ -48,6 +48,12 @@ def survival_vs_distance(args):
     plt.savefig(fig_dir+'survival_vs_distance.pdf')
     plt.close()
 
+def absorption_spline(args, E):
+    surv   = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_energy.txt')
+    surv   = surv.T
+    return scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12,
+                                                          surv[1], k=2)(E)
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot a skymap',
