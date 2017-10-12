@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
-#==============================================================================
-# File Name     : plot_HESS_region.py
-# Description   : plot a rectangular box centered on galactic plane with HESS sources
-# Creation Date : 08-24-2017
-# Last Modified : Thu 31 Aug 2017 07:28:06 PM CDT
-# Created By    : Zach Griffith 
-#==============================================================================
+########################################################################
+# Plot a rectangular box centered on galactic plane with HESS sources.
+########################################################################
 
-import argparse, copy
-import matplotlib as mpl
+import argparse
+import copy
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-import healpy as hp
-from map_w_srcs import ps_map
-from support_functions import get_fig_dir
 import matplotlib.patheffects as pe
-fig_dir = get_fig_dir()
+
+import healpy as hp
+from support_functions import get_fig_dir
+
+from map_w_srcs import ps_map
+
 plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
+fig_dir = get_fig_dir()
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 
@@ -29,7 +29,7 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
         if x>180.:
             x -= 360.
         y = 90. - np.rad2deg(y)
-        plot = (x > xmin) & (x < xmax) & (y>ymin) & (y<ymax)
+        plot = (x > xmin) & (x < xmax) & (y > ymin) & (y < ymax)
         src['x'] = x
         src['y'] = y
         src['plot'] = plot
@@ -62,11 +62,12 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
         return result
     
     ibottom = 0
-    itop = 0
+    #itop = 0
+    itop = [3,0,2,1,4,5,6,7,8,9,10,11,12]
     
-    for src in sources:
+    for index, src in enumerate(sources):
         if src['plot']:
-            ax.scatter(src['x'],src['y'], marker=src['marker'],
+            ax.scatter(src['x'], src['y'], marker=src['marker'],
                        zorder=src['zorder'],
                        color='none',
                        facecolors=src['color'],
@@ -115,12 +116,11 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                     DrawLine([xx - offset, yy], [src['x'], src['y']], ax)
                     horizontalalignment = 'right'
                 if src['position'] == 't':
-                    xx = GetFractionalX(itop,ntop,src['position'])
+                    xx = GetFractionalX(itop[index],ntop,src['position'])
                     yy = ymin + 0.75 * (ymax-ymin)
-                    itop += 1
+                    #itop += 1
                     DrawLine([xx + offset, yy], [src['x'], src['y']], ax)
                     horizontalalignment = 'left'
-                print(src['x'], src['y'], s,xx,yy)
                 ax.text(xx,yy, s.replace("~"," "),
                         color=src['color'],
                         rotation=angle,
@@ -136,42 +136,36 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                                      ]
                        )
 
-
-def main():
-    p = argparse.ArgumentParser(description="Plot map with Mercator projection")
-
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Rectangular Projection of the HESS source region',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/',
-                   help    = 'base directory for file storing')
-    p.add_argument('--mapFile', dest='mapFile', type = str,
-                   default = 'all_sky/p_value_skymap.npy',
-                   help    = 'file containing the skymap to plot')
-    p.add_argument('--outFile', dest='outFile', type = str,
-                   default = 'HESS_srcs_w_labels.pdf',
-                   help    = 'file name')
-    p.add_argument("--xsize", dest="xsize", type=int, default=1000,
-                  help="Number of X pixels, Y will be scaled acordingly.")
-    p.add_argument("-s","--scale",dest="scale",type=float,default=1.,
+    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
+                   help='base directory for file storing')
+    p.add_argument('--mapFile',
+                   default='all_sky/p_value_skymap.npy',
+                   help='file containing the skymap to plot')
+    p.add_argument('--outFile', default='HESS_srcs_w_labels.pdf',
+                   help='file name')
+    p.add_argument("--xsize", type=int, default=1000,
+                   help="Number of X pixels, Y will be scaled acordingly.")
+    p.add_argument("--scale", type=float, default=1.,
                    help="scale up or down values in map")
-    p.add_argument("--cat-labels-angle", dest="catLabelsAngle", type=float,
+    p.add_argument("--catLabelsAngle", type=float,
                    default=30., help="Oriantation of catalog labels.")
-    p.add_argument("--cat-labels-size", dest="catLabelsSize",
-                   default=12., type=float, help="Size of catalog labels.")
-    p.add_argument("--dmer", dest="dmer", type=float, default=2.,
-                  help="Interval in degrees between meridians.")
-    p.add_argument("--dpar", dest="dpar", type=float,default=1.,
-                  help="Interval in degrees between parallels")
+    p.add_argument("--catLabelsSize", type=float,
+                   default=12., help="Size of catalog labels.")
+    p.add_argument("--dmer", type=float, default=2.,
+                   help="Interval in degrees between meridians.")
+    p.add_argument("--dpar", type=float,default=1.,
+                   help="Interval in degrees between parallels")
     args = p.parse_args()
 
     # Fill 2D array
-    xmin=-180.
-    xmax=180.
-    ymax=90
-    ymin=-90
+    xmin = -180.
+    xmax = 180.
+    ymax = 90
+    ymin = -90
 
     xmin, xmax, ymin, ymax = [330,282,-5,5]
     xC = (xmin+xmax) / 2.
@@ -207,23 +201,23 @@ if __name__ == "__main__":
     skymap[np.isnan(skymap)] = hp.UNSEEN
     skymap *= args.scale
     nside1 = hp.get_nside(skymap)
-    npix   = hp.nside2npix(nside1)
+    npix = hp.nside2npix(nside1)
 
     # Set up the figure frame and coordinate rotation angle
-    coords    = ["C","G"]
+    coords = ["C","G"]
     gratcoord = "G"
 
     faspect = abs(cxmax - cxmin)/abs(ymax-ymin)
-    fysize  = 4
+    fysize = 4
     figsize = (fysize*faspect+2, fysize+2.75)
-    fig     = plt.figure(num=1,figsize=figsize)
+    fig = plt.figure(num=1,figsize=figsize)
     
-    tfig   = plt.figure(num=2,figsize=figsize)
-    rotimg  = hp.cartview(-np.log10(skymap), fig=2,coord=coords,title="",\
-                          cmap=ps_map, cbar=False,\
-                          lonra=[cxmin,cxmax],latra=[ymin,ymax],#rot=rotMap,
-                          notext=True, xsize=args.xsize,
-                          return_projected_map=True)
+    tfig = plt.figure(num=2,figsize=figsize)
+    rotimg = hp.cartview(-np.log10(skymap), fig=2, coord=coords, title="",\
+                         cmap=ps_map, cbar=False,\
+                         lonra=[cxmin,cxmax], latra=[ymin,ymax], #rot=rotMap,
+                         notext=True, xsize=args.xsize,
+                         return_projected_map=True)
     plt.close(tfig)
 
     #TeVCat sources
@@ -246,9 +240,9 @@ if __name__ == "__main__":
     sources = []
     for i, name in enumerate(f['name']):
         if i == 0 or i >2:
-            src         = copy.deepcopy(defaultsource)
-            src['RA']   = f['ra'][i]
-            src['Dec']  = f['dec'][i]
+            src = copy.deepcopy(defaultsource)
+            src['RA'] = f['ra'][i]
+            src['Dec'] = f['dec'][i]
             src['name'] = name
             sources.append(src)
         
@@ -287,4 +281,5 @@ if __name__ == "__main__":
     ax.set_ylabel('b [$^\circ$]')
     plt.gca().invert_yaxis()
     plt.savefig(fig_dir+args.outFile)
+    plt.savefig('/home/zgriffith/public_html/paper/hess_sources.pdf')
     plt.close()
