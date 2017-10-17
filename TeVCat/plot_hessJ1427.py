@@ -128,7 +128,7 @@ if __name__ == "__main__":
     #Data points
     hess_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_data.txt') 
     plot_data(hess_data, 'H.E.S.S. data', args)
-    gamma = plot_fit('Best fit (H.E.S.S. data only)', args, 0)
+    gamma = plot_fit('Best fit (H.E.S.S. data)', args, 0)
     if args.addFermi:
         fermi_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_fermi_data.txt') 
         plot_data(fermi_data, 'Fermi data', args)
