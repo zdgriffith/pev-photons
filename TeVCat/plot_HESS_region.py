@@ -63,7 +63,8 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
     
     ibottom = 0
     #itop = 0
-    itop = [3,0,2,1,4,5,6,7,8,9,10,11,12]
+    #itop = [3,0,2,1,4,5,6,7,8,9,10,11,12]
+    itop = [3,0,2,1,4,5,6,7,8,10,9,11,12,13,14]
     
     for index, src in enumerate(sources):
         if src['plot']:
@@ -239,12 +240,13 @@ if __name__ == "__main__":
     f = np.load(args.prefix+'TeVCat/hess_sources.npz')
     sources = []
     for i, name in enumerate(f['name']):
-        if i == 0 or i >2:
-            src = copy.deepcopy(defaultsource)
-            src['RA'] = f['ra'][i]
-            src['Dec'] = f['dec'][i]
-            src['name'] = name
-            sources.append(src)
+        print(name)
+        #if i == 0 or i >2:
+        src = copy.deepcopy(defaultsource)
+        src['RA'] = f['ra'][i]
+        src['Dec'] = f['dec'][i]
+        src['name'] = name
+        sources.append(src)
         
     PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax)
 

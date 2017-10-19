@@ -67,7 +67,7 @@ def plot_fit(label, args, index):
         gamma_stat = 0.1
         phi_sys = 0.2 * 1.3e-12
         gamma_sys = 0.2
-        E = 10**(np.arange(-3.01, 4.01, 0.0001))
+        E = 10**(np.arange(0, 4.01, 0.0001))
         color = colors[3]
         cfill = [253/256., 174/256., 97/256., 0.5] #burnt orange
 
