@@ -59,7 +59,7 @@ if __name__ == "__main__":
         if i in [0,4]:
             error(f, labels[i], 'primary_E', E_bins)
 
-    plt.xlabel(r'log(E$_{MC}$/GeV)')
+    plt.xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
     plt.xlim([5.7,8])
     plt.ylabel('Angular Resolution [$^{\circ}$]')
     l = plt.legend()

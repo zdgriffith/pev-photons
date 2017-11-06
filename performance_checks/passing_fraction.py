@@ -95,13 +95,13 @@ if __name__ == "__main__":
     for i, alpha in enumerate([False,3.0]):
         passing_fraction(args, alpha=alpha, suffix=labels[i])
 
-    l = plt.legend(loc='center left', fontsize=12)
+    l = plt.legend(bbox_to_anchor = (0, 0.65), loc='center left')
     plot_setter(plt.gca(),l)
 
     plt.xlim([5.7,8])
     plt.ylim([10**-4,1])
     plt.yscale('log')
-    plt.xlabel('log(E$_{reco}$/GeV)')
+    plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
     plt.savefig(fig_dir+'/passing_vs_energy_all_years.png',

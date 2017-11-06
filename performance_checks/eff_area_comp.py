@@ -13,6 +13,7 @@ from scipy.optimize import curve_fit
 
 import dashi
 from support_pandas import cut_maker, get_fig_dir
+from support_functions import plot_setter
 
 dashi.visual()
 plt.style.use('stefan')
@@ -90,9 +91,11 @@ def effective_area(logE, label, fname, w, args, index):
                                          error, args.Ebin_width,
                                          fit_func=sigmoid_flat,
                                          energy_points=x)
-        ax0.plot(fine_bins, sigmoid, color=colors[index], label=label)
+        line = ax0.plot(fine_bins, sigmoid, color=colors[index],
+                        label=label)
+                 #label=label+' Snow Heights')
 
-    return sigmoid, fine_bins
+    return sigmoid, fine_bins, line
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -110,15 +113,14 @@ if __name__ == "__main__":
                    help='log(E/GeV) bin size')
     args = p.parse_args()
 
-    labels = ['Oct 2011', 'Oct 2012', 'Oct 2013', 'Nov 2014', 'Oct 2015']
+    #labels = ['Oct 2011', 'Oct 2012', 'Oct 2013', 'Nov 2014', 'Oct 2015']
+    labels = ['2011', '2012', '2013', '2014', '2015']
 
-    width = 0.8
-    left = 0.15
-    ax0 = plt.axes([left, 0.36, width, 0.6])
-    ax1 = plt.axes([left, 0.14, width, 0.19])
-    f, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
+    #fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1], 'top':0.93})
+    fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
     comp = []
+    lines = []
     cut_args = {'standard':1, 'laputop_it':1}
     set_numbers = ['12622', '12533', '12612', '12613', '12614']
     for i, fname in enumerate(set_numbers):
@@ -128,24 +130,33 @@ if __name__ == "__main__":
         else:
             w = np.ones(len(f['Nstations']))
             
-        vals, x = effective_area(np.log10(f['primary_E']),
-                                 labels[i], fname, w, args, i)
+        vals, x, line = effective_area(np.log10(f['primary_E']),
+                                       labels[i], fname, w, args, i)
         comp.append(vals)
+        lines.append(line[0])
 
     for i, c in enumerate(comp):
         ratio = c/comp[1] 
         ax1.plot(x, ratio, color=colors[i])
 
-    ax0.xaxis.set_visible(False)
+    #ax0.xaxis.set_visible(False)
+    ax0.set_xticklabels([])
     ax0.set_xlim([5.7,8])
     ax1.set_xlim([5.7,8])
     ax0.set_ylim([0,0.55])
-    ax1.set_ylim([0,1.2])
+    ax1.set_ylim([0.2,1.2])
     ax1.grid(b=True, color='grey', linestyle='dashed')
-    ax1.set_xlabel(r'log(E$_{MC}$/GeV)')
+    ax1.set_xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
+    #ax1.set_xlabel(r'log(E$_{\textrm{MC}}$/GeV)')
     ax0.set_ylabel('Effective Area [km$^2$]')
-    ax1.set_ylabel('A$_{eff}$/A$_{eff}$(2012)', fontsize=14)
-    ax0.legend(loc='lower right')
+    ax1.set_ylabel(r'A$_{\textrm{eff}}$/A$_{\textrm{eff}}$(2012)', fontsize=14)
+    #l = ax0.legend(loc='lower right')
+    #fig.subplots_adjust(bottom=0.2)
+    l = plt.figlegend(lines, labels, loc='upper center', frameon=False,
+                   bbox_to_anchor=(0.5,  # horizontal
+                                   0.415),# vertical 
+                   ncol=5, fancybox=False)
+    plot_setter(plt.gca(),l)
     plt.savefig(fig_dir+args.outFile, facecolor='none', dpi=300)
     plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp.pdf')
     plt.close()
