@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Run background trials for checking the TS distributions.
+# Run the galactic plane correlation analysis
 ########################################################################
 
 import argparse
@@ -22,18 +22,8 @@ if __name__ == "__main__":
     p.add_argument('--prefix', type=str,
                    default='/data/user/zgriffith/pev_photons/',
                    help='Base directory for file storing.')
-    p.add_argument('--runTrial', action='store_true', default=False,
-                   help='If True, run as a background trial.')
-    p.add_argument('--verbose', action='store_true', default=False,
-                   help='if True, print progress')
-    p.add_argument('--job', type=int, default=0,
-                   help='Job number for running on cluster')
     p.add_argument('--name', type = str, default='fermi_pi0',
                    help='name of the template')
-    p.add_argument('--nTrials', type=int, default=100,
-                   help='Number of trials to run with this job')
-    p.add_argument('--n_inj', type=int, default=0,
-                   help='Number of events to inject.')
     p.add_argument("--alpha", type=float, default=3.0,
                     help="Power law index")
     args = p.parse_args()
@@ -74,36 +64,12 @@ if __name__ == "__main__":
                                     sinDec_range=sinDec_range)
 
         year_llh = TemplateLLH(exp, mc, livetime,
-                               scramble=args.runTrial,
+                               scramble=False,
                                llh_model=llh_model[year],
                                template=template)
 
         template_llh.add_sample(year, year_llh)
 
-    if args.n_inj:
-        inj = TemplateInjector(template=template_years,
-                               gamma=args.alpha,
-                               E0=1000,
-                               Ecut=None,
-                               seed=1)
-        inj.fill(exp_years, mc_years, lt_years)
-
-    if args.runTrial:
-        trials = np.zeros(args.nTrials)
-        for trial in range(args.nTrials):
-            if args.verbose:
-                print(trial)
-            if args.n_inj:
-                ni, sample = inj.sample(mean_signal=args.n_inj,
-                                        poisson=False).next()
-                trials[trial] = template_llh.fit_template_source(inject=sample,
-                                                                 scramble=True)[0]
-            else:
-                trials[trial] = template_llh.fit_template_source(scramble=True)[0]
-            if float(trial+1)%100 == 0:
-                np.save('%s/galactic_plane/trials/%s_job_%s.npy' % (args.prefix, args.name, args.job), trials)
-        np.save('%s/galactic_plane/trials/%s_job_%s.npy' % (args.prefix, args.name, args.job), trials)
-    else:
-        true = template_llh.fit_template_source(scramble=False)[0]
-        print('True Stacking TS: '+str(true))
-        np.save(args.prefix+args.name+'_TS.npy', true)
+    true = template_llh.fit_template_source(scramble=False)[0]
+    print('True Stacking TS: '+str(true))
+    np.save(args.prefix+args.name+'_TS.npy', true)

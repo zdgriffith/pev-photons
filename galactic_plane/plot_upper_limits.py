@@ -33,7 +33,7 @@ if __name__ == "__main__":
     conv = (x**2)
     fluxes = {'Old Skylab (broken)': 3.83e-9,
               'Old Skylab (fixed)': 8.33986539132e-10,
-              'Fermi pi$^0$': (2.47e-22)*conv,
+              'Fermi pi$^0$': (2.61e-22)*conv,
               '5$^{\circ}$ box': (3.42e-22)*conv,
               'Ingelman-Thunman': (1.54e-22)*conv}
               
