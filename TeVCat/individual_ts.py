@@ -11,10 +11,8 @@ import pandas as pd
 from support_pandas import get_fig_dir, livetimes
 fig_dir = get_fig_dir()
 
-from skylab import psLLH
-from skylab.psLLH import PointSourceLLH,MultiPointSourceLLH
-from skylab.ps_injector import PointSourceInjector
-from skylab.ps_model import ClassicLLH, EnergyLLH
+from skylab_comp.ps_llh import PointSourceLLH, MultiPointSourceLLH
+from skylab_comp.llh_models import ClassicLLH, EnergyLLH
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -32,11 +30,8 @@ if __name__ == "__main__":
     energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
 
     #Initialization of multi-year LLH object
-    psllh = MultiPointSourceLLH(ncpu      = 20,
-                                mode      = 'box',
-                                delta_ang = np.radians(10*0.4), #Recommended ~10 times ang_res
-                                nside     = 128
-                                )
+    psllh = MultiPointSourceLLH(ncpu=20)
+
     tot_mc    = dict()
     llh_model = dict()
 
@@ -57,7 +52,6 @@ if __name__ == "__main__":
                                llh_model = llh_model[year],
                                mode      = 'box',
                                delta_ang = np.radians(10*0.4), #Recommended ~10 times ang_res
-                               nside     = 128,
                                )
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 

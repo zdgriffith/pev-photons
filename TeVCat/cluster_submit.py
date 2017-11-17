@@ -11,7 +11,7 @@ if __name__ == "__main__":
             default=False,
             help='Option for running test off cluster')
     p.add_argument('--nJobs', dest='nJobs', type=int,
-            default='100',
+            default='1000',
             help='max jobs running on cluster')
     p.add_argument('--nTrials', dest='nTrials', type=int,
             default='10',

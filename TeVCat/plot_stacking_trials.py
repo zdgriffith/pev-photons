@@ -24,13 +24,8 @@ if __name__ == "__main__":
                    help = 'width of bin in TS space')
     args = p.parse_args()
 
-    stack_true = np.load(args.prefix+'/TeVCat/stacking_TS.npy') # observed TS
-    job_list   = glob.glob(args.prefix+'/TeVCat/stacking_trials/*') # background trials
-
-    bg_trials = []
-    for job in job_list:
-        job_ts = np.load(job)
-        bg_trials.extend(job_ts)
+    stack_true = 1.75195501641
+    bg_trials  = np.load(args.prefix+'TeVCat/stacking_trials.npy')
 
     Ntrials   = float(len(bg_trials))
 
