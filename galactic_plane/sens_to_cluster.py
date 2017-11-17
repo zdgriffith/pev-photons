@@ -10,12 +10,12 @@ import argparse as ap
 import numpy as np
 import pandas as pd
 
-from skylab_comp.sensitivity_utils import estimate_sensitivity
+from skylab.sensitivity_utils import estimate_sensitivity
 from support_pandas import livetimes
-from skylab_comp.template import Template
-from skylab_comp.template_llh import TemplateLLH, MultiTemplateLLH
-from skylab_comp.template_injector import TemplateInjector
-from skylab_comp.llh_models import ClassicLLH, EnergyLLH
+from skylab.template import Template
+from skylab.template_llh import TemplateLLH, MultiTemplateLLH
+from skylab.template_injector import TemplateInjector
+from skylab.llh_models import ClassicLLH, EnergyLLH
 
 def sensitivity(args):
     sinDec_range = [-1, -0.8]

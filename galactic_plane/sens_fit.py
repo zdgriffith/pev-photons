@@ -9,11 +9,11 @@ from glob import glob
 import argparse as ap
 
 from support_pandas import livetimes
-from skylab_comp.sensitivity_utils import fit
-from skylab_comp.template import Template
-from skylab_comp.template_llh import TemplateLLH, MultiTemplateLLH
-from skylab_comp.template_injector import TemplateInjector
-from skylab_comp.llh_models import ClassicLLH, EnergyLLH
+from skylab.sensitivity_utils import fit
+from skylab.template import Template
+from skylab.template_llh import TemplateLLH, MultiTemplateLLH
+from skylab.template_injector import TemplateInjector
+from skylab.llh_models import ClassicLLH, EnergyLLH
 
 def sensitivity(args):
     sinDec_range = [-1, -0.8]

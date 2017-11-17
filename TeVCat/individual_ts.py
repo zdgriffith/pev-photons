@@ -11,8 +11,8 @@ import pandas as pd
 from support_pandas import get_fig_dir, livetimes
 fig_dir = get_fig_dir()
 
-from skylab_comp.ps_llh import PointSourceLLH, MultiPointSourceLLH
-from skylab_comp.llh_models import ClassicLLH, EnergyLLH
+from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
+from skylab.llh_models import ClassicLLH, EnergyLLH
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

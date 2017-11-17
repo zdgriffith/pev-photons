@@ -10,8 +10,7 @@ import re
 import argparse as ap
 import numpy as np
 
-from skylab_comp.template import Template
-
+from skylab.template import Template
 
 def template_builder(args):
     """Build the template for a given year."""
