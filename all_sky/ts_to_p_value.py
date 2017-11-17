@@ -8,6 +8,7 @@
 import argparse
 import healpy as hp
 import numpy as np
+from glob import glob
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -17,31 +18,33 @@ if __name__ == "__main__":
                    default='/data/user/zgriffith/pev_photons/',
                    help='The base directory for file storing.')
     p.add_argument('--inFile', type=str,
-                   default='all_sky/skymap.npy',
+                   default='all_sky/comparison/skymap_512.npy',
                    help='The output file name.')
     p.add_argument('--outFile', type=str,
-                   default='all_sky/p_value_skymap.npy',
+                   default='all_sky/comparison/p_value_skymap.npy',
                    help='The output file name.')
     args = p.parse_args()
 
-    # File which contains uniqe the pixels of the skymap which have
+    # File which contains the pixels of the skymap which have
     # unique declination values.
-    dec_pix = np.load('/data/user/zgriffith/all_sky/dec_vals.npz')
+    dec_pix = np.load('/data/user/zgriffith/pev_photons/all_sky/dec_values_512.npz')
     pixels  = dec_pix['pix_list']
 
     ts_map = np.load(args.prefix + args.inFile)
-    n_jobs = len(pixels) 
+    n_decs = len(pixels) 
     pval_map = np.ones_like(ts_map)
     
     # For each unique declination, calculate the fraction of bg trials
     # which have a TS value above the true value.
-    n_trials = 500000
-    for job in range(n_jobs):
-        a = np.load(args.prefix+'dec_jobs/dec_TS_job_%s.npz' % float(job))
-        trials = a['indv_trials'][0:n_trials]
-        pix = pixels[job]
-        for p in pix:
-            above_true  = np.greater_equal(trials, ts_map[p])
-            pval_map[p] = np.sum(above_true)/float(len(trials))
+    for dec_i in range(n_decs):
+        print(dec_i)
+        f_list = glob(args.prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
+        trials = []
+        for f in f_list:
+            a = np.load(f)
+            trials.extend(a)
+        pix = pixels[dec_i]
+        above_true  = np.greater_equal(trials, ts_map[pix][:, np.newaxis])
+        pval_map[pix] = np.sum(above_true, axis=1)/float(len(trials))
 
     np.save(args.prefix + args.outFile, pval_map)

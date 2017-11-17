@@ -9,11 +9,14 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 
+import logging
+
 from support_pandas import get_fig_dir, livetimes
-from skylab import psLLH
-from skylab.psLLH import PointSourceLLH, MultiPointSourceLLH
-from skylab.ps_injector import PointSourceInjector
-from skylab.ps_model import ClassicLLH, EnergyLLH
+from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
+from skylab.llh_models import ClassicLLH, EnergyLLH
+
+logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
+logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
 
 fig_dir = get_fig_dir()
 plt.style.use('mystyle')
@@ -35,10 +38,7 @@ if __name__ == "__main__":
     energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
 
     # Initialization of multi-year LLH object.
-    psllh = MultiPointSourceLLH(ncpu=20,
-                                mode='box',
-                                delta_ang=np.radians(10*0.4),  # ~10x sigma
-                                nside=128)
+    psllh = MultiPointSourceLLH(ncpu=20)
     tot_mc = dict()
     llh_model = dict()
 
@@ -56,7 +56,6 @@ if __name__ == "__main__":
         year_psllh = PointSourceLLH(exp, mc, livetime,
                                     ncpu=20,
                                     mode='box',
-                                    nside=128,
                                     scramble=False,
                                     llh_model=llh_model[year],
                                     delta_ang=np.radians(10*0.4))
@@ -64,8 +63,7 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    for i, scan in enumerate(psllh.all_sky_scan(decRange=[np.radians(-85.),
-                                                np.arcsin(-0.8)])):
+    for i, scan in enumerate(psllh.all_sky_scan()):
         if i > 0:
             m = scan[0]['TS']
             break
