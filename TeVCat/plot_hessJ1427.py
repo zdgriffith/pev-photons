@@ -135,23 +135,23 @@ if __name__ == "__main__":
         combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)', args, 1)
 
     #IceCube Upper limit
-    b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
+    b = np.array([0.712*10**6,3.84*10**6])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
-    y0 = 4.7e-20 
+    y0 = (7.0486191425248695e-10)*(1e-3)
     if args.addFermi:
-        y0 *= 10**6
-        y = y0*((x/(10**3))**(2-gamma))
-        plt.plot(b, y0*((b/(10**3))**(2 - gamma)),
+        y = y0*(x**(2-gamma))
+        print(y)
+        plt.plot(b*1e-3, y0*b**(2 - gamma),
                  color=colors[4],label="IceCube 5-year 90$\%$ upper limit")
     else:
-        y = y0*(x/(10**3))**-gamma
-        plt.plot(b, y0*((b/(10**3))**(-gamma)),
+        y = y0*x**(-gamma)
+        plt.plot(b*1e-3, y0*b**(-gamma),
                  color=colors[4],label="IceCube 5-year 90$\%$ upper limit")
 
 
     #Arrow
-    plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[4])
-    plt.scatter(x, 0.6*y, marker="v", color=colors[4], s=10)
+    plt.plot([x*1e-3, x*1e-3], [y, 0.6*y], linewidth=2, color=colors[4])
+    plt.scatter(x*1e-3, 0.6*y, marker="v", color=colors[4], s=10)
 
     #Reorder legend and make the lines thicker
     handles,labels = ax.get_legend_handles_labels()
