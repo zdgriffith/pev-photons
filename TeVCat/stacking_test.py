@@ -35,8 +35,9 @@ if __name__ == "__main__":
 
     sinDec_range = [-1.,-0.8]
     sinDec_bins  = np.arange(-1., -0.799, 0.01)
-    energy_range = [5.5,8.5] # log(E/GeV)
-    energy_bins  = [np.linspace(5.5,8.5,30), sinDec_bins]
+    sinDec_bins  = np.linspace(-1.,-0.8, 21)
+    energy_range = [5.7,8] # log(E/GeV)
+    energy_bins  = [np.linspace(5.7,8,24), sinDec_bins]
 
     psllh = MultiPointSourceLLH(ncpu=20)
     tot_mc = dict()

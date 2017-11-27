@@ -137,7 +137,7 @@ if __name__ == "__main__":
     #IceCube Upper limit
     b = np.array([0.712*10**6,3.84*10**6])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
-    y0 = (7.0486191425248695e-10)*(1e-3)
+    y0 = (6.7711930683032905e-10)*(1e-3)
     if args.addFermi:
         y = y0*(x**(2-gamma))
         print(y)

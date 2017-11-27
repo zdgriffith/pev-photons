@@ -28,7 +28,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     dec_bins = np.arange(-1., -0.799, 0.01)
-    energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
+    energy_bins = [np.linspace(5.7,8,24), dec_bins]
 
     # Initialization of multi-year LLH object.
     psllh = MultiPointSourceLLH(ncpu=20)

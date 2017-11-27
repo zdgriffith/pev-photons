@@ -18,7 +18,7 @@ if __name__ == "__main__":
                    default='/data/user/zgriffith/pev_photons/',
                    help='The base directory for file storing.')
     p.add_argument('--inFile', type=str,
-                   default='all_sky/dec_values_512.npy',
+                   default='all_sky/dec_values_512.npz',
                    help='The output file name.')
     p.add_argument('--outFile', type=str,
                    default='TeVCat/p_value_hess_sources.npy',
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     src_pix = hp.ang2pix(512,
                          np.pi/2. - np.radians(sources['dec']),
                          np.radians(sources['ra']))
-    ts = np.load(args.prefix+'TeVCat/true_source_pvalues_comp.npy')
+    ts = np.load(args.prefix+'TeVCat/true_source_pvalues.npy')
     p_val = np.zeros(len(ts))
     
     for dec_i in range(n_decs):
