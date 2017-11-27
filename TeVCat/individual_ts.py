@@ -22,7 +22,7 @@ if __name__ == "__main__":
                    default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--outFile', dest='outFile', type = str,
-                   default = 'TeVCat/true_source_pvalues.npy',
+                   default = 'TeVCat/hess_sources_ts.npy',
                    help    = 'file name')
     args = p.parse_args()
 

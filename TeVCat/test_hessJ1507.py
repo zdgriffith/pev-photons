@@ -23,9 +23,6 @@ if __name__ == "__main__":
     p.add_argument('--prefix', dest='prefix', type = str,
                    default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
-    p.add_argument('--outFile', dest='outFile', type = str,
-                   default = 'TeVCat/true_source_pvalues.npy',
-                   help    = 'file name')
     args = p.parse_args()
 
     dec_bins    = np.arange(-1., -0.799, 0.01)

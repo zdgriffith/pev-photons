@@ -21,7 +21,7 @@ if __name__ == "__main__":
                    default='all_sky/dec_values_512.npz',
                    help='The output file name.')
     p.add_argument('--outFile', type=str,
-                   default='TeVCat/p_value_hess_sources.npy',
+                   default='TeVCat/hess_sources_p_values.npy',
                    help='The output file name.')
     args = p.parse_args()
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     src_pix = hp.ang2pix(512,
                          np.pi/2. - np.radians(sources['dec']),
                          np.radians(sources['ra']))
-    ts = np.load(args.prefix+'TeVCat/true_source_pvalues.npy')
+    ts = np.load(args.prefix+'TeVCat/hess_sources_ts.npy')
     p_val = np.zeros(len(ts))
     
     for dec_i in range(n_decs):
