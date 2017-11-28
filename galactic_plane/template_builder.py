@@ -16,7 +16,7 @@ def template_builder(args):
     """Build the template for a given year."""
     rad2deg = 180./np.pi
 
-    exp = np.load(args.prefix + '/datasets/' + args.year + '_exp_diffuse.npy')
+    exp = np.load(args.prefix+'/datasets/'+args.year+'_exp_diffuse.npy')
     mc  = np.load(args.prefix+'/datasets/'+args.year+'_mc_diffuse.npy')
 
     if args.mcBackground:
@@ -34,7 +34,7 @@ def template_builder(args):
     os.system('mkdir -p ' + output)
     sinDec_min = -1
     sinDec_max = -0.8
-    sinDec_bins            = np.arange(-1., -0.799, 0.01)
+    sinDec_bins = np.arange(-1., -0.799, 0.01)
 
     mask = (mc['sinDec'] > sinDec_min) & (mc['sinDec'] < sinDec_max)
     mc = mc[mask]
