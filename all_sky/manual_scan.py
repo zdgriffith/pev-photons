@@ -18,7 +18,6 @@ from support_pandas import get_fig_dir, livetimes
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 from skylab.llh_models import ClassicLLH, EnergyLLH
 
-logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
 
 fig_dir = get_fig_dir()
@@ -42,11 +41,11 @@ if __name__ == "__main__":
                    help='The output file name.')
     args = p.parse_args()
 
-    dec_bins = np.arange(-1., -0.799, 0.01)
-    energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
+    dec_bins = np.linspace(-1., -0.8, 21)
+    energy_bins = [np.linspace(5.7,8,24), dec_bins]
 
     # Initialization of multi-year LLH object.
-    psllh = MultiPointSourceLLH(ncpu=10)
+    psllh = MultiPointSourceLLH(ncpu=20)
     tot_mc = dict()
     llh_model = dict()
 
@@ -59,12 +58,12 @@ if __name__ == "__main__":
         mc['dec'] = np.arcsin(mc['sinDec'])
 
         llh_model[year] = EnergyLLH(twodim_bins=energy_bins,
-                                    twodim_range=[[5.5,8.5],[-1,-0.8]],
+                                    twodim_range=[[5.7,8],[-1,-0.8]],
                                     sinDec_bins=dec_bins,
                                     sinDec_range=[-1,-0.8])
 
         year_psllh = PointSourceLLH(exp, mc, livetime,
-                                    ncpu=10,
+                                    ncpu=20,
                                     mode='box',
                                     scramble=False,
                                     llh_model=llh_model[year],
@@ -73,12 +72,19 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    nside = 128 
-    npix  = hp.nside2npix(nside)
+    nside = 512
+    npix = hp.nside2npix(nside)
     m = np.zeros(npix)
     theta, ra = hp.pix2ang(nside, range(npix))
     dec = np.pi/2. - theta
     mask = np.less(np.sin(dec), -0.8)
+
+    for pix in np.arange(npix)[mask]:
+        m[pix] = psllh.fit_source(ra[pix],dec[pix], scramble = False)[0]
+
+    np.save(args.prefix+'/all_sky/skymap_%s_manual.npy' % nside, m)
+    '''
+    np.save('/data/user/zgriffith/pev_photons/all_sky/manual_mask.npy', mask)
 
     ts = np.zeros(npix, dtype=np.float)
     xmin = np.zeros_like(ts, dtype=[(p, np.float) for p in psllh.params])
@@ -87,4 +93,5 @@ if __name__ == "__main__":
         dtype=xmin.dtype)
     ts, xmin = psllh._scan(ra[mask], dec[mask], ts, xmin, mask)
 
-    np.save(args.prefix+'/all_sky/comparison/skymap_%s.npy' % nside, ts)
+    np.save(args.prefix+'/all_sky/skymap_%s_new.npy' % nside, ts)
+    '''

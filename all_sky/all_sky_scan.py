@@ -34,8 +34,8 @@ if __name__ == "__main__":
                    help='The output file name.')
     args = p.parse_args()
 
-    dec_bins = np.arange(-1., -0.799, 0.01)
-    energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
+    dec_bins = np.linspace(-1., -0.8, 21)
+    energy_bins = [np.linspace(5.7,8,24), dec_bins]
 
     # Initialization of multi-year LLH object.
     psllh = MultiPointSourceLLH(ncpu=20)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         mc  = np.load(args.prefix+'/datasets/'+year+'_mc_ps.npy')
 
         llh_model[year] = EnergyLLH(twodim_bins=energy_bins,
-                                    twodim_range=[[5.5,8.5],[-1,-0.8]],
+                                    twodim_range=[[5.7,8],[-1,-0.8]],
                                     sinDec_bins=dec_bins,
                                     sinDec_range=[-1,-0.8])
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    for i, scan in enumerate(psllh.all_sky_scan()):
+    for i, scan in enumerate(psllh.all_sky_scan(nside=256, follow_up_factor=1)):
         if i > 0:
             m = scan[0]['TS']
             break
