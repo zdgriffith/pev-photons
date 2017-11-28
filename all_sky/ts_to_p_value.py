@@ -18,10 +18,10 @@ if __name__ == "__main__":
                    default='/data/user/zgriffith/pev_photons/',
                    help='The base directory for file storing.')
     p.add_argument('--inFile', type=str,
-                   default='all_sky/comparison/skymap_512.npy',
-                   help='The output file name.')
+                   default='all_sky/skymap.npy',
+                   help='The input file name.')
     p.add_argument('--outFile', type=str,
-                   default='all_sky/comparison/p_value_skymap.npy',
+                   default='all_sky/p_value_skymap.npy',
                    help='The output file name.')
     args = p.parse_args()
 

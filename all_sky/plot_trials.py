@@ -29,7 +29,7 @@ if __name__ == "__main__":
                    help='width of bin in TS space')
     args = p.parse_args()
 
-    stack_true = 16.32
+    stack_true = 20.7
     job_list = glob.glob('/data/user/zgriffith/all_sky/full_*.npy')
 
     bg_trials = []

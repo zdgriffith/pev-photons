@@ -24,7 +24,8 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     dec_bins    = np.arange(-1., -0.799, 0.01)
-    energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
+    #energy_bins = [np.linspace(5.5,8.5,30), dec_bins]
+    energy_bins = [np.linspace(5.7,8,24), dec_bins]
 
     #Initialization of multi-year LLH object
     psllh = MultiPointSourceLLH(ncpu=20)
@@ -52,5 +53,8 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    a = psllh.fit_source(np.radians(214.7),np.radians(-70.9), scramble = False)
+    # 20.7002071899
+    dec = -73.4039433
+    ra  = 148.42541436
+    a = psllh.fit_source(np.radians(ra),np.radians(dec), scramble = False)
     print(a)
