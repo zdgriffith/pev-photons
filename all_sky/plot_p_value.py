@@ -123,9 +123,11 @@ if __name__ == "__main__":
     plt.text(x, y, 'IceCube Preliminary',
              color='r', fontsize=14)
 
-    # Hightlights the hotspot in the original result.
-    x,y = map1(214.7, -70.9)
-    plt.scatter(x, y, marker='o', s=2**7, lw=1,
+    # Hightlights the hotspot of the skymap
+    dec = -73.4039433
+    ra =  148.42541436
+    x,y = map1(ra, dec)
+    plt.scatter(x, y, marker='o', s=2**8, lw=1,
                 edgecolor='g', facecolor='none')
     plt.legend()
     plt.savefig(get_fig_dir()+args.outFile,
