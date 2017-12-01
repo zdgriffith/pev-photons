@@ -15,6 +15,7 @@ import healpy as hp
 from support_functions import get_fig_dir
 
 from map_w_srcs import ps_map
+from matplotlib import cm
 
 plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
@@ -50,7 +51,7 @@ def plot_events(pf, frot):
     clb = plt.colorbar(sc, orientation='vertical')
     clb.set_label('logE', fontsize=20)
 
-def plot_contour(pf, frot):
+def plot_contour(pf, frot, ax):
     cRot = hp.Rotator(coord=["C",coords[-1]])
     a = np.loadtxt(pf+'/TeVCat/hessJ1507_contour.txt')
     ra, dec = a.T
@@ -60,17 +61,24 @@ def plot_contour(pf, frot):
         if x_i>180.:
             x[i] -= 360.
     y = 90. - np.rad2deg(y)
-    plt.plot(x,y, color = 'k')
+    ax.plot(x,y, color = 'k', zorder = 10)
 
-def plot_hotspot():
-    ax = plt.gca()
+def plot_hotspot(ax):
     circle = plt.Circle((-42.65, -3.42), 0.4, color='k', lw = 1, fill=False)
     ax.add_artist(circle)
 
-def plot_skymap():
+def plot_skymap(args, ax):
+    skymap = np.load(args.prefix+args.mapFile)
+    rotimg = hp.cartview(-np.log10(skymap), fig=2, title="",\
+                         cmap=cm.gist_rainbow_r, cbar=False,\
+                         lonra=[cxmin,cxmax], latra=[ymin,ymax], #rot=rotMap,
+                         notext=True, xsize=args.xsize,
+                         return_projected_map=True)
     imgp = ax.imshow(rotimg,extent=[cxmax, cxmin, ymax,ymin],\
-                     vmin=0,vmax=4.5,cmap=ps_map)
+                     vmin=-2,vmax=14, zorder = -2,
+                     cmap=cm.gist_rainbow_r)
 
+    return ax
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Zoomed region on hessj1507 with events',
@@ -78,7 +86,7 @@ if __name__ == "__main__":
     p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
                    help='base directory for file storing')
     p.add_argument('--mapFile',
-                   default='all_sky/p_value_skymap.npy',
+                   default='galactic_plane/co_hp_map.npy',
                    help='file containing the skymap to plot')
     p.add_argument('--outFile', default='HESSJ1507_zoom.pdf',
                    help='file name')
@@ -98,8 +106,7 @@ if __name__ == "__main__":
     ymax = 90
     ymin = -90
 
-    xmin, xmax, ymin, ymax = [330,282,-5,5]
-    #xmin, xmax, ymin, ymax = [320,314,-5.5,-1.5]
+    xmin, xmax, ymin, ymax = [320,314,-5.5,-1.5]
     xC = (xmin+xmax) / 2.
     yC = (ymin+ymax) / 2.
 
@@ -153,12 +160,12 @@ if __name__ == "__main__":
             xtlbs.append('%g'%(cval))
     yts = np.arange(np.floor(ymin), np.ceil(ymax+args.dpar), args.dpar)[1:-1]
 
-    plot_events(args.prefix, frot)
-    plot_contour(args.prefix, frot)
-    plot_hotspot()
-    #plot_skymap()
-
     ax = plt.gca()
+    plot_events(args.prefix, frot)
+    #plot_skymap(args, ax)
+    plot_contour(args.prefix, frot, ax)
+    plot_hotspot(ax)
+
     ax.grid(color='k', alpha=0.2)
     ax.xaxis.set_ticks(xts)
     ax.xaxis.set_ticklabels(xtlbs)
