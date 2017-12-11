@@ -36,8 +36,8 @@ def plot_limit(x,y, unc = None, label = '', color = 'k'):
 
 if __name__ == "__main__":
     
-    x = 2*10**6/(2*np.pi*0.2)
-    conv = (x**2)
+    x = 2*10**6
+    conv = (x**2)/(2*np.pi*0.2)
     fluxes = {
               'Fermi pi$^0$': (2.61e-22)*conv,
               '5$^{\circ}$ box': (3.42e-22)*conv,
