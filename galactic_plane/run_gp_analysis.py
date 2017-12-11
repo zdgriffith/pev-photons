@@ -29,7 +29,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     sinDec_range = [-1, -0.8]
-    sinDec_bins = np.arange(-1.0, -0.799, 0.01)
+    sinDec_bins = np.linspace(-1.0, -0.8, 21)
     energy_range = [5.7, 8.0]
     energy_bins = [np.linspace(5.7,8,24), sinDec_bins]
 
