@@ -6,9 +6,10 @@
 ########################################################################
 
 import argparse
-import healpy as hp
 import numpy as np
 from glob import glob
+
+import healpy as hp
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -18,14 +19,14 @@ if __name__ == "__main__":
                    default='/data/user/zgriffith/pev_photons/',
                    help='The base directory for file storing.')
     p.add_argument('--inFile', type=str,
-                   default='all_sky/dec_values_512.npz',
-                   help='The output file name.')
+                   default='hess_sources_fit_results.npy',
+                   help='The input file name.')
     p.add_argument('--outFile', type=str,
-                   default='TeVCat/hess_sources_p_values.npy',
+                   default='hess_sources_p_values.npy',
                    help='The output file name.')
     args = p.parse_args()
 
-    dec_pix = np.load(args.prefix+args.inFile)
+    dec_pix = np.load(args.prefix+'all_sky/dec_values_512.npz')
     pixels = dec_pix['pix_list']
     n_decs = len(pixels) 
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     src_pix = hp.ang2pix(512,
                          np.pi/2. - np.radians(sources['dec']),
                          np.radians(sources['ra']))
-    ts = np.load(args.prefix+'TeVCat/hess_sources_ts.npy')
+    ts = np.load(args.prefix+'TeVCat/'+args.inFile)['TS']
     p_val = np.zeros(len(ts))
     
     for dec_i in range(n_decs):
@@ -50,4 +51,4 @@ if __name__ == "__main__":
                 p_val[i] = np.sum(np.greater(trials,ts[i]))/float(len(trials))
 
     print(p_val)
-    np.save(args.prefix + args.outFile, p_val)
+    np.save(args.prefix + 'TeVCat/'+args.outFile, p_val)
