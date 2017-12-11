@@ -24,11 +24,6 @@ fig_dir = get_fig_dir()
 plt.style.use('mystyle')
 colors = matplotlib.rcParams['axes.color_cycle']
 
-def fill_map(vals, indices, npix):
-    m = np.zeros(npix)
-    m[indices] = vals
-    return m
-    
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Create an all sky TS map.',
@@ -39,6 +34,8 @@ if __name__ == "__main__":
     p.add_argument('--outFile', type=str,
                    default='all_sky/skymap.npy',
                    help='The output file name.')
+    p.add_argument('--extension', type=float, default=0,
+                   help='Spatial extension to source hypothesis in degrees.')
     args = p.parse_args()
 
     dec_bins = np.linspace(-1., -0.8, 21)
@@ -79,19 +76,15 @@ if __name__ == "__main__":
     dec = np.pi/2. - theta
     mask = np.less(np.sin(dec), -0.8)
 
-    for pix in np.arange(npix)[mask]:
-        m[pix] = psllh.fit_source(ra[pix],dec[pix], scramble = False)[0]
-
-    np.save(args.prefix+'/all_sky/skymap_%s_manual.npy' % nside, m)
-    '''
-    np.save('/data/user/zgriffith/pev_photons/all_sky/manual_mask.npy', mask)
-
     ts = np.zeros(npix, dtype=np.float)
     xmin = np.zeros_like(ts, dtype=[(p, np.float) for p in psllh.params])
     xmin = np.array(zip(
-        *[hp.get_interp_val(xmin[p], theta, ra) for p in psllh.params]),
-        dtype=xmin.dtype)
-    ts, xmin = psllh._scan(ra[mask], dec[mask], ts, xmin, mask)
-
-    np.save(args.prefix+'/all_sky/skymap_%s_new.npy' % nside, ts)
-    '''
+              *[hp.get_interp_val(xmin[p], theta, ra) for p in psllh.params]),
+              dtype=xmin.dtype)
+    if args.extension:
+        ts, xmin = psllh._scan(ra[mask], dec[mask], ts,
+                               xmin, mask, src_extension=np.radians(ext))
+        np.save(args.prefix+'/all_sky/skymap_ext_%s.npy' % args.extension, ts)
+    else:
+        ts, xmin = psllh._scan(ra[mask], dec[mask], ts, xmin, mask)
+        np.save(args.prefix+'/all_sky/skymap.npy', ts)

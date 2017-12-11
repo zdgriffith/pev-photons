@@ -15,7 +15,6 @@ from support_pandas import get_fig_dir, livetimes
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 from skylab.llh_models import ClassicLLH, EnergyLLH
 
-logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
 
 fig_dir = get_fig_dir()
@@ -63,7 +62,7 @@ if __name__ == "__main__":
         psllh.add_sample(year, year_psllh)
         tot_mc[i] = mc 
 
-    for i, scan in enumerate(psllh.all_sky_scan(nside=256, follow_up_factor=1)):
+    for i, scan in enumerate(psllh.all_sky_scan()):
         if i > 0:
             m = scan[0]['TS']
             break
