@@ -12,7 +12,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap, LogNorm
 from matplotlib import cm
 
-import sky
+plt.style.use('stefan')
 from mpl_toolkits.basemap import Basemap
 from support_functions import get_fig_dir
 from colormaps import cmaps
@@ -33,17 +33,21 @@ if __name__ == "__main__":
                    help='If True, do not draw grid lines.')
     args = p.parse_args()
 
-    filename = args.prefix+'/galactic_plane/source_templates/'+args.mapName+'.npy'
+    filename = args.prefix+'/galactic_plane/2012/'+args.mapName+'_exp.npy'
     m = np.load(filename)
+    m = m.item()['signal_x_acceptance_map']
     m = hp.ud_grade(m,nside_out=512)
     nside = hp.npix2nside(len(m))
     npix  = hp.nside2npix(nside)
     DEC, RA = hp.pix2ang(nside, range(len(m)))
 
     #Conversion from galactic coords if needed
-    DEC, RA = hp.Rotator(coord = ['G','C'], rot = [0, 0])(DEC, RA)
+    cRot = hp.Rotator(coord = ['G','C'], rot = [0, 0])
+    DEC, RA = cRot(DEC, RA)
 
+    #f = plt.figure(num=1, figsize=(12,8))
     f = plt.figure(num=1, figsize=(12,8))
+    #f = plt.figure(num=1)
     f.clf()
     ax=f.add_subplot(1,1,1,axisbg='white')
  
@@ -61,44 +65,47 @@ if __name__ == "__main__":
                            fontsize=16)
 
         x,y = map1(45,-80)
-        plt.text(x, y, '-80$\degree$', fontsize=16)
+        plt.text(x, y, '-80$^{\circ}$', fontsize=16)
         x,y = map1(45,-70)
-        plt.text(x, y, '-70$\degree$', fontsize=16)
+        plt.text(x, y, '-70$^{\circ}$', fontsize=16)
         x,y = map1(45,-60)
-        plt.text(x, y, '-60$\degree$', fontsize=16)
+        plt.text(x, y, '-60$^{\circ}$', fontsize=16)
         x,y = map1(45,-50)
-        plt.text(x, y, '-50$\degree$', fontsize=16)
+        plt.text(x, y, '-50$^{\circ}$', fontsize=16)
 
     # Draw the galactic plane.
     if not args.noPlane:
-        tl = np.arange(-120,0,0.01)
-        tb = np.zeros(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tl = np.radians(np.arange(0,360, 0.01))
+        tb = np.radians(np.full(tl.size, 90))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k--', linewidth=1, label='Galactic Plane')
 
-        tb = 5*np.ones(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tb = np.radians(np.full(tl.size, 95))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k-', linewidth=1)
 
-        tb = -5*np.ones(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tb = np.radians(np.full(tl.size, 85))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k-', linewidth=1)
 
     # Draw the map.
+    m_norm = len(m)*m/np.sum(m[np.isfinite(m)]),
     x,y = map1(np.degrees(RA), 90-np.degrees(DEC))
     sc  = map1.scatter(x, y,
-                       c=len(m)*m/np.sum(m),
-                       norm=LogNorm(vmin=10**-3, vmax = 100),
+                       c=m_norm,
+                       norm=LogNorm(vmin=5*10**-2, vmax = np.max(m_norm)),
                        cmap= cmaps['plasma'],
-                       s=2**8, lw=0, zorder=0)
+                       s=2**3, lw=0, zorder=0, rasterized=True)
+
     clb = f.colorbar(sc, orientation='vertical')
-    clb.set_label('Magnitude [A.U.]', fontsize=20)
+    clb.set_label('Magnitude [A.U.]')
     
     plt.legend()
-    plt.savefig(get_fig_dir()+args.mapName+'.png',
+    plt.savefig(get_fig_dir()+args.mapName+'_x_acc.png',
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
+    plt.savefig('/home/zgriffith/public_html/paper/'+args.mapName+'_x_acc.pdf', bbox_inches='tight')
     plt.close()
