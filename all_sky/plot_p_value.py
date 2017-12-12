@@ -47,20 +47,22 @@ if __name__ == "__main__":
     p.add_argument('--prefix', type = str,
                    default='/data/user/zgriffith/pev_photons/',
                    help='Base directory for file storing.')
-    p.add_argument('--mapFile', type = str,
-                   default='all_sky/p_value_skymap.npy',
-                   help='File containing the skymap to plot.')
-    p.add_argument('--outFile', type = str,
-                   default='all_sky_scan.png',
-                   help='Output file name.')
+    p.add_argument('--extension', type=float, default=0,
+                   help='Spatial extension to source hypothesis in degrees.')
     p.add_argument('--noPlane', action='store_true', default=False,
                    help='If True, do not draw galactic plane.')
     p.add_argument('--noGrid', action='store_true', default=False,
                    help='If True, do not draw grid lines.')
     args = p.parse_args()
 
-    filename = args.prefix+args.mapFile
-    m = np.load(filename)
+    if args.extension:
+        inFile = args.prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
+        outFile = 'all_sky_scan_ext_%s.png' % args.extension
+    else:
+        inFile = args.prefix + 'all_sky/p_value_skymap.npy'
+        outFile = 'all_sky_scan.png'
+
+    m = np.load(inFile)
     nside = hp.npix2nside(len(m))
     npix  = hp.nside2npix(nside)
     DEC, RA = hp.pix2ang(nside, range(len(m)))
@@ -130,7 +132,7 @@ if __name__ == "__main__":
     plt.scatter(x, y, marker='o', s=2**8, lw=1,
                 edgecolor='g', facecolor='none')
     plt.legend()
-    plt.savefig(get_fig_dir()+args.outFile,
+    plt.savefig(get_fig_dir()+outFile,
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
     plt.savefig('/home/zgriffith/public_html/paper/all_sky_scan.pdf')

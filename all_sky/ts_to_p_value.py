@@ -17,20 +17,23 @@ if __name__ == "__main__":
     p.add_argument('--prefix', type=str,
                    default='/data/user/zgriffith/pev_photons/',
                    help='The base directory for file storing.')
-    p.add_argument('--inFile', type=str,
-                   default='all_sky/skymap.npy',
-                   help='The input file name.')
-    p.add_argument('--outFile', type=str,
-                   default='all_sky/p_value_skymap.npy',
-                   help='The output file name.')
+    p.add_argument('--extension', type=float, default=0,
+                   help='Spatial extension to source hypothesis in degrees.')
     args = p.parse_args()
+
+    if args.extension:
+        inFile = args.prefix + 'all_sky/ext/skymap_ext_%s.npy' % args.extension
+        outFile = args.prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
+    else:
+        inFile = args.prefix + 'all_sky/skymap.npy'
+        outFile = args.prefix + 'all_sky/p_value_skymap.npy'
 
     # File which contains the pixels of the skymap which have
     # unique declination values.
     dec_pix = np.load('/data/user/zgriffith/pev_photons/all_sky/dec_values_512.npz')
     pixels  = dec_pix['pix_list']
 
-    ts_map = np.load(args.prefix + args.inFile)
+    ts_map = np.load(inFile)
     n_decs = len(pixels) 
     pval_map = np.ones_like(ts_map)
     
@@ -47,4 +50,4 @@ if __name__ == "__main__":
         above_true  = np.greater_equal(trials, ts_map[pix][:, np.newaxis])
         pval_map[pix] = np.sum(above_true, axis=1)/float(len(trials))
 
-    np.save(args.prefix + args.outFile, pval_map)
+    np.save(outFile, pval_map)

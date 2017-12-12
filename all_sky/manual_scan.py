@@ -83,8 +83,8 @@ if __name__ == "__main__":
               dtype=xmin.dtype)
     if args.extension:
         ts, xmin = psllh._scan(ra[mask], dec[mask], ts,
-                               xmin, mask, src_extension=np.radians(ext))
-        np.save(args.prefix+'/all_sky/skymap_ext_%s.npy' % args.extension, ts)
+                               xmin, mask, src_extension=np.radians(args.extension))
+        np.save(args.prefix+'/all_sky/ext/skymap_ext_%s.npy' % args.extension, ts)
     else:
         ts, xmin = psllh._scan(ra[mask], dec[mask], ts, xmin, mask)
         np.save(args.prefix+'/all_sky/skymap.npy', ts)
