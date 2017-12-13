@@ -34,7 +34,7 @@ def template_builder(args):
     os.system('mkdir -p ' + output)
     sinDec_min = -1
     sinDec_max = -0.8
-    sinDec_bins = np.arange(-1., -0.799, 0.01)
+    sinDec_bins = np.linspace(-1., -0.80, 21)
 
     mask = (mc['sinDec'] > sinDec_min) & (mc['sinDec'] < sinDec_max)
     mc = mc[mask]
