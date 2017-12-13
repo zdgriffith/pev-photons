@@ -6,13 +6,21 @@
 
 import argparse
 import numpy as np
-import pandas as pd
 
-from support_pandas import livetimes
-from skylab.template import Template
-from skylab.template_llh import TemplateLLH, MultiTemplateLLH
-from skylab.template_injector import TemplateInjector
-from skylab.llh_models import ClassicLLH, EnergyLLH
+from load_datasets import load_gp_dataset
+
+def run_bg_trials(template_llh, args):
+    trials = template_llh.do_trials(args.bg_trials)
+    np.save(args.prefix+'galactic_plane/trials/%s_job_%s.npy' % (args.name, args.job),
+            trials['TS'])
+
+def run_template_test(template_llh, args):
+    out = template_llh.fit_template_source(scramble=False)
+
+    fit_arr = np.empty((1,), dtype=[('TS', np.float), ('nsources', np.float)])
+    fit_arr['TS'][0] = out[0]
+    fit_arr['nsources'][0] = out[1]['nsources']
+    np.save(args.prefix+'galactic_plane/'+args.name+'_fit_result.npy', fit_arr)
 
 if __name__ == "__main__":
 
@@ -26,50 +34,17 @@ if __name__ == "__main__":
                    help='name of the template')
     p.add_argument("--alpha", type=float, default=3.0,
                     help="Power law index")
+    p.add_argument("--ncpu", type=int, default=1,
+                    help="Number of cores to run on.")
+    p.add_argument('--bg_trials', type=int, default=0,
+                   help='if nonzero, run this number of background trials.')
+    p.add_argument("--job", type=int, default=0,
+                   help='job number if running background trials.')
     args = p.parse_args()
 
-    sinDec_range = [-1, -0.8]
-    sinDec_bins = np.linspace(-1.0, -0.8, 21)
-    energy_range = [5.7, 8.0]
-    energy_bins = [np.linspace(5.7,8,24), sinDec_bins]
+    template_llh, exp, mc, livetime = load_gp_dataset(args)
 
-    template_llh = MultiTemplateLLH()
-    template_years = dict()
-    exp_years = dict()
-    mc_years = dict()
-    lt_years = dict()
-    llh_model = dict()
-
-    years = ['2011', '2012', '2013', '2014','2015']
-
-    for i, year in enumerate(years): 
-        template = Template((args.prefix+'/galactic_plane/'+year+
-                             '/'+args.name+'_exp.npy'),
-                            reduced=True)
-        livetime = livetimes(year)*1.157*10**-5  #Seconds to Days
-        exp = np.load(args.prefix+'/datasets/'+year+'_exp_diffuse.npy')
-        mc = np.load(args.prefix+'/datasets/'+year+'_mc_diffuse.npy')
-
-        template_years[i] = template
-        lt_years[i] = livetime 
-        mc_years[i] = mc 
-        exp_years[i] = exp
-
-        llh_model[year] = EnergyLLH(twodim_bins=energy_bins,
-                                    twodim_range=[energy_range,sinDec_range],
-                                    seed=1,
-                                    bounds=[args.alpha, args.alpha],
-                                    fix_index=True,
-                                    sinDec_bins=sinDec_bins,
-                                    sinDec_range=sinDec_range)
-
-        year_llh = TemplateLLH(exp, mc, livetime,
-                               scramble=False,
-                               llh_model=llh_model[year],
-                               template=template)
-
-        template_llh.add_sample(year, year_llh)
-
-    true = template_llh.fit_template_source(scramble=False)[0]
-    print('True Stacking TS: '+str(true))
-    np.save(args.prefix+args.name+'_TS.npy', true)
+    if args.bg_trials:
+        run_bg_trials(template_llh, args)
+    else:
+        run_template_test(template_llh, args)

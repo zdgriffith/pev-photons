@@ -28,7 +28,7 @@ if __name__ == "__main__":
                    help='chi2 ndf values to plot')
     p.add_argument('--bin_width', type=float, default=0.2,
                    help='width of bin in TS space')
-    p.add_argument('--only_bg', type=float, default=0.2,
+    p.add_argument('--only_bg', action='store_true', default=False,
                    help='if True, do not plot true TS.')
     args = p.parse_args()
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     #Plot the observed TS
     if not args.only_bg:
-        true_TS  = np.load(args.prefix+'/galactic_plane/stacking_TS.npy')
+        true_TS  = np.load(args.prefix+'/galactic_plane/fermi_pi0_fit_result.npy')['TS']
         plt.axvline(x=true_TS, color=colors[4], label='Observed TS', lw=4)
         p_value = np.sum(np.greater(bg_trials, true_TS))/n_trials
         print("p-value: %.4f" % p_value)
