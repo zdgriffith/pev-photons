@@ -32,7 +32,7 @@ def load_ps_dataset(args):
         year_psllh = PointSourceLLH(exp, mc, livetime,
                                     ncpu=args.ncpu,
                                     mode='box',
-                                    scramble=True,
+                                    scramble=False,
                                     llh_model=llh_model,
                                     delta_ang=np.radians(10*0.4))
 
