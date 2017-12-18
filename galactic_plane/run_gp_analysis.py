@@ -40,9 +40,11 @@ if __name__ == "__main__":
                    help='if nonzero, run this number of background trials.')
     p.add_argument("--job", type=int, default=0,
                    help='job number if running background trials.')
+    p.add_argument("--seed", type=int, default=1,
+                   help='rng seed')
     args = p.parse_args()
 
-    template_llh, exp, mc, livetime = load_gp_dataset(args)
+    template_llh = load_gp_dataset(args)
 
     if args.bg_trials:
         run_bg_trials(template_llh, args)
