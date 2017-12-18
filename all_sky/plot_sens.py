@@ -17,31 +17,11 @@ plt.style.use('stefan')
 colors = mpl.rcParams['axes.color_cycle']
 fig_dir = get_fig_dir()
 
-def sens_plot(args):
-    dec_list = np.linspace(-84.,-54.,10)
-    alphas = [2.0,2.7]
-    kinds = ['sens', 'disc']
-    kind_labels = ['Sensitivity', 'Discovery Potential']
-    linestyle = ['-', '--']
-
-    for i, alpha in enumerate(alphas):
-        for j, kind in enumerate(kinds):
-            flux = np.load(args.prefix+'all_sky/%s_alpha_%s.npy' % (kind, alpha))
-
-            plt.plot(dec_list, flux*(1e-3)*(10**-3)**alpha,
-                     color=colors[i], ls=linestyle[j],
-                     label='E$^{-%s}$ %s' % (alpha, kind_labels[j]))
-
+def plot_hess_sources(args):
+    # Load source fluxes and errors
     sources = np.load(args.prefix+'TeVCat/hess_sources.npz')
-    if args.no_absorption:
-        ratio = 1
-    else:
-        surv = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_distance.txt')
-        surv = surv.T
-        spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
-                                                                surv[1], k=2)
-        ratio = spline(sources['distance'])
 
+    # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
     stat_upper = ((sources['flux']+sources['flux_stat'])
                  *1000**(-sources['alpha']+sources['alpha_stat'])*1e-12)
@@ -52,6 +32,17 @@ def sens_plot(args):
     sys_lower = ((sources['flux']-sources['flux_sys'])
                  *1000**(-sources['alpha']-sources['alpha_sys'])*1e-12)
 
+    # Apply absorption unless asked not to
+    if args.no_absorption:
+        ratio = 1
+    else:
+        surv = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_distance.txt')
+        surv = surv.T
+        spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
+                                                                surv[1], k=2)
+        ratio = spline(sources['distance'])
+
+    # Plot the source flux and statistical error
     plt.errorbar(sources['dec'], ratio*middle,
                  yerr=ratio*np.array([np.abs(middle-stat_lower),
                                       np.abs(middle-stat_upper)]),
@@ -59,12 +50,27 @@ def sens_plot(args):
                  lw=2, capthick=0, capsize=0,
                  ms=5, label='Extrapolated H.E.S.S. Sources')
 
+    # Plot systematic error
     plt.errorbar(sources['dec'], ratio*middle,
                  yerr=ratio*np.array([np.abs(middle-sys_lower),
                                       np.abs(middle-sys_upper)]),
                  fmt='none', color=colors[4], ecolor=colors[4],
                  lw=6, elinewidth=0, capthick=0, capwidth=0, alpha=0.4)
 
+def plot_sens(args):
+    dec_list = np.linspace(-84.,-54.,10)
+    indices = [2.0,2.7]
+    kinds = ['sens', 'disc']
+    kind_labels = ['Sensitivity', 'Discovery Potential']
+    linestyle = ['-', '--']
+
+    for i, index in enumerate(indices):
+        for j, kind in enumerate(kinds):
+            flux = np.load(args.prefix+'all_sky/%s_index_%s.npy' % (kind, index))
+
+            plt.plot(dec_list, flux*(1e3),
+                     color=colors[i], ls=linestyle[j],
+                     label='E$^{-%s}$ %s' % (index, kind_labels[j]))
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -77,15 +83,16 @@ if __name__ == "__main__":
                    help='if True, flux extrapolations have no absorption')
     args = p.parse_args()
 
-    sens_plot(args)
+    plot_sens(args)
+    plot_hess_sources(args)
 
-    plt.xlim([-81, -54])
+    plt.xlim([-85, -54])
     plt.ylim([1e-21, 5e-17])
     plt.xlabel(r'Declination [$^{\circ}$]')
     plt.ylabel('Flux at 1 PeV [cm$^{-2}$s$^{-1}$TeV$^{-1}$]')
     plt.yscale('log')
     plt.text(-80, 2e-21, 'IceCube Preliminary', color='r', fontsize=14)
-    l = plt.legend(loc='upper left', fontsize=18, prop={'weight':'bold'})
+    l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
     plt.savefig(fig_dir+'sensitivity.pdf', bbox_inches='tight')
     plt.close()
