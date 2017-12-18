@@ -10,13 +10,11 @@ import numpy as np
 from load_datasets import load_ps_dataset
 from skylab.ps_injector import PointSourceInjector
 
-def index_vs_events(args):
+def index_vs_events(ps_llh, args):
     """Test the fitted spectral index for a range of injected events
     and injected spectral indices.
     """
     
-    ps_llh = load_ps_dataset(args)
-
     # Initialize the range of parameters.
     fit = dict()
     fit['index_list'] = [1.5,2.0,3.0]
@@ -47,8 +45,6 @@ def fit_vs_inj_index(args):
     spectral indices with the same injected events.
     """
 
-    ps_llh = load_ps_dataset(args)
-
     # Initialize the range of parameters.
     alpha_list = np.arange(1,3.6,0.1)
 
@@ -72,8 +68,6 @@ def index_vs_dec(args):
     """Test the fitted spectral index for a range of declinations
     with a set injected spectral index and events.
     """
-    ps_llh = load_ps_dataset(args)
-
     # Initialize the range of parameters.
     dec_list = np.arange(-60, -86, 1)
 
@@ -110,4 +104,5 @@ if __name__ == "__main__":
                    help='The number of trials to run at each point.')
     args = p.parse_args()
 
-    index_vs_events(args)
+    ps_llh = load_ps_dataset(args)
+    index_vs_events(ps_llh, args)
