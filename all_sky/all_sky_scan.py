@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Perform a scan over the entire FOV, evaluating the TS at each pixel.
+# Perform a scan over the entire FOV
 ########################################################################
 
 import argparse
@@ -13,6 +13,8 @@ import healpy as hp
 from load_datasets import load_ps_dataset
 
 def manual_scan(ps_llh, args):
+    """manually test for a point source at each pixen in the sky map"""
+
     npix = hp.nside2npix(args.nside)
     m = np.zeros(npix)
 
