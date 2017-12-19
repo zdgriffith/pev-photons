@@ -26,6 +26,7 @@ def test_hotspot(ra, dec, args):
     hotspot['nsources'] = fit[1]['nsources']
     hotspot['gamma'] = fit[1]['gamma']
 
+    print(hotspot)
     np.save(args.prefix+'all_sky/hotspot.npy', hotspot)
 
 def get_hotspot_direction(args):
