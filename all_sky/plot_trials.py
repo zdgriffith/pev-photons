@@ -1,7 +1,8 @@
 #!/usr/bin/env/python
 
 ########################################################################
-# Plot background TS ensemble with observed TS.
+# Plot background TS ensemble with observed TS
+# for the hottest spot in the all sky scan.
 ########################################################################
 
 import argparse
@@ -9,7 +10,6 @@ import glob
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from scipy.stats import chi2
 
 from support_functions import get_fig_dir, plot_setter
 
@@ -23,13 +23,11 @@ if __name__ == "__main__":
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
                    help='base directory for file storing')
-    p.add_argument('--chi2_ndf', type=int, nargs='*',
-                   help='chi2 ndf values to plot')
     p.add_argument('--bin_width', type=float, default=0.5,
                    help='width of bin in TS space')
     args = p.parse_args()
 
-    stack_true = 20.7
+    hotspot = np.load(args.prefix+'all_sky/hotspot.npy')['TS'][0]
     job_list = glob.glob('/data/user/zgriffith/all_sky/full_*.npy')
 
     bg_trials = []
@@ -40,22 +38,15 @@ if __name__ == "__main__":
 
     Ntrials = float(len(bg_trials))
 
-    #Plot chi2 distributions for each degree of freedom given
-    if args.chi2_ndf != None:
-        for df in args.chi2_ndf:
-            x = np.linspace(0.1, chi2.ppf(0.9999, df), 1000)
-            plt.plot(x, chi2.pdf(x, df)*Ntrials*args.bin_width*0.5,
-                     label='$\chi^2$ N$_{DOF}$ = %s', alpha=0.75)
-
     plt.hist(bg_trials, bins=np.arange(0,100,args.bin_width),
              label='Background Trials', histtype='stepfilled',
              edgecolor='none', color='grey')
 
     #Plot the observed TS
-    plt.axvline(x=stack_true, color=colors[2],
+    plt.axvline(x=hotspot, color=colors[2],
                 label='Observed', lw=3)
 
-    p_value = np.sum(np.greater(bg_trials, stack_true))/Ntrials
+    p_value = np.sum(np.greater(bg_trials, hotspot))/Ntrials
     print("p-value: %.4f" % p_value)
 
     plt.axvline(x=np.percentile(bg_trials,68), label='1 $\sigma$',
