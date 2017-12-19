@@ -10,6 +10,7 @@ import scipy
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from glob import glob
 
 from support_functions import get_fig_dir, plot_setter
 
@@ -58,19 +59,32 @@ def plot_hess_sources(args):
                  lw=6, elinewidth=0, capthick=0, capwidth=0, alpha=0.4)
 
 def plot_sens(args):
-    dec_list = np.linspace(-84.,-54.,10)
     indices = [2.0,2.7]
-    kinds = ['sens', 'disc']
     kind_labels = ['Sensitivity', 'Discovery Potential']
     linestyle = ['-', '--']
 
-    for i, index in enumerate(indices):
-        for j, kind in enumerate(kinds):
-            flux = np.load(args.prefix+'all_sky/%s_index_%s.npy' % (kind, index))
+    if args.coarse:
+        dec_list = np.linspace(-84.,-54.,10)
+        kinds = ['sens', 'disc']
+        for i, index in enumerate(indices):
+            for j, kind in enumerate(kinds):
+                flux = np.load(args.prefix+'all_sky/%s_index_%s.npy' % (kind, index))
+                plt.plot(dec_list, flux*(1e3),
+                         color=colors[i], ls=linestyle[j],
+                         label='E$^{-%s}$ %s' % (index, kind_labels[j]))
+    else:
+        for i, index in enumerate(indices):
+            arrs = []
+            files = glob(args.prefix+'all_sky/sens_jobs/index_%s/dec*' % index)
+            for fname in files:
+                a = np.load(fname)
+                arrs.append([item for item in a[0]])
 
-            plt.plot(dec_list, flux*(1e3),
-                     color=colors[i], ls=linestyle[j],
-                     label='E$^{-%s}$ %s' % (index, kind_labels[j]))
+            arrs = np.array(sorted(arrs))
+            for j, label in enumerate(kind_labels):
+                plt.plot(arrs.T[0], arrs.T[j+1]*1e3,
+                         color=colors[i], ls=linestyle[j],
+                         label='E$^{-%s}$ %s' % (index, label))
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -81,12 +95,15 @@ if __name__ == "__main__":
     p.add_argument('--no_absorption', action='store_true',
                    default=False,
                    help='if True, flux extrapolations have no absorption')
+    p.add_argument('--coarse', action='store_true',
+                   default=False,
+                   help='if True, plot coarse sens. result from test run.')
     args = p.parse_args()
 
     plot_sens(args)
     plot_hess_sources(args)
 
-    plt.xlim([-85, -54])
+    plt.xlim([-81, -54])
     plt.ylim([1e-21, 5e-17])
     plt.xlabel(r'Declination [$^{\circ}$]')
     plt.ylabel('Flux at 1 PeV [cm$^{-2}$s$^{-1}$TeV$^{-1}$]')
@@ -95,4 +112,5 @@ if __name__ == "__main__":
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
     plt.savefig(fig_dir+'sensitivity.pdf', bbox_inches='tight')
+    plt.savefig('/home/zgriffith/public_html/paper/ps_sensitivity.pdf')
     plt.close()
