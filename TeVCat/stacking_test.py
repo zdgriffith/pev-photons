@@ -7,17 +7,18 @@
 import argparse
 import numpy as np
 
-from support_pandas import livetimes
-
-from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
-from skylab.llh_models import EnergyLLH
+from load_datasets import load_ps_dataset
 
 def run_bg_trials(psllh, sources, args):
+    """Run background trials for the H.E.S.S. stacking analysis"""
+
     trials = psllh.do_trials(args.bg_trials, src_ra=np.radians(sources['ra']),
                              src_dec=np.radians(sources['dec']))
     np.save(args.prefix+'TeVCat/stacking_trials.npy', trials['TS'])
 
 def run_stacking_test(psllh, sources, args):
+    """Run the H.E.S.S. stacking analysis"""
+
     fit_arr = np.empty((1,),
                        dtype=[('TS', np.float), ('nsources', np.float),
                               ('gamma', np.float)])
@@ -52,34 +53,8 @@ if __name__ == "__main__":
                    help='If True, use source extension in fit.')
     args = p.parse_args()
 
-    sinDec_range = [-1.,-0.8]
-    sinDec_bins  = np.linspace(-1.,-0.8, 21)
-    energy_range = [5.7,8] # log(E/GeV)
-    energy_bins  = [np.linspace(5.7,8,24), sinDec_bins]
-
-    psllh = MultiPointSourceLLH(ncpu=20)
-    llh_model = dict()
-
-    years = ['2011', '2012', '2013', '2014','2015']
-    for i, year in enumerate(years): 
-        livetime = livetimes(year)*1.157*10**-5  # Convert seconds to days.
-        exp = np.load(args.prefix+'/datasets/'+year+'_exp_ps.npy')
-        exp['dec'] = np.arcsin(exp['sinDec'])
-        mc  = np.load(args.prefix+'/datasets/'+year+'_mc_ps.npy')
-        mc['dec'] = np.arcsin(mc['sinDec'])
-
-        llh_model[year] = EnergyLLH(twodim_bins=energy_bins,
-                                    twodim_range=[[5.7,8],[-1,-0.8]],
-                                    sinDec_bins=sinDec_bins,
-                                    sinDec_range=[-1,-0.8])
-
-        year_psllh = PointSourceLLH(exp, mc, livetime,
-                                    ncpu=20,
-                                    scramble=False,
-                                    llh_model=llh_model[year],
-                                    delta_ang=np.radians(10*0.4))
-
-        psllh.add_sample(year, year_psllh)
+    # Load the dataset.
+    ps_llh = load_ps_dataset(args)
 
     sources = np.load(args.prefix+'/TeVCat/hess_sources.npz')
     if args.bg_trials:
