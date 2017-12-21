@@ -7,10 +7,7 @@
 import argparse
 import numpy as np
 
-from support_pandas import livetimes
-
-from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
-from skylab.llh_models import EnergyLLH
+from load_datasets import load_ps_dataset
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -26,34 +23,8 @@ if __name__ == "__main__":
                    help='If True, use source extension in fit.')
     args = p.parse_args()
 
-    dec_bins = np.arange(-1., -0.799, 0.01)
-    energy_bins = [np.linspace(5.7,8,24), dec_bins]
-
-    #Initialization of multi-year LLH object
-    psllh = MultiPointSourceLLH(ncpu=20)
-
-    tot_mc = dict()
-    llh_model = dict()
-
-    years = ['2011', '2012', '2013', '2014','2015']
-
-    for i, year in enumerate(years): 
-        livetime = livetimes(year)*1.157*10**-5  #Seconds to Days
-        exp = np.load(args.prefix+'/datasets/'+year+'_exp_ps.npy')
-        mc = np.load(args.prefix+'/datasets/'+year+'_mc_ps.npy')
-
-        llh_model[year] = EnergyLLH(twodim_bins  = energy_bins,
-                                    twodim_range = [[5.7,8],[-1,-0.8]],
-                                    sinDec_bins  = dec_bins, sinDec_range=[-1,-0.8])
-
-        year_psllh = PointSourceLLH(exp, mc, livetime,
-                                    scramble=False,
-                                    ncpu=20,
-                                    llh_model=llh_model[year],
-                                    mode='box',
-                                    delta_ang=np.radians(10*0.4))
-        psllh.add_sample(year, year_psllh)
-        tot_mc[i] = mc 
+    # Load the dataset.
+    ps_llh = load_ps_dataset(args)
 
     sources   = np.load(args.prefix+'TeVCat/hess_sources.npz')
 
