@@ -10,11 +10,14 @@ import numpy as np
 from load_datasets import load_gp_dataset
 
 def run_bg_trials(template_llh, args):
+    """ Run background trials for the Fermi-LAT template analysis """
     trials = template_llh.do_trials(args.bg_trials)
-    np.save(args.prefix+'galactic_plane/trials/%s_job_%s.npy' % (args.name, args.job),
+    np.save(args.prefix+'galactic_plane/trials/%s_job_%s.npy' % (args.name,
+                                                                 args.job),
             trials['TS'])
 
 def run_template_test(template_llh, args):
+    """ Run the Fermi-LAT template analysis """
     out = template_llh.fit_template_source(scramble=False)
 
     fit_arr = np.empty((1,), dtype=[('TS', np.float), ('nsources', np.float)])
