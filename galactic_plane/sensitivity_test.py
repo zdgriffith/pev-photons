@@ -27,12 +27,14 @@ if __name__ == "__main__":
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,
                    help='Spectral index of signal.')
-    p.add_argument("--ncpu", type=int, default=1,
-                    help="Number of cores to run on.")
     p.add_argument("--Enorm", type=float, default=2*10**6,
                    help='normalization energy in GeV')
     p.add_argument("--mu", type=float, default=0.,
                    help='number of signal events')
+    p.add_argument("--ncpu", type=int, default=1,
+                    help="Number of cores to run on.")
+    p.add_argument("--seed", type=int, default=1,
+                   help='rng seed')
     args = p.parse_args()
 
     template_llh = load_gp_dataset(args)

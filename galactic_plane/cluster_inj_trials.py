@@ -56,7 +56,6 @@ if __name__ == "__main__":
     index = 0 
     for n_inj in inj_list:
         for job in range(args.nJobs):
-            #arg  = ' --job %s --n_inj %s' % (index+550, n_inj+78/2.)
             arg  = ' --job %s --n_inj %s' % (index, n_inj)
             arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
             if args.test:
