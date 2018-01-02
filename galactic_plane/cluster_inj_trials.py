@@ -35,7 +35,7 @@ if __name__ == "__main__":
         cmd = 'python '+script 
     else:
         dag_name = ('/data/user/zgriffith/dagman/myJobs/'
-                    + args.name+'_sens_trials_half.dag')
+                    + args.name+'_sens_trials_.dag')
         ex       = ('condor_submit_dag -f -maxjobs '
                     + args.maxjobs + ' ' + dag_name)
 
@@ -56,7 +56,8 @@ if __name__ == "__main__":
     index = 0 
     for n_inj in inj_list:
         for job in range(args.nJobs):
-            arg  = ' --job %s --n_inj %s' % (index+550, n_inj+78/2.)
+            #arg  = ' --job %s --n_inj %s' % (index+550, n_inj+78/2.)
+            arg  = ' --job %s --n_inj %s' % (index, n_inj)
             arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
             if args.test:
                 ex  = ' '.join([cmd, arg])
