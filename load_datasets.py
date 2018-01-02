@@ -44,6 +44,8 @@ def load_gp_dataset(args):
     from skylab.template import Template
     from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 
+    template_llh = MultiTemplateLLH(ncpu=args.ncpu, seed=args.seed)
+
     years = ['2011', '2012', '2013', '2014', '2015']
 
     for i, year in enumerate(years): 
@@ -57,16 +59,16 @@ def load_gp_dataset(args):
         template = Template((args.prefix+'/galactic_plane/'+year+
                              '/'+args.name+'_exp.npy'), reduced=True)
 
-        llh_model[year] = EnergyLLH(twodim_bins=[energy_bins, sinDec_bins],
-                                    twodim_range=[energy_range, sinDec_range],
-                                    bounds=[args.alpha, args.alpha],
-                                    fix_index=True,
-                                    sinDec_bins=sinDec_bins,
-                                    sinDec_range=sinDec_range)
+        llh_model = EnergyLLH(twodim_bins=[energy_bins, sinDec_bins],
+                              twodim_range=[energy_range, sinDec_range],
+                              bounds=[args.alpha, args.alpha],
+                              fix_index=True,
+                              sinDec_bins=sinDec_bins,
+                              sinDec_range=sinDec_range)
 
         year_llh = TemplateLLH(exp, mc, livetime,
                                scramble=False,
-                               llh_model=llh_model[year],
+                               llh_model=llh_model,
                                ncpu=args.ncpu,
                                template=template)
 
