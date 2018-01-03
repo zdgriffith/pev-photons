@@ -10,6 +10,22 @@ from skylab.datasets import Datasets
 from skylab.llh_models import EnergyLLH
 
 def load_ps_dataset(args):
+    """ Creates a MultiPointSourceLLH object from the final cut level point
+    source event files
+
+    Parameters
+    ----------
+    args : Namespace object with argparse arguments from the parent script.
+           Needs to include:
+               ncpu : number of cores to use.
+               seed : random number seed.
+
+    Returns
+    ----------
+    psllh : MultiPointSourceLLH instance
+
+    """
+    
     from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
     ps_llh = MultiPointSourceLLH(ncpu=args.ncpu, seed=args.seed)
@@ -41,6 +57,22 @@ def load_ps_dataset(args):
     return ps_llh
 
 def load_gp_dataset(args):
+    """ Creates a MultiTemplateLLH object from the final cut level galactic
+    plane event files
+
+    Parameters
+    ----------
+    args : Namespace object with argparse arguments from the parent script.
+           Needs to include:
+               ncpu : number of cores to use.
+               seed : random number seed.
+
+    Returns
+    ----------
+    psllh : MultiTemplateLLH instance
+
+    """
+    
     from skylab.template import Template
     from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 
