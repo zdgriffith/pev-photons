@@ -4,14 +4,16 @@
 # Plot the angular resolution of gamma-ray MC for set years.
 ########################################################################
 
+import argparse
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from support_functions import cut_maker, get_fig_dir, find_nearest, plot_setter
+from support import get_fig_dir, plot_setter
 
-plt.style.use('stefan')
-fig_dir = get_fig_dir()
+def find_nearest(array,value):
+    return  (np.abs(array-value)).argmin()
 
 def sigma(y):
     values, base = np.histogram(y, bins=np.arange(0,20,0.01),
@@ -45,26 +47,32 @@ def error(f, label, key, x_bins):
     return np.radians(sigmas)
 
 if __name__ == "__main__":
-    
-    cut_args = {'standard':1, 'laputop_it':1}
-    
-    sets = [cut_maker('12622',cut_args), cut_maker('12533', cut_args),
-            cut_maker('12612', cut_args), cut_maker('12613', cut_args),
-            cut_maker('12614', cut_args)]
-    labels = ['2011', '2012', '2013', '2014', '2015']
-    E_bins = np.arange(5.7,8.1, 0.10)
+    p = argparse.ArgumentParser(
+            description='Plot the ang. res. weighted to an E^-2 specrum',
+            formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
+                   help='base directory for file storing')
+    p.add_argument('--outFile', default='effective_area_years.png',
+                   help='file name')
+    args = p.parse_args()
 
-    for i, f in enumerate(sets):
-        #Only plot first and last for simplicity
-        if i in [0,4]:
-            error(f, labels[i], 'primary_E', E_bins)
+    plt.style.use('stefan')
+    
+    # Plot only the first and last years for readibility
+    years = ['2011', '2015']
+
+    E_bins = np.arange(5.7, 8.1, 0.1)
+    for i, year in enumerate(years):
+        f = pd.read_hdf(args.prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+        error(f, year, 'primary_E', E_bins)
 
     plt.xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
     plt.xlim([5.7,8])
+    plt.ylim([0.1,0.6])
     plt.ylabel('Angular Resolution [$^{\circ}$]')
     l = plt.legend()
     plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(fig_dir+'ang_res_years.png', facecolor='none', dpi=300)
+    plt.savefig(get_fig_dir()+'ang_res_years.png', facecolor='none', dpi=300)
     plt.savefig('/home/zgriffith/public_html/paper/ang_res_years.pdf')
     plt.close()
