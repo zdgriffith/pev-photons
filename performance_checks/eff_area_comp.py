@@ -7,14 +7,16 @@
 
 import argparse
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from support_pandas import cut_maker, get_fig_dir
+from support_pandas import get_fig_dir
 from support_functions import plot_setter
 
+from load_datasets import load_level3_files
 dashi.visual()
 plt.style.use('stefan')
 fig_dir = get_fig_dir()
@@ -49,7 +51,7 @@ def get_effective_area_fit(energy_midpoints, eff_area,
 
     return fit_func(energy_points, *popt)
 
-def effective_area(logE, label, fname, w, args, index):
+def effective_area(args, logE, year, w, color):
 
     weights = np.zeros(len(logE))
     for i, E in enumerate(logE):
@@ -66,10 +68,10 @@ def effective_area(logE, label, fname, w, args, index):
     error_hist = dashi.factory.hist1d(logE, bins,
                                       weights=(w**-1)*weights**2)
 
-    if fname in ['12622']:
+    if year == '2011':
         n_gen = 60000
     else:
-        events = np.load('/data/user/zgriffith/sim_files/'+fname+'_events.npy')
+        events = np.load(args.prefix+'datasets/level3/'+year+'_mc_total_events.npy')
         n_gen  = events[:].astype('float')
 
     area = E_hist.bincontent/n_gen
@@ -77,11 +79,11 @@ def effective_area(logE, label, fname, w, args, index):
     
     #Plot bins unless told not to
     if not args.noBins:
-        ax0.errorbar(E_hist.bincenters, area,
-                     xerr=args.Ebin_width/2., yerr=error,
-                     capsize=0, capthick=2, lw=2, ms=0,
-                     label=label, color=colors[index], fmt='o', marker='o')
-        label = None
+        line = ax0.errorbar(E_hist.bincenters, area,
+                            xerr=args.Ebin_width/2., yerr=error,
+                            capsize=0, capthick=2, lw=2, ms=0,
+                            label=year, color=color, fmt='o', marker='o')
+        year = None
 
     #Plot Sigmoid of Effective Area
     fine_bins = np.arange(5.7,8.01,0.01)
@@ -91,15 +93,15 @@ def effective_area(logE, label, fname, w, args, index):
                                          error, args.Ebin_width,
                                          fit_func=sigmoid_flat,
                                          energy_points=x)
-        line = ax0.plot(fine_bins, sigmoid, color=colors[index],
-                        label=label)
-                 #label=label+' Snow Heights')
-
-    return sigmoid, fine_bins, line
+        line = ax0.plot(fine_bins, sigmoid, color=color,
+                        label=year)
+        return sigmoid, fine_bins, line
+    else:
+        return area, bins, line[0]
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-            description='Plot a skymap',
+            description='Plot the effective area for each MC year',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
                    help='base directory for file storing')
@@ -113,25 +115,22 @@ if __name__ == "__main__":
                    help='log(E/GeV) bin size')
     args = p.parse_args()
 
-    #labels = ['Oct 2011', 'Oct 2012', 'Oct 2013', 'Nov 2014', 'Oct 2015']
-    labels = ['2011', '2012', '2013', '2014', '2015']
-
-    #fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1], 'top':0.93})
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
     comp = []
     lines = []
-    cut_args = {'standard':1, 'laputop_it':1}
-    set_numbers = ['12622', '12533', '12612', '12613', '12614']
-    for i, fname in enumerate(set_numbers):
-        f = cut_maker(fname, cut_args)
-        if fname == '12622':
+    years = ['2011', '2012', '2013', '2014', '2015']
+    for i, year in enumerate(years):
+        f = pd.read_hdf(args.prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+
+        # Reweight events with <8 stations triggered for 2011 due to filter
+        if year == '2011':
             w = (2*(np.greater(f['Nstations'],3)&np.less(f['Nstations'],8))+1.)
         else:
             w = np.ones(len(f['Nstations']))
             
-        vals, x, line = effective_area(np.log10(f['primary_E']),
-                                       labels[i], fname, w, args, i)
+        vals, x, line = effective_area(args, np.log10(f['primary_E']),
+                                       year, w, colors[i])
         comp.append(vals)
         lines.append(line[0])
 
@@ -139,24 +138,23 @@ if __name__ == "__main__":
         ratio = c/comp[1] 
         ax1.plot(x, ratio, color=colors[i])
 
-    #ax0.xaxis.set_visible(False)
     ax0.set_xticklabels([])
     ax0.set_xlim([5.7,8])
-    ax1.set_xlim([5.7,8])
     ax0.set_ylim([0,0.55])
-    ax1.set_ylim([0.2,1.2])
-    ax1.grid(b=True, color='grey', linestyle='dashed')
-    ax1.set_xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
-    #ax1.set_xlabel(r'log(E$_{\textrm{MC}}$/GeV)')
     ax0.set_ylabel('Effective Area [km$^2$]')
+
+    ax1.set_xlim([5.7,8])
+    ax1.set_ylim([0.2,1.2])
+    ax1.grid(b=True, color='grey')#, linestyle='dashed')
+    ax1.set_xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
     ax1.set_ylabel(r'A$_{\textrm{eff}}$/A$_{\textrm{eff}}$(2012)', fontsize=14)
-    #l = ax0.legend(loc='lower right')
-    #fig.subplots_adjust(bottom=0.2)
-    l = plt.figlegend(lines, labels, loc='upper center', frameon=False,
-                   bbox_to_anchor=(0.5,  # horizontal
-                                   0.415),# vertical 
+
+    l = plt.figlegend(lines, years, loc='upper center', frameon=False,
+                   bbox_to_anchor=(0.5,    # horizontal
+                                   0.415), # vertical 
                    ncol=5, fancybox=False)
     plot_setter(plt.gca(),l)
+
     plt.savefig(fig_dir+args.outFile, facecolor='none', dpi=300)
-    plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp.pdf')
+    #plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp.pdf')
     plt.close()
