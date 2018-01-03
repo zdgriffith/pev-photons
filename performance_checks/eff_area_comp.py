@@ -8,19 +8,11 @@
 import argparse
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from support_pandas import get_fig_dir
-from support_functions import plot_setter
-
-from load_datasets import load_level3_files
-dashi.visual()
-plt.style.use('stefan')
-fig_dir = get_fig_dir()
-colors = mpl.rcParams['axes.color_cycle']
+from support import get_fig_dir, plot_setter, get_colors
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))
@@ -95,9 +87,9 @@ def effective_area(args, logE, year, w, color):
                                          energy_points=x)
         line = ax0.plot(fine_bins, sigmoid, color=color,
                         label=year)
-        return sigmoid, fine_bins, line
+        return sigmoid, fine_bins, line[0]
     else:
-        return area, bins, line[0]
+        return area, E_hist.bincenters, line[0]
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -115,6 +107,10 @@ if __name__ == "__main__":
                    help='log(E/GeV) bin size')
     args = p.parse_args()
 
+    # Plotting set up
+    dashi.visual()
+    plt.style.use('stefan')
+    colors = get_colors()
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
     comp = []
@@ -132,20 +128,20 @@ if __name__ == "__main__":
         vals, x, line = effective_area(args, np.log10(f['primary_E']),
                                        year, w, colors[i])
         comp.append(vals)
-        lines.append(line[0])
+        lines.append(line)
 
     for i, c in enumerate(comp):
         ratio = c/comp[1] 
         ax1.plot(x, ratio, color=colors[i])
 
     ax0.set_xticklabels([])
-    ax0.set_xlim([5.7,8])
-    ax0.set_ylim([0,0.55])
+    ax0.set_xlim([5.8,8])
+    ax0.set_ylim([0,0.5])
     ax0.set_ylabel('Effective Area [km$^2$]')
 
-    ax1.set_xlim([5.7,8])
+    ax1.set_xlim([5.8,8])
     ax1.set_ylim([0.2,1.2])
-    ax1.grid(b=True, color='grey')#, linestyle='dashed')
+    ax1.grid(b=True, color='grey')
     ax1.set_xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
     ax1.set_ylabel(r'A$_{\textrm{eff}}$/A$_{\textrm{eff}}$(2012)', fontsize=14)
 
@@ -155,6 +151,6 @@ if __name__ == "__main__":
                    ncol=5, fancybox=False)
     plot_setter(plt.gca(),l)
 
-    plt.savefig(fig_dir+args.outFile, facecolor='none', dpi=300)
-    #plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp.pdf')
+    plt.savefig(get_fig_dir()+args.outFile, facecolor='none', dpi=300)
+    plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp2.pdf')
     plt.close()

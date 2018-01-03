@@ -37,7 +37,7 @@ def apply_cuts(args, dataset):
 
     # Apply cuts to data
     cut = np.equal(cut,1)
-    f.to_hdf(args.prefix+'datasets/level3/'+dataset+'_quality.hdf5',
+    f[cut].to_hdf(args.prefix+'datasets/level3/'+dataset+'_quality.hdf5',
              'dataframe', mode='w')
 
 if __name__ == "__main__":
