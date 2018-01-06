@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
 ########################################################################
-# General functions for support use.
+# Supporting functions and variables
 ########################################################################
 
-def get_colors():
-    """ Provide list of colors in current style"""
+import matplotlib as mpl
 
-    import matplotlib as mpl
-    return mpl.rcParams['axes.color_cycle']
+prefix = '/data/user/zgriffith/pev_photons/'
+
+# Plotting Style
+plot_style = 'gamma_rays_5yr'
+colors = mpl.rcParams['axes.color_cycle']
 
 def get_fig_dir():
     """ provide the path for saving figures to public_html """
