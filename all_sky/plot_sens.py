@@ -58,6 +58,10 @@ def plot_hess_sources(args):
                  fmt='none', color=colors[4], ecolor=colors[4],
                  lw=6, elinewidth=0, capthick=0, capwidth=0, alpha=0.4)
 
+    if args.plot_hess_sens:
+        plt.scatter(sources['dec'], sources['sensitivity']*1e3,
+                    color=colors[3], marker='*', label='H.E.S.S. 90% limits')
+
 def plot_sens(args):
     indices = [2.0,2.7]
     kind_labels = ['Sensitivity', 'Discovery Potential']
@@ -98,6 +102,9 @@ if __name__ == "__main__":
     p.add_argument('--coarse', action='store_true',
                    default=False,
                    help='if True, plot coarse sens. result from test run.')
+    p.add_argument('--plot_hess_sens', action='store_true',
+                   default=False,
+                   help='if True, plot HESS 90% limits.')
     args = p.parse_args()
 
     plot_sens(args)
