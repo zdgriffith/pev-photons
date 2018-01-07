@@ -7,15 +7,13 @@
 import argparse
 import numpy as np
 
-from load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Test HESS positions individually',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type = str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--outFile', type = str,
                    default='hess_sources_fit_results',
                    help='file name')
@@ -26,7 +24,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_ps_dataset(args)
 
-    sources   = np.load(args.prefix+'TeVCat/hess_sources.npz')
+    sources   = np.load(prefix+'TeVCat/hess_sources.npz')
 
     fit_arr = np.empty((len(sources['dec']),),
                        dtype=[('TS', np.float), ('nsources', np.float),
@@ -49,6 +47,6 @@ if __name__ == "__main__":
         fit_arr['nsources'][i] = out[1]['nsources']
 
     if args.extended:
-        np.save(args.prefix+'TeVCat/extended/'+args.outFile+'.npy', fit_arr)
+        np.save(prefix+'TeVCat/extended/'+args.outFile+'.npy', fit_arr)
     else:
-        np.save(args.prefix+'TeVCat/'+args.outFile+'.npy', fit_arr)
+        np.save(prefix+'TeVCat/'+args.outFile+'.npy', fit_arr)

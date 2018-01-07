@@ -7,14 +7,15 @@
 import argparse
 import numpy as np
 
-from load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 def run_bg_trials(psllh, sources, args):
     """Run background trials for the H.E.S.S. stacking analysis"""
 
     trials = psllh.do_trials(args.bg_trials, src_ra=np.radians(sources['ra']),
                              src_dec=np.radians(sources['dec']))
-    np.save(args.prefix+'TeVCat/stacking_trials.npy', trials['TS'])
+    np.save(prefix+'TeVCat/stacking_trials.npy', trials['TS'])
 
 def run_stacking_test(psllh, sources, args):
     """Run the H.E.S.S. stacking analysis"""
@@ -36,17 +37,15 @@ def run_stacking_test(psllh, sources, args):
     fit_arr['nsources'][0] = out[1]['nsources']
     
     if args.extended:
-        np.save(args.prefix+'TeVCat/extended/stacking_fit_result.npy', fit_arr)
+        np.save(prefix+'TeVCat/extended/stacking_fit_result.npy', fit_arr)
     else:
-        np.save(args.prefix+'TeVCat/stacking_fit_result.npy', fit_arr)
+        np.save(prefix+'TeVCat/stacking_fit_result.npy', fit_arr)
 
 if __name__ == "__main__":
 
     p = argparse.ArgumentParser(
             description='Runs a stacking test of the HESS source catalog.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--bg_trials', type=float, default=0,
                    help='if nonzero, run this number of background trials')
     p.add_argument('--extended', action='store_true', default=False,

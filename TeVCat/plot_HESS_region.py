@@ -12,13 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 
 import healpy as hp
-from support_functions import get_fig_dir
 
-from map_w_srcs import ps_map
-
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
+from pev_photons.support import prefix, get_fig_dir, ps_map, plot_style
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 
@@ -141,8 +136,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Rectangular Projection of the HESS source region',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--mapFile',
                    default='all_sky/p_value_skymap.npy',
                    help='file containing the skymap to plot')
@@ -161,6 +154,8 @@ if __name__ == "__main__":
     p.add_argument("--dpar", type=float,default=1.,
                    help="Interval in degrees between parallels")
     args = p.parse_args()
+
+    plt.style.use(plot_style)
 
     # Fill 2D array
     xmin = -180.
@@ -197,7 +192,7 @@ if __name__ == "__main__":
       cxmax = xmin + 180.
     
     # Read in the skymap and mask out empty pixels
-    skymap = np.load(args.prefix+args.mapFile)
+    skymap = np.load(prefix+args.mapFile)
     # remove naughty values
     skymap[np.isnan(skymap)] = hp.UNSEEN
     skymap *= args.scale
@@ -237,7 +232,7 @@ if __name__ == "__main__":
                      'plotLabel': True
                     }
 
-    f = np.load(args.prefix+'TeVCat/hess_sources.npz')
+    f = np.load(prefix+'TeVCat/hess_sources.npz')
     sources = []
     for i, name in enumerate(f['name']):
         print(name)
@@ -282,6 +277,6 @@ if __name__ == "__main__":
     ax.set_xlabel('l [$^\circ$]')
     ax.set_ylabel('b [$^\circ$]')
     plt.gca().invert_yaxis()
-    plt.savefig(fig_dir+args.outFile)
+    plt.savefig(get_fig_dir()+args.outFile)
     plt.savefig('/home/zgriffith/public_html/paper/hess_sources.pdf')
     plt.close()

@@ -8,16 +8,15 @@
 import argparse
 import numpy as np
 
-from load_datasets import load_ps_dataset
 from skylab.ps_injector import PointSourceInjector
+
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='HESS source sensitivity calculation',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,
@@ -27,7 +26,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_ps_dataset(args)
 
-    hess = np.load(args.prefix+'TeVCat/hess_sources.npz')
+    hess = np.load(prefix+'TeVCat/hess_sources.npz')
     sens = list()
     disc = list()
 
@@ -56,4 +55,4 @@ if __name__ == "__main__":
     a['sensitivity']         = sens
     a['discovery_potential'] = disc
 
-    np.savez(args.prefix+'TeVCat/hess_sources.npz', **a)
+    np.savez(prefix+'TeVCat/hess_sources.npz', **a)

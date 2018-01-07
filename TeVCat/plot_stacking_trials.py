@@ -3,29 +3,25 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from scipy.stats import chi2
 
-from support_functions import get_fig_dir, plot_setter
-fig_dir = get_fig_dir()
-
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='plot scrambled trials',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--chi2_ndf', type = int, nargs='*',
                    help='chi2 ndf values to plot')
     p.add_argument('--bin_width', type=float, default=0.2,
                    help='width of bin in TS space')
     args = p.parse_args()
 
-    stack_true = np.load(args.prefix+'TeVCat/stacking_fit_result.npy')['TS']
-    bg_trials = np.load(args.prefix+'TeVCat/stacking_trials.npy')
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
+
+    stack_true = np.load(prefix+'TeVCat/stacking_fit_result.npy')['TS']
+    bg_trials = np.load(prefix+'TeVCat/stacking_trials.npy')
     n_trials = len(bg_trials)
 
     #Plot chi2 distributions for each degree of freedom given
@@ -68,5 +64,5 @@ if __name__ == "__main__":
     l = plt.legend()
     plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(fig_dir+'stacking_trials.pdf')
+    plt.savefig(get_fig_dir()+'stacking_trials.pdf')
     plt.close()

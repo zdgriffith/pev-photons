@@ -7,19 +7,14 @@
 
 import argparse
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import scipy
 
-from support_functions import get_fig_dir, plot_setter
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 from gamma_ray_survival import absorption_spline
 
-fig_dir = get_fig_dir()
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-
 #Plot data points
-def plot_data(data, label, args):
+def plot_data(data, label, colors, args):
     if 'Fermi' in label:
         color = 'k'
     else:
@@ -45,7 +40,7 @@ def flux_calc(E, E0, phi0, phi_unc, gamma, gamma_unc):
            *(E/E0)**(2 - (gamma + gamma_unc*(-1)**flip)))
 
 #Plot the best fits to the source flux.
-def plot_fit(label, args, index):
+def plot_fit(label, colors, args, index):
 
     E0 = 1
     if 'Fermi' in label:
@@ -92,7 +87,7 @@ def plot_fit(label, args, index):
             if args.Ecut is not None:
                 flux *= np.exp(-E/args.Ecut)
             if not args.no_absorption:
-                flux *= absorption_spline(args, E)
+                flux *= absorption_spline(E)
 
     # The center line of the flux fit.
     plt.plot(E, phi, label=label, color=color, linestyle='-', zorder=index)
@@ -113,8 +108,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot the SED of HESS J1427-608',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument('--addFermi', action='store_true', default=False,
                    help='If True, plot Fermi data and combined fit.')
     p.add_argument('--no_absorption', action='store_true', default=False,
@@ -123,16 +116,20 @@ if __name__ == "__main__":
                    help='Option for an exponential cut-off.')
     args = p.parse_args()
 
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
+
     fig,ax = plt.subplots(1)
 
     #Data points
-    hess_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_data.txt') 
-    plot_data(hess_data, 'H.E.S.S. data', args)
-    gamma = plot_fit('Best fit (H.E.S.S. data)', args, 0)
+    hess_data = np.loadtxt(prefix+'TeVCat/hessJ1427_data.txt') 
+    plot_data(hess_data, 'H.E.S.S. data', colors, args)
+    gamma = plot_fit('Best fit (H.E.S.S. data)', colors, args, 0)
     if args.addFermi:
-        fermi_data = np.loadtxt(args.prefix+'TeVCat/hessJ1427_fermi_data.txt') 
+        fermi_data = np.loadtxt(prefix+'TeVCat/hessJ1427_fermi_data.txt') 
         plot_data(fermi_data, 'Fermi data', args)
-        combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)', args, 1)
+        combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)',
+                                  colors, args, 1)
 
     #IceCube Upper limit
     b = np.array([0.712*10**6,3.84*10**6])  # The 5% to 95% energy range.
@@ -179,6 +176,6 @@ if __name__ == "__main__":
     plt.xscale('log')
     plt.yscale('log')
     plt.tight_layout()
-    plt.savefig(fig_dir+outFile)
+    plt.savefig(get_fig_dir()+outFile)
     plt.savefig('/home/zgriffith/public_html/paper/hess_J1427.pdf')
     plt.close()
