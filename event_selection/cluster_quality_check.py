@@ -3,10 +3,6 @@
 import re, os, sys, argparse, glob
 from getGoodRuns import fileCleaner
 
-##############
-#Run icetray scripts I've written on i3 files I have stored
-#############
-
 if __name__ == "__main__":
 
     p = argparse.ArgumentParser(

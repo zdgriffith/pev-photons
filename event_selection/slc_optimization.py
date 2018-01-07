@@ -4,20 +4,14 @@
 # Plot optimized slc selection region.
 ########################################################################
 
-import simFunctions
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pandas as pd
 
-from support_functions import get_fig_dir, plot_setter
-fig_dir = get_fig_dir()
 import dashi
-dashi.visual()
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 import colormaps as cmaps
 import tables as t
-import pandas as pd
 
 def rhombus(width, depth, cos_zen, color):
     start = 4.8/(cos_zen+0.05)
@@ -31,6 +25,8 @@ def rhombus(width, depth, cos_zen, color):
 
 #Plot distribution of slcs
 def slc_plot(f, cos_zen, fname='slc_dist.png'):
+    colors = plt.rcParams['axes.color_cycle']
+
     time_bins = np.arange(4.5,10.1,0.1)
     dom_bins = np.arange(1,61,1)
     times = f['time'] 
@@ -51,7 +47,7 @@ def slc_plot(f, cos_zen, fname='slc_dist.png'):
     l = plt.legend(loc='lower left', frameon=True)
     plot_setter(plt.gca(),l)
     plt.tight_layout()
-    plt.savefig(fig_dir+fname)
+    plt.savefig(get_fig_dir()+fname)
     if zen_min == 0.95:
         plt.savefig('/home/zgriffith/public_html/paper/slc_optimization.pdf')
     plt.close()
@@ -61,6 +57,9 @@ if __name__ == "__main__":
     pf = '/data/user/zgriffith/ShowerLLH/'
     f = t.openFile(pf+'/IT81-II_data/files/burn_sample/slcs/burn_sample.hdf5')
     cosZen = np.cos(f.root.Laputop.cols.zenith[:])
+
+    dashi.visual()
+    plt.style.use(plot_style)
 
     for i, zen_min in enumerate([0.80,0.85,0.90,0.95]):
         slcs = f.root.slcs.read()
