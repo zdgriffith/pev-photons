@@ -9,6 +9,8 @@ import argparse, sys, tables, file_functions
 import time, glob
 import pandas as pd
 
+from pev_photons.support import prefix
+
 def combine_hdfs(file_list, outFile):
 
     err = 0
@@ -39,12 +41,10 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Combine HDF files',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--year', default='2012', help='Analyis Year')
     args = p.parse_args()
     
-    file_list = glob.glob(args.prefix+'datasets/quality_energies/'+args.year+'/Run*.hdf5')
-    outFile = args.prefix+'datasets/quality_energies/'+args.year+'.hdf5'
+    file_list = glob.glob(prefix+'datasets/quality_energies/'+args.year+'/Run*.hdf5')
+    outFile = prefix+'datasets/quality_energies/'+args.year+'.hdf5'
 
     combine_hdfs(file_list, outFile)

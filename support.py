@@ -8,7 +8,7 @@
 prefix = '/data/user/zgriffith/pev_photons/'
 
 # Plotting Style
-plot_style = 'gamma_rays_5yr'
+plot_style = prefix+'gamma_rays_5yr.mplstyle'
 
 # Custom color map in the style of
 # the all-sky neutrino point source analysis.

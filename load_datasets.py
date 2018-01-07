@@ -9,6 +9,8 @@ import numpy as np
 from skylab.datasets import Datasets
 from skylab.llh_models import EnergyLLH
 
+from pev_photons.support import prefix
+
 def load_ps_dataset(args):
     """ Creates a MultiPointSourceLLH object from the final cut level point
     source event files
@@ -88,7 +90,7 @@ def load_gp_dataset(args):
         sinDec_bins = Datasets['GammaRays5yr_GalPlane'].sinDec_bins(name)
         sinDec_range = [sinDec_bins[0], sinDec_bins[-1]]
 
-        template = Template((args.prefix+'/galactic_plane/'+year+
+        template = Template((prefix+'/galactic_plane/'+year+
                              '/'+args.name+'_exp.npy'), reduced=True)
 
         llh_model = EnergyLLH(twodim_bins=[energy_bins, sinDec_bins],

@@ -8,10 +8,12 @@ import argparse
 import numpy as np
 import pandas as pd
 
+from pev_photons.support import prefix
+
 def apply_cuts(args, dataset):
 
     # Load given dataset
-    f = pd.read_hdf(args.prefix+'datasets/level3/'+dataset+'.hdf5')
+    f = pd.read_hdf(prefix+'datasets/level3/'+dataset+'.hdf5')
 
     # Event must be contained within IceTop
     cut = np.less_equal(f['laputop_it'].values, 1)
@@ -37,7 +39,7 @@ def apply_cuts(args, dataset):
 
     # Apply cuts to data
     cut = np.equal(cut,1)
-    f[cut].to_hdf(args.prefix+'datasets/level3/'+dataset+'_quality.hdf5',
+    f[cut].to_hdf(prefix+'datasets/level3/'+dataset+'_quality.hdf5',
              'dataframe', mode='w')
 
 if __name__ == "__main__":
@@ -45,8 +47,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='apply quality cuts to level 3 files',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--year', default='all',
                    help='Year of mc and data. If all, run all years')
     args = p.parse_args()

@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_ps_dataset(args)
 
-    sources = np.load(args.prefix+'/TeVCat/hess_sources.npz')
+    sources = np.load(prefix+'/TeVCat/hess_sources.npz')
     if args.bg_trials:
         run_bg_trials(psllh, sources, args)
     else:
