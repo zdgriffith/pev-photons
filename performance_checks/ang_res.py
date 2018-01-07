@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from support import get_fig_dir, plot_setter
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
     return  (np.abs(array-value)).argmin()
@@ -50,20 +50,18 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot the ang. res. weighted to an E^-2 specrum',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--outFile', default='effective_area_years.png',
                    help='file name')
     args = p.parse_args()
 
-    plt.style.use('stefan')
+    plt.style.use(plot_style)
     
     # Plot only the first and last years for readibility
     years = ['2011', '2015']
 
     E_bins = np.arange(5.7, 8.1, 0.1)
     for i, year in enumerate(years):
-        f = pd.read_hdf(args.prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
         error(f, year, 'primary_E', E_bins)
 
     plt.xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')

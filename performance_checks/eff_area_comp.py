@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from support import get_fig_dir, plot_setter, get_colors
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))
@@ -63,7 +63,7 @@ def effective_area(args, logE, year, w, color):
     if year == '2011':
         n_gen = 60000
     else:
-        events = np.load(args.prefix+'datasets/level3/'+year+'_mc_total_events.npy')
+        events = np.load(prefix+'datasets/level3/'+year+'_mc_total_events.npy')
         n_gen  = events[:].astype('float')
 
     area = E_hist.bincontent/n_gen
@@ -95,8 +95,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot the effective area for each MC year',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--outFile', default='effective_area_years.png',
                    help='file name')
     p.add_argument('--noBins', action='store_true', default=False,
@@ -109,15 +107,16 @@ if __name__ == "__main__":
 
     # Plotting set up
     dashi.visual()
-    plt.style.use('stefan')
-    colors = get_colors()
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
+
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
     comp = []
     lines = []
     years = ['2011', '2012', '2013', '2014', '2015']
     for i, year in enumerate(years):
-        f = pd.read_hdf(args.prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
 
         # Reweight events with <8 stations triggered for 2011 due to filter
         if year == '2011':

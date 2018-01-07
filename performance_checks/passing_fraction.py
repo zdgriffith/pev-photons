@@ -11,14 +11,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import dashi
-from support_functions import get_fig_dir, plot_setter
+from pev_photons.support import get_fig_dir, plot_setter, plot_style
 from support_pandas import load_all_folds
 
-dashi.visual()
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
-       
 def passing_fraction(args, alpha=False, suffix=''):
     if 'all' in args.years:
         args.years = ['2011','2012','2013','2014','2015']
@@ -80,9 +75,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Create an all sky TS map',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--outFile', type=str,
                    default='passing_vs_energy.png',
                    help='file name')
@@ -90,6 +82,9 @@ if __name__ == "__main__":
                    help=('Year(s) to plot.  If "all", '
                          'will plot the combination'))
     args = p.parse_args()
+
+    dashi.visual()
+    plt.style.use(plot_style)
 
     labels = [' (point source selection)', ' (galactic plane selection)']
     for i, alpha in enumerate([False,3.0]):
@@ -104,7 +99,7 @@ if __name__ == "__main__":
     plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(fig_dir+'/passing_vs_energy_all_years.png',
+    plt.savefig(get_fig_dir()+'/passing_vs_energy_all_years.png',
                 facecolor='none', dpi=300)
     plt.savefig('/home/zgriffith/public_html/paper/passing_fraction.pdf')
     plt.close()
