@@ -6,47 +6,20 @@
 
 import argparse as ap
 import healpy as hp
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap, LogNorm
+from matplotlib.colors import LogNorm
 from matplotlib import cm
 
 import sky
 from mpl_toolkits.basemap import Basemap
-from support_functions import get_fig_dir
 
-plt.style.use('stefan')
-# Custom color map in the style of
-# the all-sky neutrino point source analysis.
-ps_map = {'blue' : ((0.0, 0.0, 1.0),
-                    (0.17, 1.0, 1.0),
-                    (0.4, 1.0, 1.0),
-                    (0.6, 1.0, 1.0),
-                    (0.7, 0.2, 0.2),
-                    (1.0, 0.0, 0.0)),
-          'green': ((0.0, 0.0, 1.0),
-                    (0.17, 1.0, 1.0),
-                    (0.5, 0.0416, 0.0416),
-                    (0.6, 0.0, 0.0),
-                    (0.8, 0.5, 0.5),
-                    (1.0, 1.0, 1.0)),
-          'red':   ((0.0, 0.0, 1.0),
-                   (0.17, 1.0, 1.0),
-                   (0.5, 0.0416, 0.0416),
-                   (0.6, 0.0416, 0.0416),
-                   (0.7, 1.0, 1.0),
-                    (1.0, 1.0, 1.0))}
-
-ps_map = LinearSegmentedColormap('ps_map', ps_map, 256)
+from pev_photons.support import prefix, plot_style, get_fig_dir, ps_map
 
 if __name__ == "__main__":
     p = ap.ArgumentParser(
             description='Plot a skymap with a south polar projection.',
             formatter_class=ap.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type = str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--extension', type=float, default=0,
                    help='Spatial extension to source hypothesis in degrees.')
     p.add_argument('--noPlane', action='store_true', default=False,
@@ -55,11 +28,13 @@ if __name__ == "__main__":
                    help='If True, do not draw grid lines.')
     args = p.parse_args()
 
+    plt.style.use(plot_style)
+
     if args.extension:
-        inFile = args.prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
+        inFile = prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
         outFile = 'all_sky_scan_ext_%s.png' % args.extension
     else:
-        inFile = args.prefix + 'all_sky/p_value_skymap.npy'
+        inFile = prefix + 'all_sky/p_value_skymap.npy'
         outFile = 'all_sky_scan.png'
 
     m = np.load(inFile)
@@ -135,5 +110,5 @@ if __name__ == "__main__":
     plt.savefig(get_fig_dir()+outFile,
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
-    plt.savefig('/home/zgriffith/public_html/paper/all_sky_scan.pdf')
+    #plt.savefig('/home/zgriffith/public_html/paper/all_sky_scan.pdf')
     plt.close()

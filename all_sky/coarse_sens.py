@@ -9,7 +9,8 @@ import numpy as np
 import logging
 
 from skylab.ps_injector import PointSourceInjector
-from load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
@@ -18,9 +19,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Calculate sensitivity as a function of declination.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,
@@ -48,5 +46,5 @@ if __name__ == "__main__":
             sens[j] = result[0]["flux"][0]
             disc[j] = result[0]["flux"][1]
 
-            np.save(args.prefix+'all_sky/sens_index_%s.npy' % index, sens)
-            np.save(args.prefix+'all_sky/disc_index_%s.npy' % index, disc)
+            np.save(prefix+'all_sky/sens_index_%s.npy' % index, sens)
+            np.save(prefix+'all_sky/disc_index_%s.npy' % index, disc)

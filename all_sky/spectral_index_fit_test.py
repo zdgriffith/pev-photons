@@ -7,8 +7,9 @@
 import argparse
 import numpy as np
 
-from load_datasets import load_ps_dataset
 from skylab.ps_injector import PointSourceInjector
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 def index_vs_events(ps_llh, args):
     """Test the fitted spectral index for a range of injected events
@@ -37,7 +38,7 @@ def index_vs_events(ps_llh, args):
                                  injector=inj, mean_signal=n_inj,
                                  poisson=False)
             fit['fit_index'][i][j] = a['gamma']
-            np.save(args.prefix+'all_sky/systematics/index_vs_events.npy',
+            np.save(prefix+'all_sky/systematics/index_vs_events.npy',
                     fit)
 
 def fit_vs_inj_index(args):
@@ -61,7 +62,7 @@ def fit_vs_inj_index(args):
                              injector=inj, mean_signal=20,
                              poisson=False)
         alpha_fits[i] = a['gamma']
-        np.save(args.prefix+'all_sky/systematics/fit_vs_inj_index.npy',
+        np.save(prefix+'all_sky/systematics/fit_vs_inj_index.npy',
                 alpha_fits)
 
 def index_vs_dec(args):
@@ -83,15 +84,12 @@ def index_vs_dec(args):
                              injector=inj, mean_signal=20,
                              poisson=False)
         alpha_fits[i] = a['gamma']
-        np.save(args.prefix+'all_sky/systematics/index_vs_dec.npy', alpha_fits)
+        np.save(prefix+'all_sky/systematics/index_vs_dec.npy', alpha_fits)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Functions to test the fitted spectral index.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,

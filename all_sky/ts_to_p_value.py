@@ -10,23 +10,22 @@ import healpy as hp
 import numpy as np
 from glob import glob
 
+from pev_photons.support import prefix
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Convert TS map to p-value map.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument('--extension', type=float, default=0,
                    help='Spatial extension to source hypothesis in degrees.')
     args = p.parse_args()
 
     if args.extension:
-        inFile = args.prefix + 'all_sky/ext/skymap_ext_%s.npy' % args.extension
-        outFile = args.prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
+        inFile = prefix + 'all_sky/ext/skymap_ext_%s.npy' % args.extension
+        outFile = prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
     else:
-        inFile = args.prefix + 'all_sky/skymap.npy'
-        outFile = args.prefix + 'all_sky/p_value_skymap.npy'
+        inFile = prefix + 'all_sky/skymap.npy'
+        outFile = prefix + 'all_sky/p_value_skymap.npy'
 
     # File which contains the pixels of the skymap which have
     # unique declination values.
@@ -41,7 +40,7 @@ if __name__ == "__main__":
     # which have a TS value above the true value.
     for dec_i in range(n_decs):
         print(dec_i)
-        f_list = glob(args.prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
+        f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
         trials = []
         for f in f_list:
             a = np.load(f)

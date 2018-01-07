@@ -9,15 +9,14 @@ import numpy as np
 
 import healpy as hp
 
+from pev_photons.support import prefix
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Create an array of unique declination values',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--nside", type=int, default=512,
                    help='nside of skymap')
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument('--outFile', type=str,
                    default='all_sky/dec_values_512.npz',
                    help='The output file name.')
@@ -35,6 +34,6 @@ if __name__ == "__main__":
         if mask[i] == True:
             pix_list.append(pix[np.equal(dec_list,dec)]) 
 
-    np.savez(args.prefix+args.outFile,
+    np.savez(prefix+args.outFile,
              pix_list=pix_list,
              decs=unique_decs[mask])

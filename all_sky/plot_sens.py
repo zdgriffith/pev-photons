@@ -8,19 +8,14 @@
 import argparse
 import scipy
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from glob import glob
 
-from support_functions import get_fig_dir, plot_setter
-
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
+from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
-    sources = np.load(args.prefix+'TeVCat/hess_sources.npz')
+    sources = np.load(prefix+'TeVCat/hess_sources.npz')
 
     # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
@@ -37,7 +32,7 @@ def plot_hess_sources(args):
     if args.no_absorption:
         ratio = 1
     else:
-        surv = np.loadtxt(args.prefix+'TeVCat/gamma_survival_vs_distance.txt')
+        surv = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_distance.txt')
         surv = surv.T
         spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
                                                                 surv[1], k=2)
@@ -72,14 +67,14 @@ def plot_sens(args):
         kinds = ['sens', 'disc']
         for i, index in enumerate(indices):
             for j, kind in enumerate(kinds):
-                flux = np.load(args.prefix+'all_sky/%s_index_%s.npy' % (kind, index))
+                flux = np.load(prefix+'all_sky/%s_index_%s.npy' % (kind, index))
                 plt.plot(dec_list, flux*(1e3),
                          color=colors[i], ls=linestyle[j],
                          label='E$^{-%s}$ %s' % (index, kind_labels[j]))
     else:
         for i, index in enumerate(indices):
             arrs = []
-            files = glob(args.prefix+'all_sky/sens_jobs/index_%s/dec*' % index)
+            files = glob(prefix+'all_sky/sens_jobs/index_%s/dec*' % index)
             for fname in files:
                 a = np.load(fname)
                 arrs.append([item for item in a[0]])
@@ -94,8 +89,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot the sensitivity as a function of declination.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--no_absorption', action='store_true',
                    default=False,
                    help='if True, flux extrapolations have no absorption')
@@ -106,6 +99,9 @@ if __name__ == "__main__":
                    default=False,
                    help='if True, plot HESS 90% limits.')
     args = p.parse_args()
+
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
 
     plot_sens(args)
     plot_hess_sources(args)
@@ -118,6 +114,6 @@ if __name__ == "__main__":
     plt.text(-80, 2e-21, 'IceCube Preliminary', color='r', fontsize=14)
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
-    plt.savefig(fig_dir+'sensitivity.pdf', bbox_inches='tight')
+    plt.savefig(get_fig_dir()+'sensitivity.pdf', bbox_inches='tight')
     plt.savefig('/home/zgriffith/public_html/paper/ps_sensitivity.pdf')
     plt.close()

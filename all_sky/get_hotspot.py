@@ -8,6 +8,8 @@ import argparse
 import numpy as np
 import healpy as hp
 
+from pev_photons.support import prefix
+
 def test_hotspot(ra, dec, args):
     from load_datasets import load_ps_dataset
 
@@ -27,10 +29,10 @@ def test_hotspot(ra, dec, args):
     hotspot['gamma'] = fit[1]['gamma']
 
     print(hotspot)
-    np.save(args.prefix+'all_sky/hotspot.npy', hotspot)
+    np.save(prefix+'all_sky/hotspot.npy', hotspot)
 
 def get_hotspot_direction(args):
-    m = np.load(args.prefix+'all_sky/skymap.npy')
+    m = np.load(prefix+'all_sky/skymap.npy')
     npix = len(m)
     nside = hp.npix2nside(npix)
     theta, ra = hp.pix2ang(nside, range(npix))
@@ -46,9 +48,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Test hotspot',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev_photons/',
-                   help    = 'base directory for file storing')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,

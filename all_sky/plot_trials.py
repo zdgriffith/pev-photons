@@ -8,26 +8,22 @@
 import argparse
 import glob
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from support_functions import get_fig_dir, plot_setter
-
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
+from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='plot scrambled trials',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--bin_width', type=float, default=0.5,
                    help='width of bin in TS space')
     args = p.parse_args()
 
-    hotspot = np.load(args.prefix+'all_sky/hotspot.npy')['TS'][0]
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
+
+    hotspot = np.load(prefix+'all_sky/hotspot.npy')['TS'][0]
     job_list = glob.glob('/data/user/zgriffith/all_sky/full_*.npy')
 
     bg_trials = []
@@ -65,6 +61,6 @@ if __name__ == "__main__":
     plt.ylim([0.5,Ntrials])
     plt.tight_layout()
     plt.text(1, 3000, 'IceCube Preliminary', color = 'r', fontsize=14)
-    plt.savefig(fig_dir+'all_sky_trials.pdf')
+    plt.savefig(get_fig_dir()+'all_sky_trials.pdf')
     plt.savefig('/home/zgriffith/public_html/paper/all_sky_trials.pdf')
     plt.close()

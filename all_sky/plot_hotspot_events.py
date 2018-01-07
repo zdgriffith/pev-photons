@@ -6,23 +6,19 @@
 
 import argparse
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from support_functions import get_fig_dir
+from pev_photons.support import prefix, get_fig_dir, plot_style
+
 from colormaps import cmaps
 
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
-
-def plot_events(pf):
+def plot_events():
     years = ['2011', '2012', '2013', '2014','2015']
     decs = []
     ras = []
     E_list = []
     for i, year in enumerate(years): 
-        exp = np.load(pf+'/datasets/'+year+'_exp_ps.npy')
+        exp = np.load(prefix+'/datasets/'+year+'_exp_ps.npy')
         decs.extend(exp['dec'])
         ras.extend(exp['ra'])
         E_list.extend(exp['logE'])
@@ -41,15 +37,16 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Zoomed region on hessj1507 with events',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--outFile', default='hotspot_zoom.pdf',
                    help='file name')
     args = p.parse_args()
 
-    plot_events(args.prefix)
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
 
-    hotspot = np.load(args.prefix+'all_sky/hotspot.npy')
+    plot_events()
+
+    hotspot = np.load(prefix+'all_sky/hotspot.npy')
     plt.scatter(hotspot['ra'][0], hotspot['dec'][0],
                 marker='+', color = 'green', s = 2**6)
     ax = plt.gca()
@@ -59,5 +56,5 @@ if __name__ == "__main__":
 
     ax.set_xlabel('RA [$^\circ$]')
     ax.set_ylabel('Dec [$^\circ$]')
-    plt.savefig(fig_dir+args.outFile)
+    plt.savefig(get_fig_dir()+args.outFile)
     plt.close()

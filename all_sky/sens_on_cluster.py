@@ -8,15 +8,13 @@ import argparse
 import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
-from load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Calculate sensitivity as a function of declination.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,
@@ -47,5 +45,5 @@ if __name__ == "__main__":
     flux['dec'] = args.dec
     flux['sens'] = result[0]['flux'][0]
     flux['disc'] = result[0]['flux'][1]
-    np.save(args.prefix+'all_sky/sens_jobs/index_%s/dec_%s.npy' % (args.index, args.dec),
+    np.save(prefix+'all_sky/sens_jobs/index_%s/dec_%s.npy' % (args.index, args.dec),
             flux)

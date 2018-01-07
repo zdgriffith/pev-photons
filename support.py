@@ -4,13 +4,36 @@
 # Supporting functions and variables
 ########################################################################
 
-import matplotlib as mpl
-
+# Location to store data files
 prefix = '/data/user/zgriffith/pev_photons/'
 
 # Plotting Style
 plot_style = 'gamma_rays_5yr'
-colors = mpl.rcParams['axes.color_cycle']
+
+# Custom color map in the style of
+# the all-sky neutrino point source analysis.
+from matplotlib.colors import LinearSegmentedColormap
+
+ps_map = {'blue' : ((0.0, 0.0, 1.0),
+                    (0.17, 1.0, 1.0),
+                    (0.4, 1.0, 1.0),
+                    (0.6, 1.0, 1.0),
+                    (0.7, 0.2, 0.2),
+                    (1.0, 0.0, 0.0)),
+          'green': ((0.0, 0.0, 1.0),
+                    (0.17, 1.0, 1.0),
+                    (0.5, 0.0416, 0.0416),
+                    (0.6, 0.0, 0.0),
+                    (0.8, 0.5, 0.5),
+                    (1.0, 1.0, 1.0)),
+          'red':   ((0.0, 0.0, 1.0),
+                   (0.17, 1.0, 1.0),
+                   (0.5, 0.0416, 0.0416),
+                   (0.6, 0.0416, 0.0416),
+                   (0.7, 1.0, 1.0),
+                    (1.0, 1.0, 1.0))}
+
+ps_map = LinearSegmentedColormap('ps_map', ps_map, 256)
 
 def get_fig_dir():
     """ provide the path for saving figures to public_html """

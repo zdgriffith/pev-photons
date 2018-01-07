@@ -4,19 +4,16 @@
 # Functions to plot the behavior of the fitted spectral index.
 ########################################################################
 
-import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
-from support_functions import get_fig_dir, plot_setter
+from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
 
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-fig_dir = get_fig_dir()
+def index_vs_events():
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
 
-def index_vs_events(args):
-    fit = np.load(args.prefix+'all_sky/systematics/index_vs_events.npy').item()
+    fit = np.load(prefix+'all_sky/systematics/index_vs_events.npy').item()
     
     for i, index in enumerate(fit['index_list']):
         # Plot the median of the fitted index
@@ -42,16 +39,8 @@ def index_vs_events(args):
     plt.xlim([fit['n_list'][0],fit['n_list'][-1]])
     plt.ylim([1.0, 4.0])
     plt.tight_layout()
-    plt.savefig(fig_dir+'index_vs_events.png')
+    plt.savefig(get_fig_dir()+'index_vs_events.png')
     plt.close()
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(
-            description='plot spectral index fitting',
-            formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type = str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
-    args = p.parse_args()
-
-    index_vs_events(args)
+    index_vs_events()

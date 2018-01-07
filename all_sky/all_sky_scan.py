@@ -10,7 +10,8 @@ import logging
 
 import healpy as hp
 
-from load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.support import prefix
 
 def manual_scan(ps_llh, args):
     """manually test for a point source at each pixen in the sky map"""
@@ -28,19 +29,16 @@ def manual_scan(ps_llh, args):
         ts, xmin = ps_llh._scan(ra[mask], dec[mask],
                                 ts, xmin, mask,
                                 src_extension=np.radians(args.extension))
-        np.save(args.prefix+'/all_sky/ext/skymap_ext_%s.npy' % args.extension,
+        np.save(prefix+'/all_sky/ext/skymap_ext_%s.npy' % args.extension,
                 ts)
     else:
         ts, xmin = ps_llh._scan(ra[mask], dec[mask], ts, xmin, mask)
-        np.save(args.prefix+'/all_sky/skymap.npy', ts)
+        np.save(prefix+'/all_sky/skymap.npy', ts)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Create an all sky TS map.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='The base directory for file storing.')
     p.add_argument('--outFile', type=str,
                    default='all_sky/skymap.npy',
                    help='The output file name.')
@@ -62,7 +60,7 @@ if __name__ == "__main__":
 
     # Set the logging output file.
     logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
-    logging.basicConfig(filename=args.prefix+'all_sky/scan.log',
+    logging.basicConfig(filename=prefix+'all_sky/scan.log',
                         filemode='w', level=logging.INFO)
 
     if args.coarse_scan:
@@ -70,6 +68,6 @@ if __name__ == "__main__":
             if i > 0:
                 m = scan[0]['TS']
                 break
-        np.save(args.prefix+args.outFile, m)
+        np.save(prefix+args.outFile, m)
     else:
         manual_scan(ps_llh, args)
