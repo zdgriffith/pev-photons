@@ -8,16 +8,15 @@ import argparse
 import glob
 import numpy as np
 import numpy.lib.recfunctions
+import matplotlib.pyplot as plt
+from scipy.stats import chi2
+
+from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
 
 def plot_trials(args, bg_trials, n_trials, true_TS):
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    from scipy.stats import chi2
-    from support_functions import get_fig_dir, plot_setter
 
-    plt.style.use('stefan')
-    colors = mpl.rcParams['axes.color_cycle']
-    fig_dir = get_fig_dir()
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
 
     #Plot the background trials scrambled in right ascension
     c_rgb = (215/256.,25/256.,28/256., 0.5)
@@ -57,16 +56,13 @@ def plot_trials(args, bg_trials, n_trials, true_TS):
     plt.xlabel('Test Statistic', fontweight = 'bold')
     plt.ylabel('Trials', fontweight = 'bold')
     plt.tight_layout()
-    plt.savefig(fig_dir+'bg_trials.pdf')
+    plt.savefig(get_fig_dir()+'bg_trials.pdf')
     plt.close()
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot scrambled trials.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='base directory for file storing')
     p.add_argument('--plot_trials', action='store_true', default=False,
                    help='if True, plot TS distribution.')
     p.add_argument('--chi2_ndf', type=int, nargs='*',
@@ -78,7 +74,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     #Load in scrambled trials
-    job_list = glob.glob(args.prefix+'/galactic_plane/trials/*') 
+    job_list = glob.glob(prefix+'/galactic_plane/trials/*') 
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)
@@ -86,7 +82,7 @@ if __name__ == "__main__":
     n_trials = float(len(bg_trials))
 
     #Calculate true result p-value
-    fit_result = np.load(args.prefix+'/galactic_plane/fermi_pi0_fit_result.npy')
+    fit_result = np.load(prefix+'/galactic_plane/fermi_pi0_fit_result.npy')
     true_TS  = fit_result['TS']
 
     p_value = np.sum(np.greater(bg_trials, fit_result['TS']))/n_trials
@@ -99,7 +95,7 @@ if __name__ == "__main__":
                                                           data=[p_value],
                                                           dtypes=np.float,
                                                           usemask=False)
-        np.save(args.prefix+'/galactic_plane/fermi_pi0_fit_result.npy',
+        np.save(prefix+'/galactic_plane/fermi_pi0_fit_result.npy',
                 fit_result)
 
     #Plot if desired

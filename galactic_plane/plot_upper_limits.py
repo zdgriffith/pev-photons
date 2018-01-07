@@ -5,15 +5,10 @@
 ########################################################################
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from support_functions import get_fig_dir
+from pev_photons.support import get_fig_dir, plot_style
 
-fig_dir = get_fig_dir()
-plt.style.use('stefan')
-colors = mpl.rcParams['axes.color_cycle']
-    
 # Plots an arrow
 def plot_limit(x,y, unc = None, label = '', color = 'k'):
     # A scatter point.
@@ -28,6 +23,9 @@ def plot_limit(x,y, unc = None, label = '', color = 'k'):
                      markeredgewidth=1.5)
 
 if __name__ == "__main__":
+
+    plt.style.use(plot_style)
+    colors = plt.rcParams['axes.color_cycle']
     
     x = 2*10**6
     conv = (x**2)
@@ -48,6 +46,6 @@ if __name__ == "__main__":
     plt.xlabel(r'$E_\gamma$ [GeV]')
     plt.ylabel(r'$E^2J_\gamma$ [GeV cm${}^{-2}$ s${}^{-1}$]')
     plt.legend()
-    plt.savefig(fig_dir+'sensitivity_comparison.png', facecolor='none',
+    plt.savefig(get_fig_dir()+'sensitivity_comparison.png', facecolor='none',
                 bbox_inches="tight", dpi=300)
     plt.close()

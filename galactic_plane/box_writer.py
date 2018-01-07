@@ -9,6 +9,8 @@ import numpy as np
 
 import healpy as hp
 
+from pev_photons.support import prefix
+
 #Constant emission within some galactic latitude bound.
 def box(args):
     npix  = hp.nside2npix(args.nside)
@@ -17,8 +19,8 @@ def box(args):
     m = np.zeros(npix)
     mask = np.less(np.abs(np.pi/2. - gal_lat),np.radians(args.size))
     m[mask] += 1
-    np.save(args.prefix+('/galactic_plane/source_templates/'
-                         'box_%s.npy' % args.size), m) 
+    np.save(prefix+('/galactic_plane/source_templates/'
+                    'box_%s.npy' % args.size), m) 
 
 # Ingelman-Thunman template, a thin constant plane region
 # with an exponential decay beyond.
@@ -34,14 +36,11 @@ def ingelman_thunman(args):
     mask = np.less(np.abs(np.pi/2. - gal_lat), theta_0)
     m[mask] += 1 
     m[~mask] += np.exp(-d*np.tan(np.abs(np.pi/2.-gal_lat[~mask]))/h_0)
-    np.save(args.prefix+'/galactic_plane/source_templates/ingelman.npy', m) 
+    np.save(prefix+'/galactic_plane/source_templates/ingelman.npy', m) 
 
 if __name__ == "__main__":
     p = ap.ArgumentParser(description='Build template maps.',
                           formatter_class=ap.RawTextHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--size', type=float, default=5.0,
                    help='width of galactic plane in degrees.')
     p.add_argument('--nside', type=int, default=512,

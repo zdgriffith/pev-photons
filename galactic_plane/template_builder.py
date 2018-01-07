@@ -11,13 +11,14 @@ import argparse as ap
 import numpy as np
 
 from skylab.template import Template
+from pev_photons.support import prefix
 
 def template_builder(args):
     """Build the template for a given year."""
     rad2deg = 180./np.pi
 
-    exp = np.load(args.prefix+'/datasets/'+args.year+'_exp_diffuse.npy')
-    mc  = np.load(args.prefix+'/datasets/'+args.year+'_mc_diffuse.npy')
+    exp = np.load(prefix+'/datasets/'+args.year+'_exp_diffuse.npy')
+    mc  = np.load(prefix+'/datasets/'+args.year+'_mc_diffuse.npy')
 
     if args.mcBackground:
       ev  = mc
@@ -28,7 +29,7 @@ def template_builder(args):
       ext = '_exp'
       weights = None
 
-    output = (args.prefix + '/galactic_plane/' + args.year + '/' 
+    output = (prefix + '/galactic_plane/' + args.year + '/' 
               + args.inFile + ext)
 
     os.system('mkdir -p ' + output)
@@ -43,7 +44,7 @@ def template_builder(args):
 
     template = Template()
 
-    template.build(map_in=(args.prefix+'/galactic_plane/source_templates/'
+    template.build(map_in=(prefix+'/galactic_plane/source_templates/'
                            + args.inFile + '.npy'),
                    nside_out=512,
                    mc=mc, exp=exp,
@@ -62,9 +63,6 @@ def template_builder(args):
 if __name__ == '__main__':
     p = ap.ArgumentParser(description='Build template maps.',
                           formatter_class=ap.RawTextHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--mcBackground', action='store_true',
                     help=('Use MC to build background PDFs '
                           'and produce data scrambles.'))

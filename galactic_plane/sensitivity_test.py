@@ -9,7 +9,9 @@ import numpy as np
 
 from skylab.sensitivity_utils import estimate_sensitivity
 from skylab.template_injector import TemplateInjector
-from load_datasets import load_gp_dataset
+
+from pev_photons.load_datasets import load_gp_dataset
+from pev_photons.support import get_fig_dir()
 
 def mu2flux(inj, args):
 
@@ -20,9 +22,6 @@ def mu2flux(inj, args):
 if __name__ == "__main__":
     p = ap.ArgumentParser(description='Test galactic plane sensitivity.',
                           formatter_class=ap.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,
@@ -50,8 +49,7 @@ if __name__ == "__main__":
         mu2flux(inj, args)
 
     #Directory where plots will go
-    path = ("/home/zgriffith/public_html/"
-            "photon_analysis/pev_photons/galactic_plane/"+args.name+"/")
+    path = (get_fig_dir()+args.name+'/')
 
     results = estimate_sensitivity(template_llh, inj,
                                    nstep=11, 

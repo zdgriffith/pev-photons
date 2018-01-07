@@ -6,24 +6,19 @@
 
 import argparse as ap
 import healpy as hp
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap, LogNorm
 from matplotlib import cm
 
-plt.style.use('stefan')
 from mpl_toolkits.basemap import Basemap
-from support_functions import get_fig_dir
+from pev_photons.support import prefix, plot_style, get_fig_dir
 from colormaps import cmaps
 
 if __name__ == "__main__":
     p = ap.ArgumentParser(
             description='Plot a skymap with a south polar projection.',
             formatter_class=ap.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type = str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--mapName', type = str,
                    default='fermi_pi0',
                    help='Name of the skymap to plot.')
@@ -33,7 +28,9 @@ if __name__ == "__main__":
                    help='If True, do not draw grid lines.')
     args = p.parse_args()
 
-    filename = args.prefix+'/galactic_plane/2012/'+args.mapName+'_exp.npy'
+    plt.style.use(plot_style)
+
+    filename = prefix+'/galactic_plane/2012/'+args.mapName+'_exp.npy'
     m = np.load(filename)
     m = m.item()['signal_x_acceptance_map']
     m = hp.ud_grade(m,nside_out=512)

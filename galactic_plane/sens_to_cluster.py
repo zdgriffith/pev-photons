@@ -9,7 +9,9 @@ import numpy as np
 
 from skylab.template_injector import TemplateInjector
 from skylab.sensitivity_utils import estimate_sensitivity
-from load_datasets import load_gp_dataset
+
+from pev_photons.load_datasets import load_gp_dataset
+from pev_photons.support import prefix
 
 def sensitivity(args):
     template_llh = load_gp_dataset(args)
@@ -27,14 +29,11 @@ def sensitivity(args):
     n = trials['TS'][ trials['TS'] > 0].size
     ntot = trials['TS'].size
 
-    np.save(args.prefix+"galactic_plane/sens_trials/"+args.name+"_job_"+str(args.job)+".npy", [args.n_inj, n, ntot])
+    np.save(prefix+"galactic_plane/sens_trials/"+args.name+"_job_"+str(args.job)+".npy", [args.n_inj, n, ntot])
 
 if __name__ == "__main__":
     p = ap.ArgumentParser(description='Galactic plane sensitivity runs.',
                           formatter_class=ap.RawDescriptionHelpFormatter)
-    p.add_argument('--prefix', type=str,
-                   default='/data/user/zgriffith/pev_photons/',
-                   help='Base directory for file storing.')
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,
