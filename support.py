@@ -4,11 +4,15 @@
 # Supporting functions and variables
 ########################################################################
 
-# Location to store data files
+# Location to store created data files
 prefix = '/data/user/zgriffith/pev_photons/'
 
+# Location where files are kept that are only accessed,
+# not written to.
+resource_dir = '/data/user/zgriffith/pev_photons/resources/'
+
 # Plotting Style
-plot_style = prefix+'gamma_rays_5yr.mplstyle'
+plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
 
 # Custom color map in the style of
 # the all-sky neutrino point source analysis.
