@@ -99,7 +99,5 @@ if __name__ == "__main__":
     plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'/passing_vs_energy_all_years.png',
-                facecolor='none', dpi=300)
-    plt.savefig('/home/zgriffith/public_html/paper/passing_fraction.pdf')
+    plt.savefig(get_fig_dir()+'/passing_vs_energy_all_years.pdf')
     plt.close()

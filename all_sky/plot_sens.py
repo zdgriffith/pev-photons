@@ -117,5 +117,4 @@ if __name__ == "__main__":
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
     plt.savefig(get_fig_dir()+'sensitivity.pdf', bbox_inches='tight')
-    plt.savefig('/home/zgriffith/public_html/paper/ps_sensitivity.pdf')
     plt.close()

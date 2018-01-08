@@ -177,5 +177,4 @@ if __name__ == "__main__":
     plt.yscale('log')
     plt.tight_layout()
     plt.savefig(get_fig_dir()+outFile)
-    plt.savefig('/home/zgriffith/public_html/paper/hess_J1427.pdf')
     plt.close()

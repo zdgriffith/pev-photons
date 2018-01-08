@@ -110,5 +110,4 @@ if __name__ == "__main__":
     plt.savefig(get_fig_dir()+outFile,
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
-    #plt.savefig('/home/zgriffith/public_html/paper/all_sky_scan.pdf')
     plt.close()

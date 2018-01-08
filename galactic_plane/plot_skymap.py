@@ -104,5 +104,4 @@ if __name__ == "__main__":
     plt.savefig(get_fig_dir()+args.mapName+'_x_acc.png',
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
-    plt.savefig('/home/zgriffith/public_html/paper/'+args.mapName+'_x_acc.pdf', bbox_inches='tight')
     plt.close()

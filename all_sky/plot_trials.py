@@ -62,5 +62,4 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.text(1, 3000, 'IceCube Preliminary', color = 'r', fontsize=14)
     plt.savefig(get_fig_dir()+'all_sky_trials.pdf')
-    plt.savefig('/home/zgriffith/public_html/paper/all_sky_trials.pdf')
     plt.close()

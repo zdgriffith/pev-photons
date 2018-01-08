@@ -151,5 +151,4 @@ if __name__ == "__main__":
     plot_setter(plt.gca(),l)
 
     plt.savefig(get_fig_dir()+args.outFile, facecolor='none', dpi=300)
-    plt.savefig('/home/zgriffith/public_html/paper/eff_area_comp2.pdf')
     plt.close()

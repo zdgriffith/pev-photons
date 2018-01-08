@@ -279,5 +279,4 @@ if __name__ == "__main__":
     ax.set_ylabel('b [$^\circ$]')
     plt.gca().invert_yaxis()
     plt.savefig(get_fig_dir()+args.outFile)
-    plt.savefig('/home/zgriffith/public_html/paper/hess_sources.pdf')
     plt.close()
