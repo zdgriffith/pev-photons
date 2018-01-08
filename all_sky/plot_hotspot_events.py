@@ -4,11 +4,10 @@
 # Zoomed Region on hotspot location with events
 ########################################################################
 
-import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, get_fig_dir, plot_style
+from pev_photons.support import prefix, fig_dir, plot_style
 
 from colormaps import cmaps
 
@@ -34,13 +33,6 @@ def plot_events():
     clb.set_label('logE', fontsize=20)
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(
-            description='Zoomed region on hessj1507 with events',
-            formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--outFile', default='hotspot_zoom.pdf',
-                   help='file name')
-    args = p.parse_args()
-
     plt.style.use(plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
@@ -56,5 +48,5 @@ if __name__ == "__main__":
 
     ax.set_xlabel('RA [$^\circ$]')
     ax.set_ylabel('Dec [$^\circ$]')
-    plt.savefig(get_fig_dir()+args.outFile)
+    plt.savefig(fig_dir+'all_sky/hotspot_zoom.pdf')
     plt.close()

@@ -11,7 +11,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import dashi
-from pev_photons.support import get_fig_dir, plot_setter, plot_style
+from pev_photons.support import fig_dir, plot_setter, plot_style
 from support_pandas import load_all_folds
 
 def passing_fraction(args, alpha=False, suffix=''):
@@ -99,5 +99,6 @@ if __name__ == "__main__":
     plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'/passing_vs_energy_all_years.pdf')
+    plt.savefig(fig_dir+'performance_checks/passing_vs_energy_all_years.pdf')
+    plt.savefig(fig_dir+'paper/passing_fraction.pdf')
     plt.close()

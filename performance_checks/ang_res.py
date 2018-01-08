@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
+from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
     return  (np.abs(array-value)).argmin()
@@ -71,5 +71,6 @@ if __name__ == "__main__":
     l = plt.legend()
     plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'ang_res_years.png', facecolor='none', dpi=300)
+    plt.savefig(fig_dir+'performance_checks/ang_res_years.pdf')
+    plt.savefig(fig_dir+'paper/ang_res_years.pdf')
     plt.close()

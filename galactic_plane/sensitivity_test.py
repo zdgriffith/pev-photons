@@ -11,7 +11,7 @@ from skylab.sensitivity_utils import estimate_sensitivity
 from skylab.template_injector import TemplateInjector
 
 from pev_photons.load_datasets import load_gp_dataset
-from pev_photons.support import get_fig_dir()
+from pev_photons.support import fig_dir
 
 def mu2flux(inj, args):
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         mu2flux(inj, args)
 
     #Directory where plots will go
-    path = (get_fig_dir()+args.name+'/')
+    path = (fig_dir+'galactic_plane/'+args.name+'/')
 
     results = estimate_sensitivity(template_llh, inj,
                                    nstep=11, 

@@ -7,7 +7,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
+from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
 
 def index_vs_events():
     plt.style.use(plot_style)
@@ -39,7 +39,7 @@ def index_vs_events():
     plt.xlim([fit['n_list'][0],fit['n_list'][-1]])
     plt.ylim([1.0, 4.0])
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'index_vs_events.png')
+    plt.savefig(fig_dir+'all_sky/index_vs_events.png')
     plt.close()
 
 if __name__ == "__main__":

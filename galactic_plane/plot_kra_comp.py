@@ -8,7 +8,7 @@ import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, resource_dir, get_fig_dir, plot_style
+from pev_photons.support import prefix, resource_dir, fig_dir, plot_style
 
 def abs(E):
     surv   = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
@@ -55,6 +55,6 @@ if __name__ == "__main__":
     plt.xlabel(r'$E_\gamma$ [GeV]')
     plt.ylabel(r'$E^2J_\gamma$ [GeV cm${}^{-2}$ s${}^{-1}$ sr${}^{-1}$]')
     plt.legend()
-    plt.savefig(get_fig_dir()+'kra_comp.png', facecolor='none',
+    plt.savefig(fig_dir+'galactic_plane/kra_comp.png', facecolor='none',
                 bbox_inches="tight", dpi=300)
     plt.close()

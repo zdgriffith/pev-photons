@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
+from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))
@@ -95,8 +95,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot the effective area for each MC year',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--outFile', default='effective_area_years.png',
-                   help='file name')
     p.add_argument('--noBins', action='store_true', default=False,
                    help='if True, do not plot bins')
     p.add_argument('--sigmoid', action='store_true', default=False,
@@ -150,5 +148,6 @@ if __name__ == "__main__":
                    ncol=5, fancybox=False)
     plot_setter(plt.gca(),l)
 
-    plt.savefig(get_fig_dir()+args.outFile, facecolor='none', dpi=300)
+    plt.savefig(fig_dir+'performance_checks/eff_area_comp.pdf')
+    plt.savefig(fig_dir+'paper/eff_area_comp.pdf')
     plt.close()

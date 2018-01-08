@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import dashi
-from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
+from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
 import colormaps as cmaps
 import tables as t
 
@@ -47,9 +47,9 @@ def slc_plot(f, cos_zen, fname='slc_dist.png'):
     l = plt.legend(loc='lower left', frameon=True)
     plot_setter(plt.gca(),l)
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+fname)
+    plt.savefig(fig_dir+'event_selection/'+fname)
     if zen_min == 0.95:
-        plt.savefig('/home/zgriffith/public_html/paper/slc_optimization.pdf')
+        plt.savefig(fig_dir+'paper/slc_optimization.pdf')
     plt.close()
 
 

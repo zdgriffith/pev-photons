@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 
-from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
+from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
 from gamma_ray_survival import absorption_spline
 
 #Plot data points
@@ -176,5 +176,7 @@ if __name__ == "__main__":
     plt.xscale('log')
     plt.yscale('log')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+outFile)
+    plt.savefig(fig_dir+'TeVCat/'+outFile)
+    if args.addFermi:
+        plt.savefig(fig_dir+'paper/hess_J1427.pdf')
     plt.close()

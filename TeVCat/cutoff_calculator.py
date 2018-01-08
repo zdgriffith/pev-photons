@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 import dashi
-from pev_photons.support import prefix, get_fig_dir, plot_style
+from pev_photons.support import prefix, fig_dir, plot_style
 
 def cutoff_calculator():
     sources = np.load(prefix+'TeVCat/hess_sources.npz')
@@ -62,5 +62,5 @@ if __name__ == "__main__":
 
     plt.xlabel('Minimum Cut-Off Energy [TeV]')
     plt.legend()
-    plt.savefig(get_fig_dir()+args.outFile, facecolor='none', dpi=300)
+    plt.savefig(fig_dir+'TeVCat/'+args.outFile, facecolor='none', dpi=300)
     plt.close()

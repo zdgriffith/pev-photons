@@ -7,7 +7,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import get_fig_dir, plot_style
+from pev_photons.support import fig_dir, plot_style
 
 # Plots an arrow
 def plot_limit(x,y, unc = None, label = '', color = 'k'):
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     plt.xlabel(r'$E_\gamma$ [GeV]')
     plt.ylabel(r'$E^2J_\gamma$ [GeV cm${}^{-2}$ s${}^{-1}$]')
     plt.legend()
-    plt.savefig(get_fig_dir()+'sensitivity_comparison.png', facecolor='none',
-                bbox_inches="tight", dpi=300)
+    plt.savefig(fig_dir+'galactic_plane/sensitivity_comparison.png',
+                facecolor='none', bbox_inches="tight", dpi=300)
     plt.close()

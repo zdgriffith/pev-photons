@@ -14,7 +14,7 @@ from matplotlib import cm
 import sky
 from mpl_toolkits.basemap import Basemap
 
-from pev_photons.support import prefix, plot_style, get_fig_dir, ps_map
+from pev_photons.support import prefix, plot_style, fig_dir, ps_map
 
 if __name__ == "__main__":
     p = ap.ArgumentParser(
@@ -32,10 +32,10 @@ if __name__ == "__main__":
 
     if args.extension:
         inFile = prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
-        outFile = 'all_sky_scan_ext_%s.png' % args.extension
+        outFile = 'all_sky_scan_ext_%s.pdf' % args.extension
     else:
         inFile = prefix + 'all_sky/p_value_skymap.npy'
-        outFile = 'all_sky_scan.png'
+        outFile = 'all_sky_scan.pdf'
 
     m = np.load(inFile)
     nside = hp.npix2nside(len(m))
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     plt.scatter(x, y, marker='o', s=2**8, lw=1,
                 edgecolor='g', facecolor='none')
     plt.legend()
-    plt.savefig(get_fig_dir()+outFile,
-                facecolor='none', dpi=300,
-                bbox_inches='tight') 
+    plt.savefig(fig_dir+'all_sky/'+outFile)
+    if not args.extension:
+        plt.savefig(fig_dir+'paper/all_sky_scan.pdf')
     plt.close()

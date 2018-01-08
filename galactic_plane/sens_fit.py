@@ -12,7 +12,7 @@ from skylab.sensitivity_utils import fit
 from skylab.template_injector import TemplateInjector
 
 from pev_photons.load_datasets import load_gp_dataset
-from pev_photons.support import prefix, get_fig_dir
+from pev_photons.support import prefix, fig_dir
 
 def sensitivity(args):
     template_llh = load_gp_dataset(args)
@@ -39,7 +39,7 @@ def sensitivity(args):
     ni, ni_err, images = fit(inj_list, frac, tot,
                              0.9, ylabel="fraction TS > 0.90",
                              npar = 2, par = None,
-                             image_base=get_fig_dir()+'fermi_pi0_sens')
+                             image_base=fig_dir+'galactic_plane/fermi_pi0_sens')
     flux = inj.mu2flux(ni)
     flux_err = flux * ni_err / ni
 

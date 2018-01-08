@@ -11,7 +11,7 @@ import numpy.lib.recfunctions
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 
-from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
+from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
 
 def plot_trials(args, bg_trials, n_trials, true_TS):
 
@@ -56,7 +56,7 @@ def plot_trials(args, bg_trials, n_trials, true_TS):
     plt.xlabel('Test Statistic', fontweight = 'bold')
     plt.ylabel('Trials', fontweight = 'bold')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'bg_trials.pdf')
+    plt.savefig(fig_dir+'galactic_plane/bg_trials.pdf')
     plt.close()
 
 if __name__ == "__main__":

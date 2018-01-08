@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from glob import glob
 
 from pev_photons.support import prefix, resource_dir
-from pev_photons.support import get_fig_dir, plot_setter, plot_style
+from pev_photons.support import fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
@@ -116,5 +116,6 @@ if __name__ == "__main__":
     plt.text(-80, 2e-21, 'IceCube Preliminary', color='r', fontsize=14)
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
-    plt.savefig(get_fig_dir()+'sensitivity.pdf', bbox_inches='tight')
+    plt.savefig(fig_dir+'all_sky/sensitivity.pdf', bbox_inches='tight')
+    plt.savefig(fig_dir+'paper/sensitivity.pdf', bbox_inches='tight')
     plt.close()

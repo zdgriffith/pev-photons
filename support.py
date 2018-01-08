@@ -4,12 +4,15 @@
 # Supporting functions and variables
 ########################################################################
 
-# Location to store data files that are created from the package scripts.
+# Directory to store data files that are created from the package scripts.
 prefix = '/data/user/zgriffith/pev_photons/'
 
-# Location where files are kept that are only accessed,
+# Directory where files are kept that are only accessed,
 # not written to.
 resource_dir = '/data/user/zgriffith/pev_photons/resources/'
+
+# Directory to store plots
+fig_dir = '/home/zgriffith/public_html/pev_photons/'
 
 # The matplotlib plotting stylesheet.
 plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
@@ -38,18 +41,6 @@ ps_map = {'blue' : ((0.0, 0.0, 1.0),
                     (1.0, 1.0, 1.0))}
 
 ps_map = LinearSegmentedColormap('ps_map', ps_map, 256)
-
-def get_fig_dir():
-    """ provide the path for saving figures to public_html """
-
-    import os
-
-    path = os.getcwd() 
-    if 'home' in path:
-        fig_dir = os.path.expanduser('~') + '/public_html/' + '/'.join(os.getcwd().split('/')[3:]) + '/'
-    else:
-        fig_dir = os.path.expanduser('~') + '/public_html/' + '/'.join(os.getcwd().split('/')[4:]) + '/'
-    return fig_dir
 
 def plot_setter(ax, legend = None, bg_color = 'white', text_color='#262626'):
     """ Make the lines thicker in the legend, standardize text colors """

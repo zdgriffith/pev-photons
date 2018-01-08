@@ -14,7 +14,7 @@ import matplotlib.patheffects as pe
 import healpy as hp
 
 from pev_photons.support import prefix, resource_dir
-from pev_photons.support import get_fig_dir, ps_map, plot_style
+from pev_photons.support import fig_dir, ps_map, plot_style
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 
@@ -140,8 +140,6 @@ if __name__ == "__main__":
     p.add_argument('--mapFile',
                    default='all_sky/p_value_skymap.npy',
                    help='file containing the skymap to plot')
-    p.add_argument('--outFile', default='HESS_srcs_w_labels.pdf',
-                   help='file name')
     p.add_argument("--xsize", type=int, default=1000,
                    help="Number of X pixels, Y will be scaled acordingly.")
     p.add_argument("--scale", type=float, default=1.,
@@ -278,5 +276,6 @@ if __name__ == "__main__":
     ax.set_xlabel('l [$^\circ$]')
     ax.set_ylabel('b [$^\circ$]')
     plt.gca().invert_yaxis()
-    plt.savefig(get_fig_dir()+args.outFile)
+    plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.pdf')
+    plt.savefig(fig_dir+'paper/hess_sources.pdf')
     plt.close()

@@ -8,7 +8,7 @@ import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, resource_dir, get_fig_dir, plot_style
+from pev_photons.support import prefix, resource_dir, fig_dir, plot_style
 
 def survival_vs_energy():
     surv = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
@@ -25,7 +25,7 @@ def survival_vs_energy():
     plt.ylabel('Survival Probability', fontweight='bold')
     plt.xscale('log')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'survival_vs_energy.pdf')
+    plt.savefig(fig_dir+'TeVCat/survival_vs_energy.pdf')
     plt.close()
 
 def survival_vs_distance():
@@ -42,7 +42,7 @@ def survival_vs_distance():
     plt.xlabel('Distance to Sun [kpc]', fontweight='bold')
     plt.ylabel('Survival Probability', fontweight='bold')
     plt.tight_layout()
-    plt.savefig(get_fig_dir()+'survival_vs_distance.pdf')
+    plt.savefig(fig_dir+'TeVCat/survival_vs_distance.pdf')
     plt.close()
 
 def absorption_spline(E):

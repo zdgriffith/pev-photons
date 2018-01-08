@@ -12,7 +12,7 @@ from matplotlib.colors import LinearSegmentedColormap, LogNorm
 from matplotlib import cm
 
 from mpl_toolkits.basemap import Basemap
-from pev_photons.support import prefix, plot_style, get_fig_dir
+from pev_photons.support import prefix, plot_style, fig_dir
 from colormaps import cmaps
 
 if __name__ == "__main__":
@@ -101,7 +101,9 @@ if __name__ == "__main__":
     clb.set_label('Magnitude [A.U.]')
     
     plt.legend()
-    plt.savefig(get_fig_dir()+args.mapName+'_x_acc.png',
+    plt.savefig(fig_dir+'galactic_plane/'+args.mapName+'_x_acc.png',
                 facecolor='none', dpi=300,
                 bbox_inches='tight') 
+    if args.mapName == 'fermi_pi0':
+        plt.savefig(fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
     plt.close()

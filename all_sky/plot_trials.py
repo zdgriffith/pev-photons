@@ -10,7 +10,7 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, plot_style, get_fig_dir, plot_setter
+from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -61,5 +61,6 @@ if __name__ == "__main__":
     plt.ylim([0.5,Ntrials])
     plt.tight_layout()
     plt.text(1, 3000, 'IceCube Preliminary', color = 'r', fontsize=14)
-    plt.savefig(get_fig_dir()+'all_sky_trials.pdf')
+    plt.savefig(fig_dir+'all_sky/all_sky_trials.pdf')
+    plt.savefig(fig_dir+'paper/all_sky_trials.pdf')
     plt.close()
