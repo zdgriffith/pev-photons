@@ -2,24 +2,35 @@
 
 Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
 
-cluster_submit.py:  Submit a dagman to the cluster for stacking background trials.
+## Individual Source Tests
 
-cutoff_calculator.py:  For each HESS source, calculate the minimum cut-off energy matching a sensitivity
+* individual_ts.py
+    : calculates the true TS for each HESS source
+* hess_ts_to_pvalue.py
+    : converts HESS TS values to p-values using bg trials at the declination of the source
+* hess_sensitivities.py
+    : calculates the sensitivity to each HESS source's declination and spectral index 
 
-gamma_ray_survival.py:  Plots the survival function(s) for gamma rays 
+## All sky scan map in HESS source region
 
-hess_sensitivities.py:  Calculates the sensitivity to each HESS source's declination and spectral index 
+* plot_HESS_region.py
+    : plots a rectangular region of the sky centered on the galactic plane using healpix, with sources marked with dots and lines to labels of the sources.
 
-individual_ts.py:  Calculates the true TS for each HESS source
+## HESS catalog stacking test
 
-map_w_srcs.py:  plots simple crosses on top of zoomed in skymap with basemap
+* stacking_test.py
+    : stacked likelihood test for all H.E.S.S. sources considered. This saves the best fit TS, n_sources, and spectral index.
+* plot_stacking_trials.py
+    : plots the background trial TS distribution
 
-plot_hessJ1427.py:  plots the SED of HESS J1427-608 and IceCube's 5-year upper limit
+## HESS J1427-608
 
-plot_HESS_region.py:  plots a rectangular region of the sky centered on the galactic plane using healpix, with sources marked with dots and lines to labels of the sources.
+* plot_hessJ1427.py
+    : plots the SED of HESS J1427-608 and IceCube's 5-year upper limit
 
-plot_stacking_trials.py:  plots the background trial TS distribution
+# Miscellaneous
 
-sensitivity.py:  Plots the sensitivity and discovery potential as a function of declination, with HESS source fluxes extrapolated
-
-stacking_test.py:  runs the likelihood test of the HESS sources as a stacked catalog
+* cutoff_calculator.py
+    : For each HESS source, calculate the minimum cut-off energy matching a sensitivity
+* gamma_ray_survival.py
+    : Plots the survival function(s) for gamma rays 

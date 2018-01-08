@@ -1,14 +1,29 @@
 # pev_photons
+
 The scripts used to produce the results of the PeV gamma-ray analysis
 
-Directories:
+## Directories
 
-all_sky: Scripts related to the all-sky component of the analysis
+* all_sky
+    : Scripts related to the all-sky component of the analysis
 
-event_selection:  Scripts used to create the event selection and produce files at the final cut level
+* TeVCat
+    : Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
 
-galactic_plane:  The scripts related to the galactic plane component of the gamma-ray analysis.
+* galactic_plane
+    : The scripts related to the galactic plane component of the gamma-ray analysis.
 
-performance_checks:  Scripts testing the performance of reconstruction, event selection, etc.
+* performance_checks
+    : Scripts testing the performance of reconstruction, event selection, etc.
 
-TeVCat:  Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
+* event_selection
+    : Scripts used to create the event selection and produce files at the final cut level
+
+## Scripts
+
+* support.py
+    : Define the file location and plotting style here
+* make_directories.py
+    : Create all necessary directories in the specified file path, if necessary.
+* load_datasets.py
+    : Provides functions to load Skylab datasets.

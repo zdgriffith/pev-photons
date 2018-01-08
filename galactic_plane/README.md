@@ -2,22 +2,26 @@
 
 The scripts related to the galactic plane component of the gamma-ray analysis.
 
-Files:
+## Constructing the Templates
 
-box_writer.py:  Write simple galactic plane template maps. 
+* template_builder.py
+    : Build template maps for use in Skylab. (Credit: Josh Wood)
+* plot_skymap.py
+    : Plot the template map convolved with detector acceptance in a South Pole projection.
 
-cluster_submit.py:  Submit a dagman to the cluster for galactic plane background trials.
+## Template Analysis
 
-ns_to_flux.py:  Converts a given number of signal events (ns) to a flux.
+* run_gp_analysis.py
+    : produces the fitted TS and n_sources for the correlation with the given template.
+* cluster_bg_trials.py (run on submitter)
+    : produces scrambled background trials on the cluster.
+* plot_trials.py : plots the background trial ensemble compared to result, yields p-value.
 
-plot_skymap.py:  Plot a skymap projected with the South Pole at the center.
+## Sensitivity Calculation
 
-plot_trials.py:  Plot the TS distribution of background trials.
-
-plot_upper_limits.py:  Plot upper limits for a galactic plane flux.
-
-run_trials.py:  Run background trials for checking the TS distributions.
-
-sensitivity_test.py:  Test the sensitivity to a galactic plane flux template.
-
-template_builder.py:  Build template maps for use in Skylab. (Credit: Josh Wood)
+* sensitivity_test.py
+    : runs a coarse sensitivity test.
+* cluster_sens_trials.py
+    : produces 10000 trials for each injection point in range.
+* sens_fit.py
+    Calculates sensitivity from trials produced by cluster_sens_trials.py
