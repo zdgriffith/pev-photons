@@ -10,6 +10,7 @@ import re
 import argparse as ap
 import numpy as np
 
+from skylab.datasets import Datasets
 from skylab.template import Template
 from pev_photons.support import prefix
 
@@ -17,8 +18,8 @@ def template_builder(args):
     """Build the template for a given year."""
     rad2deg = 180./np.pi
 
-    exp = np.load(prefix+'/datasets/'+args.year+'_exp_diffuse.npy')
-    mc  = np.load(prefix+'/datasets/'+args.year+'_mc_diffuse.npy')
+    name = 'IC86.'+args.year
+    exp, mc, livetime = Datasets['GammaRays5yr_GalPlane'].season(name)
 
     if args.mcBackground:
       ev  = mc
