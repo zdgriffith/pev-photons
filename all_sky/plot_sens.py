@@ -11,11 +11,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-from pev_photons.support import prefix, get_fig_dir, plot_setter, plot_style
+from pev_photons.support import prefix, resource_dir
+from pev_photons.support import get_fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
-    sources = np.load(prefix+'TeVCat/hess_sources.npz')
+    sources = np.load(resource_dir+'hess_sources.npz')
 
     # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
@@ -32,7 +33,7 @@ def plot_hess_sources(args):
     if args.no_absorption:
         ratio = 1
     else:
-        surv = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_distance.txt')
+        surv = np.loadtxt(resource_dir+'gamma_survival_vs_distance.txt')
         surv = surv.T
         spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
                                                                 surv[1], k=2)
@@ -54,7 +55,8 @@ def plot_hess_sources(args):
                  lw=6, elinewidth=0, capthick=0, capwidth=0, alpha=0.4)
 
     if args.plot_hess_sens:
-        plt.scatter(sources['dec'], sources['sensitivity']*1e3,
+        hess_sens = np.load(prefix+'TeVCat/hess_sens.npz')
+        plt.scatter(sources['dec'], hess_sens['sensitivity']*1e3,
                     color=colors[3], marker='*', label='H.E.S.S. 90% limits')
 
 def plot_sens(args):

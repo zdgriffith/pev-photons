@@ -11,7 +11,7 @@ from glob import glob
 
 import healpy as hp
 
-from pev_photons.support import prefix
+from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     pixels = dec_pix['pix_list']
     n_decs = len(pixels) 
 
-    sources = np.load(prefix+'TeVCat/hess_sources.npz')
+    sources = np.load(resource_dir+'hess_sources.npz')
     src_pix = hp.ang2pix(512,
                          np.pi/2. - np.radians(sources['dec']),
                          np.radians(sources['ra']))

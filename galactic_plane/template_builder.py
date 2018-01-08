@@ -12,7 +12,7 @@ import numpy as np
 
 from skylab.datasets import Datasets
 from skylab.template import Template
-from pev_photons.support import prefix
+from pev_photons.support import prefix, resource_dir
 
 def template_builder(args):
     """Build the template for a given year."""
@@ -45,8 +45,7 @@ def template_builder(args):
 
     template = Template()
 
-    template.build(map_in=(prefix+'/galactic_plane/source_templates/'
-                           + args.inFile + '.npy'),
+    template.build(map_in=(resource_dir + args.inFile + '.npy'),
                    nside_out=512,
                    mc=mc, exp=exp,
                    coords='galactic',

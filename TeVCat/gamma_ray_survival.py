@@ -8,10 +8,10 @@ import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, get_fig_dir, plot_style
+from pev_photons.support import prefix, resource_dir, get_fig_dir, plot_style
 
 def survival_vs_energy():
-    surv = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_energy.txt')
+    surv = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
     surv = surv.T
     spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0], surv[1], k=2)
     x = 10**np.arange(12,17, 0.01)
@@ -29,7 +29,7 @@ def survival_vs_energy():
     plt.close()
 
 def survival_vs_distance():
-    surv = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_distance.txt')
+    surv = np.loadtxt(resource_dir+'gamma_survival_vs_distance.txt')
     surv = surv.T
     spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0], surv[1], k=2)
     x = np.arange(0,30, 0.01)
@@ -46,7 +46,7 @@ def survival_vs_distance():
     plt.close()
 
 def absorption_spline(E):
-    surv   = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_energy.txt')
+    surv   = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
     surv   = surv.T
     return scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12,
                                                           surv[1], k=2)(E)

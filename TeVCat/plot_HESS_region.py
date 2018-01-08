@@ -13,7 +13,8 @@ import matplotlib.patheffects as pe
 
 import healpy as hp
 
-from pev_photons.support import prefix, get_fig_dir, ps_map, plot_style
+from pev_photons.support import prefix, resource_dir
+from pev_photons.support import get_fig_dir, ps_map, plot_style
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 
@@ -232,7 +233,7 @@ if __name__ == "__main__":
                      'plotLabel': True
                     }
 
-    f = np.load(prefix+'TeVCat/hess_sources.npz')
+    f = np.load(resource_dir+'hess_sources.npz')
     sources = []
     for i, name in enumerate(f['name']):
         print(name)

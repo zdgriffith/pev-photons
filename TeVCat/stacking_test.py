@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 
 from pev_photons.load_datasets import load_ps_dataset
-from pev_photons.support import prefix
+from pev_photons.support import prefix, resource_dir
 
 def run_bg_trials(psllh, sources, args):
     """Run background trials for the H.E.S.S. stacking analysis"""
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_ps_dataset(args)
 
-    sources = np.load(prefix+'/TeVCat/hess_sources.npz')
+    sources = np.load(resource_dir+'hess_sources.npz')
     if args.bg_trials:
         run_bg_trials(psllh, sources, args)
     else:

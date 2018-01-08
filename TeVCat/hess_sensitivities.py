@@ -11,7 +11,7 @@ import numpy as np
 from skylab.ps_injector import PointSourceInjector
 
 from pev_photons.load_datasets import load_ps_dataset
-from pev_photons.support import prefix
+from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_ps_dataset(args)
 
-    hess = np.load(prefix+'TeVCat/hess_sources.npz')
+    hess = np.load(resource_dir+'hess_sources.npz')
     sens = list()
     disc = list()
 
@@ -49,10 +49,9 @@ if __name__ == "__main__":
             disc.append(result[0]["flux"][1])
             print(sens)
 
-    a = {}
-    for key in hess.keys():
-        a[key] = hess[key]
-    a['sensitivity']         = sens
+    a = dict()
+    a['name'] = hess['name']
+    a['sensitivity'] = sens
     a['discovery_potential'] = disc
 
-    np.savez(prefix+'TeVCat/hess_sources.npz', **a)
+    np.savez(prefix+'TeVCat/hess_sens.npz', **a)

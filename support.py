@@ -4,14 +4,14 @@
 # Supporting functions and variables
 ########################################################################
 
-# Location to store created data files
+# Location to store data files that are created from the package scripts.
 prefix = '/data/user/zgriffith/pev_photons/'
 
 # Location where files are kept that are only accessed,
 # not written to.
 resource_dir = '/data/user/zgriffith/pev_photons/resources/'
 
-# Plotting Style
+# The matplotlib plotting stylesheet.
 plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
 
 # Custom color map in the style of

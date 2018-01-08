@@ -8,10 +8,10 @@ import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, get_fig_dir, plot_style
+from pev_photons.support import prefix, resource_dir, get_fig_dir, plot_style
 
 def abs(E):
-    surv   = np.loadtxt(prefix+'TeVCat/gamma_survival_vs_energy.txt')
+    surv   = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
     surv   = surv.T
     return scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12,
                                                           surv[1], k=2)(E)
