@@ -1,43 +1,34 @@
 #!/usr/bin/env python
 
-import os, sys, argparse
+import os
+import sys
+import argparse as ap
+
+from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
 
-    p = argparse.ArgumentParser(
-            description='Run stacking test trials on cluster',
-            formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--test', dest='test', action='store_true',
-            default=False,
-            help='Option for running test off cluster')
-    p.add_argument('--nJobs', dest='nJobs', type=int,
-            default='1000',
-            help='max jobs running on cluster')
-    p.add_argument('--nTrials', dest='nTrials', type=int,
-            default='10',
-            help='max jobs running on cluster')
-    p.add_argument('--maxjobs', dest='maxjobs',
-            default='1200',
-            help='max jobs running on cluster')
-    p.add_argument('--rm_old', dest='rm_old', action='store_true',
-            default=False,
-            help='Remove old dag files?')
-    p.add_argument('--rescue', dest='rescue', action='store_true',
-            default=False,
-            help='Option for submitting rescue file')
+    p = ap.ArgumentParser(description='Run stacking test trials on cluster',
+                          formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--test', action='store_true', default=False,
+                   help='Option for running test off cluster')
+    p.add_argument('--maxjobs', type=str, default='1200',
+                   help='Max jobs running on the cluster.')
+    p.add_argument('--rm_old', action='store_true', default=False,
+                   help='Remove old dag files?')
+    p.add_argument('--nJobs', type=int, default='1000',
+                   help='max jobs running on cluster')
+    p.add_argument('--nTrials', type=int, default=10,
+                   help='max jobs running on cluster')
     args = p.parse_args()
 
-    script = "/home/zgriffith/photon_analysis/pev_photons/TeVCat/stacking_test.py"
+    script = os.getcwd() + '/stacking_test.py'
 
     if args.test:
         cmd = 'python '+script 
     else:
-        dag_name = '/data/user/zgriffith/dagman/myJobs/stacking_trials.dag'
+        dag_name = prefix+'dagman/stacking_trials.dag'
         ex       = 'condor_submit_dag -f -maxjobs ' +args.maxjobs+' '+dag_name
-
-        if args.rescue:
-            os.system(ex)
-            sys.exit()
 
         if args.rm_old:
             print('Deleting '+dag_name[:-3]+' files...')
@@ -45,14 +36,16 @@ if __name__ == "__main__":
 
         dag = open(dag_name, "w+")
 
-    index = 0
+    job_num = 0
     for job in range(args.nJobs):
         arg  = ' --runTrial --job %s --nTrials %s' % (job, args.nTrials)
         if args.test:
             ex  = ' '.join([cmd, arg])
         else:
-            arg = script+arg
-            dag.write("JOB " + str(index) + " /data/user/zgriffith/dagman/OneJob.submit\n")
-            dag.write("VARS " + str(index) + " ARGS=\"" + arg + "\"\n")
-        index += 1
+            dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'basic.submit\n')
+            dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
+            dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
+            dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
+        job_num += 1
+
     os.system(ex)

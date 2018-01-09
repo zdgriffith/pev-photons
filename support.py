@@ -4,18 +4,19 @@
 # Supporting functions and variables
 ########################################################################
 
-# Directory to store data files that are created from the package scripts.
-prefix = '/data/user/zgriffith/pev_photons/'
-
 # Directory where files are kept that are only accessed,
 # not written to.
 resource_dir = '/data/user/zgriffith/pev_photons/resources/'
 
-# Directory to store plots
-fig_dir = '/home/zgriffith/public_html/pev_photons/'
-
 # The matplotlib plotting stylesheet.
 plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
+
+# Directory to store data files that are created from the package scripts.
+#prefix = '/data/user/zgriffith/pev_photons/'
+prefix = '/data/user/zgriffith/test_dagman/'
+
+# Directory to store plots
+fig_dir = '/home/zgriffith/public_html/pev_photons/'
 
 # Custom color map in the style of
 # the all-sky neutrino point source analysis.

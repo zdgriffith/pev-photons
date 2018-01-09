@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
 ########################################################################
-## Submit a dagman to the cluster for galactic plane background trials.
+## Submit a dagman to the cluster for galactic plane sensitivity trials
 ########################################################################
 
 import os
 import sys
 import argparse as ap
+
+from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
 
@@ -24,24 +26,16 @@ if __name__ == "__main__":
                    help='Max jobs running on the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
-    p.add_argument('--rescue', action='store_true', default=False,
-                   help='Option for submitting the rescue file.')
     args = p.parse_args()
 
-    script = ('/home/zgriffith/photon_analysis/'
-              'pev_photons/galactic_plane/sens_to_cluster.py')
+    script = os.getcwd() + '/sens_to_cluster.py'
 
     if args.test:
         cmd = 'python '+script 
     else:
-        dag_name = ('/data/user/zgriffith/dagman/myJobs/'
-                    + args.name+'_sens_trials_.dag')
+        dag_name = prefix+'dagman/'+args.name+'_sens_trials.dag'
         ex       = ('condor_submit_dag -f -maxjobs '
                     + args.maxjobs + ' ' + dag_name)
-
-        if args.rescue:
-            os.system(ex)
-            sys.exit()
 
         if args.rm_old:
             print('Deleting '+dag_name[:-3]+' files...')
@@ -53,17 +47,17 @@ if __name__ == "__main__":
     # run on sensitivity_test.py first. 
     inj_list =[20.,   98.,  176.,  254.,  332.,  410.,
                488.,  566.,  644., 722.,  800.]
-    index = 0 
+    job_num = 0 
     for n_inj in inj_list:
         for job in range(args.nJobs):
-            arg  = ' --job %s --n_inj %s' % (index, n_inj)
+            arg  = ' --job %s --n_inj %s' % (job_num, n_inj)
             arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
             if args.test:
                 ex  = ' '.join([cmd, arg])
             else:
-                arg = script+arg
-                dag.write(('JOB ' + str(index)
-                           + ' /data/user/zgriffith/dagman/four_gigs.submit\n'))
-                dag.write('VARS ' + str(index) + " ARGS=\"" + arg + "\"\n")
-            index += 1
+                dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'extra_memory.submit\n')
+                dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
+                dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
+                dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
+            job_num += 1
     os.system(ex)

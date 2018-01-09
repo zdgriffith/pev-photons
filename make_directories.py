@@ -12,7 +12,7 @@ def make_file_dirs():
     # All second level directories
     dir_list = ['all_sky', 'datasets', 'event_selection',
                 'galactic_plane', 'performance_checks',
-                'TeVCat']
+                'TeVCat', 'dagman']
 
     sub_dirs = dict()
     sub_dirs['all_sky'] = ['dec_trials', 'sens_jobs/index_2.0',
@@ -20,6 +20,8 @@ def make_file_dirs():
 
     sub_dirs['galactic_plane'] = ['2011', '2012', '2013', '2014', '2015',
                                   'source_templates', 'trials', 'sens_trials']
+
+    sub_dirs['dagman'] = ['logs']
 
     for directory in sub_dirs.keys():
         for sub_dir in sub_dirs[directory]:

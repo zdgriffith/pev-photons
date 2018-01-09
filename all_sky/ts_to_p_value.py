@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # File which contains the pixels of the skymap which have
     # unique declination values.
-    dec_pix = np.load('/data/user/zgriffith/pev_photons/all_sky/dec_values_512.npz')
+    dec_pix = np.load(prefix+'all_sky/dec_values_512.npz')
     pixels  = dec_pix['pix_list']
 
     ts_map = np.load(inFile)
