@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Run background trials for galactic plane sensitivity calculation
+# Run signal-injected trials for galactic plane sensitivity calculation
 ########################################################################
 
 import argparse as ap
@@ -13,7 +13,7 @@ from skylab.sensitivity_utils import estimate_sensitivity
 from pev_photons.load_datasets import load_gp_dataset
 from pev_photons.support import prefix
 
-def sensitivity(args):
+def fit_ts(args):
     template_llh = load_gp_dataset(args)
 
     inj = TemplateInjector(template=template_llh.template,
@@ -32,7 +32,7 @@ def sensitivity(args):
     np.save(prefix+"galactic_plane/sens_trials/"+args.name+"_job_"+str(args.job)+".npy", [args.n_inj, n, ntot])
 
 if __name__ == "__main__":
-    p = ap.ArgumentParser(description='Galactic plane sensitivity runs.',
+    p = ap.ArgumentParser(description='Galactic plane signal-injected trials.',
                           formatter_class=ap.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
@@ -52,4 +52,4 @@ if __name__ == "__main__":
                    help='job number')
     args = p.parse_args()
 
-    sensitivity(args)
+    fit_ts(args)

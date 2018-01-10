@@ -28,7 +28,7 @@ if __name__ == "__main__":
                    help='Remove old dag files?')
     args = p.parse_args()
 
-    script = os.getcwd() + '/sens_to_cluster.py'
+    script = os.getcwd() + '/inj_trials.py'
 
     if args.test:
         cmd = 'python '+script 

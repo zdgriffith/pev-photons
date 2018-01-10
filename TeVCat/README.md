@@ -20,6 +20,8 @@ Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
 
 * stacking_test.py
     : stacked likelihood test for all H.E.S.S. sources considered. This saves the best fit TS, n_sources, and spectral index.
+* cluster_stacking_trials.py
+    : run background trials for the stacking test on the cluster.
 * plot_stacking_trials.py
     : plots the background trial TS distribution
 
@@ -30,7 +32,5 @@ Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
 
 # Miscellaneous
 
-* cutoff_calculator.py
-    : For each HESS source, calculate the minimum cut-off energy matching a sensitivity
 * gamma_ray_survival.py
     : Plots the survival function(s) for gamma rays 

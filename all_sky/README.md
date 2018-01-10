@@ -6,6 +6,8 @@ The scripts used to produce the all-sky-scan and related results.
 
 * all_sky_scan.py
     : perform an unbinned LLH test over each point of a grid in the sky, creating a TS map
+* dec_list.py
+    : create an array of unique declination values for a given Nside
 * one_dec_ts.py
     : calculate the TS for random trials at a given declination.
 * cluster_dec_trials.py
@@ -21,8 +23,6 @@ The scripts used to produce the all-sky-scan and related results.
     : get hotspot from TS map and save information.
 * plot_trials.py
     : plot hotspot TS and background trials TS ensemble.
-* plot_hotspot_events.py
-    : scatterplot of events in region around hotspot.
 
 ## Sensitivity Calculation
 
@@ -34,9 +34,3 @@ The scripts used to produce the all-sky-scan and related results.
     : Calculate sensitivity and discovery potential every 3 degrees.
 * plot_sens.py
     : Plot sensitivity and discovery potential as a function of declination with projected HESS fluxes.
-
-## Fitted spectral index systematics test
-* spectral_index_fit_test.py
-    : Functions to test the behavior of the fitted spectral index.
-* plot_spectral_test.py
-    : Plotting functions for output from spectra_index_fit_test.py

@@ -15,13 +15,15 @@ The scripts related to the galactic plane component of the gamma-ray analysis.
     : produces the fitted TS and n_sources for the correlation with the given template.
 * cluster_bg_trials.py (run on submitter)
     : produces scrambled background trials on the cluster.
-* plot_trials.py : plots the background trial ensemble compared to result, yields p-value.
+* p_value_calc.py : calculates the p_value of the best-fit TS and saves to the fit result.
 
 ## Sensitivity Calculation
 
 * sensitivity_test.py
     : runs a coarse sensitivity test.
-* cluster_sens_trials.py
-    : produces 10000 trials for each injection point in range.
+* inj_trials.py
+    : runs signal-injected trials and fits the TS for sensitivity calculation.
+* cluster_inj_trials.py (run on submitter)
+    : produces 10000 trials for each injection point in range using inj_trials.py
 * sens_fit.py
-    Calculates sensitivity from trials produced by cluster_sens_trials.py
+    : Calculates sensitivity from trials produced by cluster_sens_trials.py
