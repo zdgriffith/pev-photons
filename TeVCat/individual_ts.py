@@ -19,6 +19,10 @@ if __name__ == "__main__":
                    help='file name')
     p.add_argument('--extended', action='store_true', default=False,
                    help='If True, use source extension in fit.')
+    p.add_argument("--ncpu", type=int, default=1,
+                    help="Number of cores to run on.")
+    p.add_argument("--seed", type=int, default=1,
+                   help='rng seed')
     args = p.parse_args()
 
     # Load the dataset.
@@ -33,14 +37,14 @@ if __name__ == "__main__":
     for i, dec in enumerate(sources['dec']):
     
         if args.extended:
-            out = psllh.fit_source(np.radians(sources['ra'][i]),
-                                   np.radians(dec),
-                                   src_extension=np.radians(sources['extent'])[i],
-                                   scramble = False)
+            out = ps_llh.fit_source(np.radians(sources['ra'][i]),
+                                    np.radians(dec),
+                                    src_extension=np.radians(sources['extent'])[i],
+                                    scramble = False)
         else:
-            out = psllh.fit_source(np.radians(sources['ra'][i]),
-                                   np.radians(dec),
-                                   scramble = False)
+            out = ps_llh.fit_source(np.radians(sources['ra'][i]),
+                                    np.radians(dec),
+                                    scramble = False)
 
         fit_arr['TS'][i] = out[0]
         fit_arr['gamma'][i] = out[1]['gamma']
