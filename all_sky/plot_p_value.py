@@ -11,7 +11,6 @@ import numpy as np
 from matplotlib.colors import LogNorm
 from matplotlib import cm
 
-import sky
 from mpl_toolkits.basemap import Basemap
 
 from pev_photons.support import prefix, plot_style, fig_dir, ps_map
@@ -69,20 +68,20 @@ if __name__ == "__main__":
 
     # Draw the galactic plane.
     if not args.noPlane:
-        tl = np.arange(-120,0,0.01)
-        tb = np.zeros(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tl = np.radians(np.arange(0,360, 0.01))
+        tb = np.radians(np.full(tl.size, 90))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k--', linewidth=1, label='Galactic Plane')
 
-        tb = 5*np.ones(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tb = np.radians(np.full(tl.size, 95))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k-', linewidth=1)
 
-        tb = -5*np.ones(np.size(tl))
-        (tra,tdec) = sky.gal2eq(tl, tb)
-        x,y = map1(tra, tdec)
+        tb = np.radians(np.full(tl.size, 85))
+        tdec, tra = np.degrees(cRot(tb,tl))
+        x,y = map1(tra, 90-tdec)
         sc  = map1.plot(x, y, 'k-', linewidth=1)
 
     # Draw the test statistic map.
