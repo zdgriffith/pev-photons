@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 
-from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
+from pev_photons.support import resource_dir, fig_dir, plot_setter, plot_style
 from gamma_ray_survival import absorption_spline
 
 #Plot data points
@@ -122,11 +122,11 @@ if __name__ == "__main__":
     fig,ax = plt.subplots(1)
 
     #Data points
-    hess_data = np.loadtxt(prefix+'TeVCat/hessJ1427_data.txt') 
+    hess_data = np.loadtxt(resource_dir+'/hessJ1427_data.txt') 
     plot_data(hess_data, 'H.E.S.S. data', colors, args)
     gamma = plot_fit('Best fit (H.E.S.S. data)', colors, args, 0)
     if args.addFermi:
-        fermi_data = np.loadtxt(prefix+'TeVCat/hessJ1427_fermi_data.txt') 
+        fermi_data = np.loadtxt(resource_dir+'/hessJ1427_fermi_data.txt') 
         plot_data(fermi_data, 'Fermi data', args)
         combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)',
                                   colors, args, 1)
