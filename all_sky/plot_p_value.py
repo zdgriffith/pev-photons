@@ -68,6 +68,7 @@ if __name__ == "__main__":
 
     # Draw the galactic plane.
     if not args.noPlane:
+        cRot = hp.Rotator(coord = ['G','C'], rot = [0, 0])
         tl = np.radians(np.arange(0,360, 0.01))
         tb = np.radians(np.full(tl.size, 90))
         tdec, tra = np.degrees(cRot(tb,tl))
