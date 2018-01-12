@@ -4,18 +4,26 @@
 # Supporting functions and variables
 ########################################################################
 
-# Directory where files are kept that are only accessed,
-# not written to.
-resource_dir = '/data/user/zgriffith/pev_photons/resources/'
+########################################################################
+########################################################################
 
-# The matplotlib plotting stylesheet.
-plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
+# Change these directories to your personal storage locations. 
 
 # Directory to store data files that are created from the package scripts.
 prefix = '/data/user/zgriffith/pev_photons/'
 
 # Directory to store plots
 fig_dir = '/home/zgriffith/public_html/pev_photons/'
+
+########################################################################
+########################################################################
+
+# Directory where files are kept that are only accessed,
+# not written to.
+resource_dir = '/data/user/zgriffith/pev_photons/resources/'
+
+# The matplotlib plotting stylesheet.
+plot_style = resource_dir+'gamma_rays_5yr.mplstyle'
 
 def plot_setter(ax, legend = None, bg_color = 'white', text_color='#262626'):
     """ Make the lines thicker in the legend, standardize text colors """

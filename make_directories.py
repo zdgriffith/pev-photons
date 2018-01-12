@@ -49,5 +49,10 @@ def make_fig_dirs():
     
 
 if __name__ == "__main__":
+    if (    prefix == '/data/user/zgriffith/pev_photons/'
+        or fig_dir == '/home/zgriffith/public_html/pev_photons/'
+       ):
+        raise Exception('You need to change the storage directories in support.py first!')
+
     make_file_dirs() 
     make_fig_dirs()
