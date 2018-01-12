@@ -11,6 +11,7 @@
 # healpy == 1.8.6
 # basemap == 1.0.7 
 # 
+# dashi == 0.1
 # skylab
 
 # TO USE: Run "source enter_environment.sh" 
