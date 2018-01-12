@@ -6,7 +6,7 @@
 
 import numpy as np
 from glob import glob
-import argparse as ap
+import argparse as argparse
 
 from skylab.sensitivity_utils import fit
 from skylab.template_injector import TemplateInjector
@@ -58,8 +58,8 @@ def sensitivity(args):
     np.save(prefix+'galactic_plane/fermi_pi0_sens.npy', sens_result)
 
 if __name__ == "__main__":
-    p = ap.ArgumentParser(description='Perform a sensitivity calculation fit',
-                          formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description='Perform a sensitivity calculation fit',
+                   formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,

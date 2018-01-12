@@ -4,7 +4,7 @@
 # Test the sensitivity to a galactic plane flux template. 
 ########################################################################
 
-import argparse as ap
+import argparse
 import numpy as np
 
 from skylab.sensitivity_utils import estimate_sensitivity
@@ -20,8 +20,8 @@ def mu2flux(inj, args):
     print('E^2dN/dE = %s' % conv)
 
 if __name__ == "__main__":
-    p = ap.ArgumentParser(description='Test galactic plane sensitivity.',
-                          formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description='Test galactic plane sensitivity.',
+                   formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,

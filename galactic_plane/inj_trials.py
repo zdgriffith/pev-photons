@@ -4,7 +4,7 @@
 # Run signal-injected trials for galactic plane sensitivity calculation
 ########################################################################
 
-import argparse as ap
+import argparse
 import numpy as np
 
 from skylab.template_injector import TemplateInjector
@@ -32,8 +32,8 @@ def fit_ts(args):
     np.save(prefix+"galactic_plane/sens_trials/"+args.name+"_job_"+str(args.job)+".npy", [args.n_inj, n, ntot])
 
 if __name__ == "__main__":
-    p = ap.ArgumentParser(description='Galactic plane signal-injected trials.',
-                          formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description='Galactic plane signal-injected trials.',
+                   formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
     p.add_argument("--alpha", type=float, default=3.0,

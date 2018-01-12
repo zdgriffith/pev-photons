@@ -7,14 +7,14 @@
 import os
 import sys
 import random
-import argparse as ap
+import argparse
 
 from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
 
-    p = ap.ArgumentParser(description='Submit trials to the cluster.',
-                          formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description='Submit trials to the cluster.',
+                   formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
                    help='Option for running test off cluster.')
     p.add_argument('--nJobs', type=int, default=500,

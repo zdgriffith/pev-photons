@@ -4,7 +4,7 @@
 # Plot a skymap projected with the South Pole at the center.
 ########################################################################
 
-import argparse as ap
+import argparse
 import healpy as hp
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,9 +16,9 @@ from pev_photons.support import prefix, plot_style, fig_dir
 from colormaps import cmaps
 
 if __name__ == "__main__":
-    p = ap.ArgumentParser(
-            description='Plot a skymap with a south polar projection.',
-            formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+                   description='Plot a skymap with a south polar projection.',
+                   formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--mapName', type = str,
                    default='fermi_pi0',
                    help='Name of the skymap to plot.')

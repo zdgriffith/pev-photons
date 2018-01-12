@@ -5,9 +5,9 @@
 # Credit for the script goes to Josh Wood.
 ########################################################################
 
+import argparse
 import os
 import re
-import argparse as ap
 import numpy as np
 
 from skylab.datasets import Datasets
@@ -61,8 +61,8 @@ def template_builder(args):
     template.write(output + '.npy')
 
 if __name__ == '__main__':
-    p = ap.ArgumentParser(description='Build template maps.',
-                          formatter_class=ap.RawTextHelpFormatter)
+    p = argparse.ArgumentParser(description='Build template maps.',
+                   formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('--mcBackground', action='store_true',
                     help=('Use MC to build background PDFs '
                           'and produce data scrambles.'))

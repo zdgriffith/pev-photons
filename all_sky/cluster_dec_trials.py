@@ -5,16 +5,16 @@
 # for each declination value in a healpix map within the FOV.
 ########################################################################
 
+import argparse
 import os
 import sys
-import argparse as ap
 
 from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
 
-    p = ap.ArgumentParser(description='Submit trials to the cluster.',
-                          formatter_class=ap.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(description='Submit trials to the cluster.',
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
                    help='Option for running test off cluster.')
     p.add_argument('--maxjobs', type=str, default='1200',
