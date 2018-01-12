@@ -6,9 +6,9 @@
 ########################################################################
 
 import argparse
-import glob
 import numpy as np
 import matplotlib.pyplot as plt
+from glob import glob
 
 from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     colors = plt.rcParams['axes.color_cycle']
 
     hotspot = np.load(prefix+'all_sky/hotspot.npy')['TS'][0]
-    job_list = glob.glob('/data/user/zgriffith/all_sky/full_*.npy')
+    job_list = glob('/data/user/zgriffith/all_sky/full_*.npy')
 
     bg_trials = []
     for job in job_list:

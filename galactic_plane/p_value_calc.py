@@ -5,11 +5,11 @@
 ########################################################################
 
 import argparse
-import glob
 import numpy as np
 import numpy.lib.recfunctions
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
+from glob import glob
 
 from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     #Load in scrambled trials
-    job_list = glob.glob(prefix+'/galactic_plane/trials/*') 
+    job_list = glob(prefix+'/galactic_plane/trials/*') 
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)
