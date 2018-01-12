@@ -12,8 +12,7 @@ from matplotlib.colors import LinearSegmentedColormap, LogNorm
 from matplotlib import cm
 
 from mpl_toolkits.basemap import Basemap
-from pev_photons.support import prefix, plot_style, fig_dir
-from colormaps import cmaps
+from pev_photons.support import prefix, plot_style, fig_dir, plasma_map
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -91,10 +90,8 @@ if __name__ == "__main__":
     # Draw the map.
     m_norm = len(m)*m/np.sum(m[np.isfinite(m)]),
     x,y = map1(np.degrees(RA), 90-np.degrees(DEC))
-    sc  = map1.scatter(x, y,
-                       c=m_norm,
+    sc  = map1.scatter(x, y, c=m_norm, cmap=plasma_map,
                        norm=LogNorm(vmin=5*10**-2, vmax = np.max(m_norm)),
-                       cmap= cmaps['plasma'],
                        s=2**3, lw=0, zorder=0, rasterized=True)
 
     clb = f.colorbar(sc, orientation='vertical')
