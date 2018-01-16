@@ -72,7 +72,7 @@ if __name__ == "__main__":
             batches[run] = [[file]]
 
     print(sum([len(batches[i]) for i in batches.keys()]))
-    script = "/home/zgriffith/photon_analysis/pev_photons/event_selection/quality_energies.py"
+    script = "/home/zgriffith/pev_photons/event_selection/quality_energies.py"
 
     count = 0
     for k, key in enumerate(batches.keys()):
