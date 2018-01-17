@@ -23,9 +23,5 @@ The scripts used to produce the results of the PeV gamma-ray analysis
     : support files
 ## Scripts
 
-* support.py
-    : Define the file location and plotting style here
 * make_directories.py
     : Create all necessary directories in the specified file path, if necessary.
-* load_datasets.py
-    : Provides functions to load Skylab datasets.
