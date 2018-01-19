@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 
-from pev_photons.support import resource_dir, fig_dir, plot_setter, plot_style
+from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 from gamma_ray_survival import absorption_spline
 
 #Plot data points

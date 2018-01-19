@@ -10,8 +10,8 @@ import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
 
-from pev_photons.load_datasets import load_dataset
-from pev_photons.support import prefix, resource_dir
+from utils.load_datasets import load_dataset
+from utils.support import prefix, resource_dir
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

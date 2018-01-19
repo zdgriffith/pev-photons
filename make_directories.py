@@ -6,7 +6,7 @@
 
 import os
 
-from pev_photons.support import prefix, fig_dir
+from utils.support import prefix, fig_dir
 
 def make_file_dirs():
     # All second level directories

@@ -13,7 +13,7 @@ from matplotlib import cm
 
 from mpl_toolkits.basemap import Basemap
 
-from pev_photons.support import prefix, plot_style, fig_dir, ps_map
+from utils.support import prefix, plot_style, fig_dir, ps_map
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

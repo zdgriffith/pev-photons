@@ -9,7 +9,7 @@ import numpy as np
 
 import healpy as hp
 
-from pev_photons.support import prefix
+from utils.support import prefix
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

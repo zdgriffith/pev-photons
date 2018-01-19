@@ -19,7 +19,7 @@ The scripts used to produce the results of the PeV gamma-ray analysis
 * event_selection
     : Scripts used to create the event selection and produce files at the final cut level
 
-* pev_photons
+* utils
     : support files
 
 ## Scripts

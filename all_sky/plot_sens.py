@@ -11,8 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-from pev_photons.support import prefix, resource_dir
-from pev_photons.support import fig_dir, plot_setter, plot_style
+from utils.support import prefix, resource_dir
+from utils.support import fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors

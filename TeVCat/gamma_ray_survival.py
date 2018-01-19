@@ -8,7 +8,7 @@ import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pev_photons.support import prefix, resource_dir, fig_dir, plot_style
+from utils.support import prefix, resource_dir, fig_dir, plot_style
 
 def survival_vs_energy():
     surv = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')

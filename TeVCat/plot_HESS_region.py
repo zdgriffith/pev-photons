@@ -13,8 +13,8 @@ import matplotlib.patheffects as pe
 
 import healpy as hp
 
-from pev_photons.support import prefix, resource_dir
-from pev_photons.support import fig_dir, ps_map, plot_style
+from utils.support import prefix, resource_dir
+from utils.support import fig_dir, ps_map, plot_style
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 

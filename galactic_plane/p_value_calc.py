@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from glob import glob
 
-from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
+from utils.support import prefix, plot_style, fig_dir, plot_setter
 
 def plot_trials(args, bg_trials, n_trials, true_TS):
 

@@ -10,8 +10,8 @@ import logging
 
 import healpy as hp
 
-from pev_photons.load_datasets import load_dataset
-from pev_photons.support import prefix
+from utils.load_datasets import load_dataset
+from utils.support import prefix
 
 def manual_scan(ps_llh, args):
     """manually test for a point source at each pixen in the sky map"""

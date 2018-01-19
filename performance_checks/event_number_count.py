@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from pev_photons.support import prefix
+from utils.support import prefix
 
 if __name__ == "__main__":
 

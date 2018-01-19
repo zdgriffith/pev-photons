@@ -9,7 +9,7 @@ import sys
 import random
 import argparse
 
-from pev_photons.support import prefix, resource_dir
+from utils.support import prefix, resource_dir
 
 if __name__ == "__main__":
 

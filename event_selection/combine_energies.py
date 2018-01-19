@@ -9,7 +9,7 @@ import argparse, sys, tables, file_functions
 import time, glob
 import pandas as pd
 
-from pev_photons.support import prefix
+from utils.support import prefix
 
 def combine_hdfs(file_list, outFile):
 

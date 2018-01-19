@@ -11,7 +11,7 @@ from glob import glob
 
 import healpy as hp
 
-from pev_photons.support import prefix, resource_dir
+from utils.support import prefix, resource_dir
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

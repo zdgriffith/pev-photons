@@ -9,7 +9,7 @@ import numpy as np
 from skylab.datasets import Datasets
 from skylab.llh_models import EnergyLLH
 
-from pev_photons.support import prefix
+from utils.support import prefix
 
 from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH

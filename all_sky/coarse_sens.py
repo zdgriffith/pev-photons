@@ -9,8 +9,8 @@ import numpy as np
 import logging
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.load_datasets import load_dataset
-from pev_photons.support import prefix
+from utils.load_datasets import load_dataset
+from utils.support import prefix
 
 logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)

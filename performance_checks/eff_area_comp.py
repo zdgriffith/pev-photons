@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import prefix, fig_dir, plot_setter, plot_style
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))

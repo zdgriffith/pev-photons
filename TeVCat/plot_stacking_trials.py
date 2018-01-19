@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 
-from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import prefix, fig_dir, plot_setter, plot_style
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

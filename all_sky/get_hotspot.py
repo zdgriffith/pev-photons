@@ -8,8 +8,8 @@ import argparse
 import numpy as np
 import healpy as hp
 
-from pev_photons.load_datasets import load_dataset
-from pev_photons.support import prefix
+from utils.load_datasets import load_dataset
+from utils.support import prefix
 
 def test_hotspot(ra, dec, args):
 

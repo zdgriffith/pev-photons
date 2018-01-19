@@ -12,7 +12,7 @@ import numpy as np
 
 from skylab.datasets import Datasets
 from skylab.template import Template
-from pev_photons.support import prefix, resource_dir
+from utils.support import prefix, resource_dir
 
 def template_builder(args):
     """Build the template for a given year."""

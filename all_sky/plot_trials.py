@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-from pev_photons.support import prefix, plot_style, fig_dir, plot_setter
+from utils.support import prefix, plot_style, fig_dir, plot_setter
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

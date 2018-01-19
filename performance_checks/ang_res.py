@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from pev_photons.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import prefix, fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
     return  (np.abs(array-value)).argmin()
