@@ -9,7 +9,7 @@ import numpy as np
 import logging
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Initialization of multi-year LLH object.
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     dec_list = np.radians(np.linspace(-84.,-54.,10))
     for index in [2.0,2.7]:

@@ -7,7 +7,7 @@
 import argparse
 import numpy as np
 
-from pev_photons.load_datasets import load_gp_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 def run_bg_trials(template_llh, args):
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    template_llh = load_gp_dataset(args)
+    template_llh = load_dataset('galactic_plane', args)
 
     if args.bg_trials:
         run_bg_trials(template_llh, args)

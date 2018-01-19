@@ -7,7 +7,7 @@
 import argparse
 import numpy as np
 
-from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix, resource_dir
 
 if __name__ == "__main__":
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     sources = np.load(resource_dir+'hess_sources.npz')
 

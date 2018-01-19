@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 if __name__ == "__main__":
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Initialization of multi-year LLH object.
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     inj= PointSourceInjector(args.index, E0=10**6,
                              sinDec_bandwidth=np.sin(np.radians(2)))

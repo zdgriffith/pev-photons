@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 
 from pev_photons.support import prefix
-from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_dataset
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     #Initialization of multi-year LLH object
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     decs = np.load(prefix+'all_sky/dec_values_512.npz')['decs']
 

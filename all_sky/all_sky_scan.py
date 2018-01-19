@@ -10,7 +10,7 @@ import logging
 
 import healpy as hp
 
-from pev_photons.load_datasets import load_ps_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 def manual_scan(ps_llh, args):
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     # Set the logging output file.
     logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)

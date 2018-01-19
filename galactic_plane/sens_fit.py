@@ -11,11 +11,11 @@ import argparse as argparse
 from skylab.sensitivity_utils import fit
 from skylab.template_injector import TemplateInjector
 
-from pev_photons.load_datasets import load_gp_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix, fig_dir
 
 def sensitivity(args):
-    template_llh = load_gp_dataset(args)
+    template_llh = load_dataset('galactic_plane', args)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,

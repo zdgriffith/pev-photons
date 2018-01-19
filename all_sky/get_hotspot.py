@@ -8,12 +8,12 @@ import argparse
 import numpy as np
 import healpy as hp
 
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 def test_hotspot(ra, dec, args):
-    from load_datasets import load_ps_dataset
 
-    ps_llh = load_ps_dataset(args)
+    ps_llh = load_dataset('point_source', args)
 
     hotspot = np.empty((1,),
                        dtype=[('ra', np.float), ('dec', np.float),

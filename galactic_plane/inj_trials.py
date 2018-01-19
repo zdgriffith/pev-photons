@@ -10,11 +10,11 @@ import numpy as np
 from skylab.template_injector import TemplateInjector
 from skylab.sensitivity_utils import estimate_sensitivity
 
-from pev_photons.load_datasets import load_gp_dataset
+from pev_photons.load_datasets import load_dataset
 from pev_photons.support import prefix
 
 def fit_ts(args):
-    template_llh = load_gp_dataset(args)
+    template_llh = load_dataset('galactic_plane', args)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,
