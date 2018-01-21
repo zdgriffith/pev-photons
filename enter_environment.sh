@@ -17,7 +17,6 @@
 
 # TO USE: Run "source enter_environment.sh" 
 
-
 eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
 source /data/user/zgriffith/pev_photons/resources/photon_env/bin/activate
 export PYTHONPATH=$PYTHONPATH:"$(pwd)"

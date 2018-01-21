@@ -16,7 +16,7 @@ def make_file_dirs():
 
     sub_dirs = dict()
     sub_dirs['all_sky'] = ['dec_trials', 'sens_jobs/index_2.0',
-                           'sens_jobs/index_2.7']
+                           'sens_jobs/index_2.7', 'all_sky_trials']
 
     sub_dirs['galactic_plane'] = ['2011', '2012', '2013', '2014', '2015',
                                   'source_templates', 'trials', 'sens_trials']
