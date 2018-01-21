@@ -18,13 +18,19 @@ if __name__ == "__main__":
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--bin_width', type=float, default=0.5,
                    help='width of bin in TS space')
+    p.add_argument('--use_original_trials', action='store_true', default=False,
+                   help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
     plt.style.use(plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     hotspot = np.load(prefix+'all_sky/hotspot.npy')['TS'][0]
-    job_list = glob('/data/user/zgriffith/all_sky/full_*.npy')
+
+    if args.use_original_trials:
+        job_list = glob('/data/user/zgriffith/pev_photons/all_sky/all_sky_trials/full_*.npy')
+    else:
+        job_list = glob(prefix+'all_sky/all_sky_trials/full_*.npy')
 
     bg_trials = []
     for job in job_list:
