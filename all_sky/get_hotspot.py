@@ -28,7 +28,9 @@ def test_hotspot(ra, dec, args):
     hotspot['nsources'] = fit[1]['nsources']
     hotspot['gamma'] = fit[1]['gamma']
 
-    print(hotspot)
+    pairs = [hotspot.dtype.names[i]+': %0.2f' % val for i, val in enumerate(hotspot[0])]
+    for pair in pairs:
+        print(pair)
     np.save(prefix+'all_sky/hotspot.npy', hotspot)
 
 def get_hotspot_direction(args):
