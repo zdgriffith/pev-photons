@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
+from scipy import interpolate
 
 from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 from gamma_ray_survival import absorption_spline
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     gamma = plot_fit('Best fit (H.E.S.S. data)', colors, args, 0)
     if args.addFermi:
         fermi_data = np.loadtxt(resource_dir+'/hessJ1427_fermi_data.txt') 
-        plot_data(fermi_data, 'Fermi data', args)
+        plot_data(fermi_data, 'Fermi data', colors, args)
         combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)',
                                   colors, args, 1)
 

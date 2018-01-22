@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 import dashi
-from utils.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))
@@ -63,7 +63,7 @@ def effective_area(args, logE, year, w, color):
     if year == '2011':
         n_gen = 60000
     else:
-        events = np.load(prefix+'datasets/level3/'+year+'_mc_total_events.npy')
+        events = np.load(resource_dir+'datasets/level3/'+year+'_mc_total_events.npy')
         n_gen  = events[:].astype('float')
 
     area = E_hist.bincontent/n_gen
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     lines = []
     years = ['2011', '2012', '2013', '2014', '2015']
     for i, year in enumerate(years):
-        f = pd.read_hdf(prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
 
         # Reweight events with <8 stations triggered for 2011 due to filter
         if year == '2011':

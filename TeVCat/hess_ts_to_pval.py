@@ -23,9 +23,11 @@ if __name__ == "__main__":
     p.add_argument('--outFile', type=str,
                    default='hess_sources_p_values.npy',
                    help='The output file name.')
+    p.add_argument('--use_original_trials', action='store_true', default=False,
+                   help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
-    dec_pix = np.load(prefix+'all_sky/dec_values_512.npz')
+    dec_pix = np.load(resource_dir+'dec_values_512.npz')
     pixels = dec_pix['pix_list']
     n_decs = len(pixels) 
 
@@ -37,8 +39,11 @@ if __name__ == "__main__":
     p_val = np.zeros(len(ts))
     
     for dec_i in range(n_decs):
-        print(dec_i)
-        f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
+        print('{}/{}'.format(dec_i, n_decs))
+        if args.use_original_trials:
+            f_list = glob('/data/user/zgriffith/pev_photons/all_sky/dec_trials/dec_%s_job_*' % dec_i)
+        else:
+            f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
         trials = []
         for f in f_list:
             a = np.load(f)

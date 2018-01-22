@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import dashi
-from utils.support import prefix, fig_dir, resource_dir
+from utils.support import fig_dir, resource_dir
 from utils.support import plot_setter, plot_style, plasma_map
 
 def rhombus(width, depth, cos_zen, color):

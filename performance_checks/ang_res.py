@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from utils.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
     return  (np.abs(array-value)).argmin()
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     E_bins = np.arange(5.7, 8.1, 0.1)
     for i, year in enumerate(years):
-        f = pd.read_hdf(prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
         error(f, year, 'primary_E', E_bins)
 
     plt.xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')

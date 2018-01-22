@@ -71,10 +71,15 @@ if __name__ == "__main__":
                    help='width of bin in TS space')
     p.add_argument('--only_bg', action='store_true', default=False,
                    help='if True, do not plot true TS.')
+    p.add_argument('--use_original_trials', action='store_true', default=False,
+                   help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
     #Load in scrambled trials
-    job_list = glob(prefix+'/galactic_plane/trials/*') 
+    if args.use_original_trials:
+        job_list = glob('/data/user/zgriffith/pev_photons/galactic_plane/trials/*') 
+    else:
+        job_list = glob(prefix+'/galactic_plane/trials/*') 
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)

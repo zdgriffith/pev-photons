@@ -12,23 +12,23 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import dashi
-from utils.support import prefix, fig_dir, plot_setter, plot_style
+from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def final_sample(args, year, sel, level, label):
     f = {'level3':{}, 'level4':{}}
     if level == 'level3':
         if label == 'Data':
-            f = pd.read_hdf(prefix+'datasets/quality_energies/'+year+'.hdf5')
+            f = pd.read_hdf(resource_dir+'datasets/quality_energies/'+year+'.hdf5')
             return np.log10(f['laputop_E']), np.ones(f.shape[0])
         else:
-            f = pd.read_hdf(prefix+'datasets/level3/'+year+'_mc_quality.hdf5')
+            f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
             return np.log10(f['laputop_E']), f['weights']
     else:
         if label == 'Data':
-            f = np.load(prefix+'datasets/'+year+'_exp_'+sel+'.npy')
+            f = np.load(resource_dir+'datasets/'+year+'_exp_'+sel+'.npy')
             return f['logE'], np.ones(f.shape[0])
         else:
-            f = np.load(prefix+'datasets/'+year+'_mc_'+sel+'.npy')
+            f = np.load(resource_dir+'datasets/'+year+'_mc_'+sel+'.npy')
             return f['logE'], f['ow']
 
 def passing_fraction(args, sel='ps', suffix=''):

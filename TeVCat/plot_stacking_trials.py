@@ -15,13 +15,18 @@ if __name__ == "__main__":
                    help='chi2 ndf values to plot')
     p.add_argument('--bin_width', type=float, default=0.2,
                    help='width of bin in TS space')
+    p.add_argument('--use_original_trials', action='store_true', default=False,
+                   help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
     plt.style.use(plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     stack_true = np.load(prefix+'TeVCat/stacking_fit_result.npy')['TS']
-    bg_trials = np.load(prefix+'TeVCat/stacking_trials.npy')
+    if args.use_original_trials:
+        bg_trials = np.load('/data/user/zgriffith/pev_photons/TeVCat/stacking_trials.npy')
+    else:
+        bg_trials = np.load(prefix+'TeVCat/stacking_trials.npy')
     n_trials = len(bg_trials)
 
     #Plot chi2 distributions for each degree of freedom given
