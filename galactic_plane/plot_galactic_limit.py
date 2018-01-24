@@ -37,7 +37,7 @@ def plot_flux_model(x, y0, y1, color, edgecolor, alpha, label):
     ax.add_patch(p)
 
 def plot_HESE():
-    surv = np.loadtxt('/data/user/zgriffith/pev_photons/TeVCat/gamma_survival_vs_energy.txt')
+    surv = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')
     surv = surv.T
     spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0]*10**-12, surv[1], k=2)
     E = 10**(np.arange(-0.01, 5.01, 0.001))
@@ -77,14 +77,13 @@ if __name__ == "__main__":
     plot_flux_model(xnew, att_low_y, att_up_y,
                     color='c', edgecolor='none', alpha=0.5,
                     label='Vernetto \& Lipari\'17 (Attenuated)')
-    plot_HESE()
 
-    ax.set_xlim([1e2,1e4])
+    ax.set_xlim([10,1e4])
     ax.set_ylim([1e-11,1e-8])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$E_\gamma$ [TeV]')
     ax.set_ylabel(r'$E^2 \Phi$ [GeV cm${}^{-2}$ s${}^{-1}$]')
     ax.legend(loc='lower left', scatterpoints=1)
-    plt.savefig(fig_dir+'flux_scaled_to_gp_frac_vernetto.png')
+    plt.savefig(fig_dir+'galactic_plane/flux_scaled_to_gp_frac_vernetto.png')
     plt.close()

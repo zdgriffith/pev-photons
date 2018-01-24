@@ -63,7 +63,7 @@ if __name__ == "__main__":
     exp = {}
     exp['CASA-MIA'] = {'data':np.array([[140,180,310,650,1300],
                                         [3.4e-5,2.6e-5,2.4e-5,2.6e-5,3.5e-5]]),
-                      'color':'magenta', 'marker':'D',
+                      'color':colors[1], 'marker':'D',
                       'convert': True, 'label':'CASA-MIA'}
     exp['IC40'] = {'data':np.array([[3e3], [1.2e-3]]),
                    'color':'cyan', 'marker':'H',
