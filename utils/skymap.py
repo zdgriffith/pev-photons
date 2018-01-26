@@ -9,6 +9,8 @@ from mpl_toolkits.basemap import Basemap
 
 import healpy as hp
 
+from utils.support import resource_dir
+
 class PolarSkyMap(object):
     """ Class for plotting sky maps using Basemap projected from the Pole.
 
@@ -105,3 +107,18 @@ class PolarSkyMap(object):
         if colorbar_label:
             clb = self.fig.colorbar(sc, orientation='vertical')
             clb.set_label(colorbar_label, fontsize=20)
+
+    def plot_HESE(self):
+        """ Plot HESE Cascades """
+        events = np.load(resource_dir+'HESE.npz')
+
+        mask = np.less(events['dec'],-40) & np.greater(events['dec'], -85)
+        sc = self.basemap.scatter(events['ra'][mask], events['dec'][mask],
+                                  latlon=True, marker ='+', s=2**7,
+                                  color='k', zorder=2, linewidths=2,
+                                  label='HESE Cascades')
+
+        for i, ra in enumerate(events['ra'][mask]):
+            self.basemap.tissot(ra, events['dec'][mask][i], events['err'][mask][i],
+                                40, edgecolor='k', facecolor='none',
+                                linewidth=2, zorder=4)

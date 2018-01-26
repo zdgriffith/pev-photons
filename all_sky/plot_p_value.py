@@ -21,6 +21,8 @@ if __name__ == "__main__":
                    help='If True, do not draw galactic plane.')
     p.add_argument('--noGrid', action='store_true', default=False,
                    help='If True, do not draw grid lines.')
+    p.add_argument('--HESE', action='store_true', default=False,
+                   help='If True, plot the HESE cascades.')
     args = p.parse_args()
 
     plt.style.use(plot_style)
@@ -50,15 +52,21 @@ if __name__ == "__main__":
     skymap.plot_sky_map(healpy_map, colorbar_label='-log$_{10}$p',
                         **scatter_args)
     
-    # Hightlights the hotspot of the skymap
-    dec = -73.4039433
-    ra =  148.42541436
-    x, y = skymap.basemap(ra, dec)
-    plt.scatter(x, y, marker='o', s=2**9, lw=2,
-                edgecolor='g', facecolor='none')
+    if args.HESE:
+        # plot the HESE cascade events and their 1 sigma errors
+        skymap.plot_HESE()
+    else:
+        # Hightlights the hotspot of the skymap
+        dec = -73.4039433
+        ra =  148.42541436
+        x, y = skymap.basemap(ra, dec)
+        plt.scatter(x, y, marker='o', s=2**9, lw=2,
+                    edgecolor='g', facecolor='none')
 
     ax.legend()
     plt.savefig(fig_dir+'all_sky/'+outFile)
-    if not args.extension:
+    if args.HESE:
+        plt.savefig(fig_dir+'paper/hese_events.pdf')
+    elif not args.extension:
         plt.savefig(fig_dir+'paper/all_sky_scan.pdf')
     plt.close()
