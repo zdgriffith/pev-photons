@@ -43,9 +43,12 @@ if __name__ == "__main__":
         skymap.plot_galactic_plane()
 
     # Plot the pre-trial p-value as -log_10(p-value)
-    healpy_map = np.load(inFile)
-    skymap.plot_sky_map(healpy_map, color_map=ps_map,
-                        neg_log=True, colorbar_label='-log$_{10}$p')
+    healpy_map = -np.log10(np.load(inFile))
+    scatter_args = {'cmap':ps_map, 's':2, 'lw':0, 'zorder':0,
+                    'vmin':0, 'vmax':4.5, 'rasterized':True}
+
+    skymap.plot_sky_map(healpy_map, colorbar_label='-log$_{10}$p',
+                        **scatter_args)
     
     # Hightlights the hotspot of the skymap
     dec = -73.4039433

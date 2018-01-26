@@ -75,35 +75,32 @@ class PolarSkyMap(object):
         x,y = self.basemap(tra, 90-tdec)
         sc  = self.basemap.plot(x, y, 'k-', linewidth=1)
 
-    def plot_sky_map(self, sky_map, color_map,
-                     neg_log=True, colorbar_label=None):
+    def plot_sky_map(self, sky_map, coord='C', colorbar_label=None,
+                     **scatter_args):
         """ Plot a sky map.
         Parameters
         ----------
         sky_map : numpy array
-            A sky map in healpix format and in equatorial coordinates.
-        color_map : matplotlib.colors.LinearSegmentedColormap
-            a matplotlib colormap
-        neg_log : boolean
-            plot -log10(sky_map)
+            A sky map in healpix format
+
+        coord : coordinate system of healpix map ([C]elestial, [G]alactic, etc.)
+
         colorbar_label : string
             label for the color bar.
         
+        \*\*scatter_args
+            keyword arguments for the scatter plot
+
         """
-        sky_map = sky_map
         npix = len(sky_map)
         nside = hp.npix2nside(npix)
-        dec, ra = np.degrees(hp.pix2ang(nside, range(npix)))
 
-        if neg_log:
-            sky_map = -np.log10(sky_map)
+        dec, ra = hp.pix2ang(nside, range(npix))
+        if coord != 'C':
+            dec, ra = hp.Rotator(coord=[coord, 'C'], rot=[0,0])(dec, ra)
 
-        x,y = self.basemap(ra, 90-dec)
-        sc  = self.basemap.scatter(x, y, c=sky_map,
-                                   vmin=0, vmax=4.5,
-                                   cmap=color_map,
-                                   s=2, lw=0, zorder=0,
-                                   rasterized=True)
+        x,y = self.basemap(np.degrees(ra), 90-np.degrees(dec))
+        sc  = self.basemap.scatter(x, y, c=sky_map, **scatter_args)
 
         if colorbar_label:
             clb = self.fig.colorbar(sc, orientation='vertical')
