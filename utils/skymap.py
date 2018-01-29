@@ -8,6 +8,7 @@ import numpy as np
 from mpl_toolkits.basemap import Basemap
 
 import healpy as hp
+import pandas as pd
 
 from utils.support import resource_dir
 
@@ -110,15 +111,15 @@ class PolarSkyMap(object):
 
     def plot_HESE(self):
         """ Plot HESE Cascades """
-        events = np.load(resource_dir+'HESE.npz')
+        events = pd.read_hdf(resource_dir+'HESE.hdf5')
 
-        mask = np.less(events['dec'],-40) & np.greater(events['dec'], -85)
-        sc = self.basemap.scatter(events['ra'][mask], events['dec'][mask],
+        events = events[events['is_cascade']]
+        sc = self.basemap.scatter(events['ra'], events['dec'],
                                   latlon=True, marker ='+', s=2**7,
                                   color='k', zorder=2, linewidths=2,
                                   label='HESE Cascades')
 
-        for i, ra in enumerate(events['ra'][mask]):
-            self.basemap.tissot(ra, events['dec'][mask][i], events['err'][mask][i],
+        for i, ra in enumerate(events['ra']):
+            self.basemap.tissot(ra, events['dec'][i], events['err'][i],
                                 40, edgecolor='k', facecolor='none',
                                 linewidth=2, zorder=4)
