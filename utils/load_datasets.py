@@ -35,10 +35,10 @@ def load_dataset(name, args):
 
     """
 
-    if name == 'point_source':
-        name = 'GammaRays5yr_PointSrc'
+    if name in ['point_source', 'HESE']:
+        dataset = 'GammaRays5yr_PointSrc'
     elif name == 'galactic_plane':
-        name = 'GammaRays5yr_GalPlane'
+        dataset = 'GammaRays5yr_GalPlane'
     else:
         raise(ValueError, 'Name must be "point_source" or "galactic_plane".')
 
@@ -46,21 +46,21 @@ def load_dataset(name, args):
     model_args = {}
     years = ['2011', '2012', '2013', '2014', '2015']
 
-    if name == 'GammaRays5yr_PointSrc':
+    if name == 'point_source':
         llh = MultiPointSourceLLH(seed=args.seed)
         llh_args['mode'] = 'box'
         llh_args['delta_ang'] = np.radians(4.0)
-    elif name == 'GammaRays5yr_GalPlane':
+    elif name in ['galactic_plane', 'HESE']:
         llh = MultiTemplateLLH(seed=args.seed)
         model_args['bounds'] = [args.alpha, args.alpha]
         model_args['fix_index'] = True
 
     for i, year in enumerate(years): 
         season = 'IC86.'+year
-        exp, mc, livetime = Datasets[name].season(season)
-        energy_bins = Datasets[name].energy_bins(season)
+        exp, mc, livetime = Datasets[dataset].season(season)
+        energy_bins = Datasets[dataset].energy_bins(season)
         energy_range = [energy_bins[0], energy_bins[-1]]
-        sinDec_bins = Datasets[name].sinDec_bins(season)
+        sinDec_bins = Datasets[dataset].sinDec_bins(season)
         sinDec_range = [sinDec_bins[0], sinDec_bins[-1]]
 
         llh_model = EnergyLLH(twodim_bins=[energy_bins, sinDec_bins],
@@ -68,10 +68,10 @@ def load_dataset(name, args):
                               sinDec_bins=sinDec_bins,
                               sinDec_range=sinDec_range, **model_args)
 
-        if name == 'GammaRays5yr_PointSrc':
+        if name == 'point_source':
             llh_year = PointSourceLLH(exp, mc, livetime, llh_model, **llh_args)
         else:
-            template = Template((prefix+'/galactic_plane/'+year+
+            template = Template((prefix+'/'+name+'/'+year+
                                  '/'+args.name+'_exp.npy'), reduced=True)
             llh_year = TemplateLLH(exp, mc, livetime, llh_model,
                                    template=template, **llh_args)
