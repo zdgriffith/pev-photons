@@ -38,10 +38,8 @@ if __name__ == "__main__":
     signal_pdf = combine_srcs(ra, np.pi/2.-dec, cascades)
 
     # Convert from equatorial to galactic coordinates
-    """
-    theta_gal, phi_gal = hp.Rotator(coord = ['G','C'], rot = [0,0])(dec, ra)
+    theta_gal, phi_gal = hp.Rotator(coord = ['C','G'], rot = [0,0])(dec, ra)
     pix = hp.ang2pix(nside, theta_gal, phi_gal)
     signal_pdf = np.take(signal_pdf, pix)
-    """
 
-    np.save(prefix+'HESE/source_templates/cascades.npy', signal_pdf)
+    np.save(prefix+'template/source_templates/cascades.npy', signal_pdf)

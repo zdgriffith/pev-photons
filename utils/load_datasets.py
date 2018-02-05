@@ -35,7 +35,7 @@ def load_dataset(name, args):
 
     """
 
-    if name in ['point_source', 'HESE']:
+    if name == 'point_source':
         dataset = 'GammaRays5yr_PointSrc'
     elif name == 'galactic_plane':
         dataset = 'GammaRays5yr_GalPlane'
@@ -50,7 +50,7 @@ def load_dataset(name, args):
         llh = MultiPointSourceLLH(seed=args.seed)
         llh_args['mode'] = 'box'
         llh_args['delta_ang'] = np.radians(4.0)
-    elif name in ['galactic_plane', 'HESE']:
+    else:
         llh = MultiTemplateLLH(seed=args.seed)
         model_args['bounds'] = [args.alpha, args.alpha]
         model_args['fix_index'] = True
