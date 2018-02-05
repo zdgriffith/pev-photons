@@ -10,8 +10,8 @@ The scripts used to produce the results of the PeV gamma-ray analysis
 * TeVCat
     : Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
 
-* galactic_plane
-    : The scripts related to the galactic plane component of the gamma-ray analysis.
+* template
+    : The scripts related to the template components of the gamma-ray analysis.
 
 * performance_checks
     : Scripts testing the performance of reconstruction, event selection, etc.

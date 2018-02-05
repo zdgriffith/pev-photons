@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Run signal-injected trials for galactic plane sensitivity calculation
+# Run signal-injected trials for tempalte sensitivity calculation
 ########################################################################
 
 import argparse
@@ -29,10 +29,11 @@ def fit_ts(args):
     n = trials['TS'][ trials['TS'] > 0].size
     ntot = trials['TS'].size
 
-    np.save(prefix+"galactic_plane/sens_trials/"+args.name+"_job_"+str(args.job)+".npy", [args.n_inj, n, ntot])
+    np.save(prefix+'template/sens_trials/'+args.name+'/'+args.name+'_job_'+str(args.job)+'.npy',
+            [args.n_inj, n, ntot])
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(description='Galactic plane signal-injected trials.',
+    p = argparse.ArgumentParser(description='Template signal-injected trials.',
                    formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-## Submit a dagman to the cluster for galactic plane background trials.
+## Submit a dagman to the cluster for template background trials.
 ########################################################################
 
 import os
@@ -31,7 +31,7 @@ if __name__ == "__main__":
                    help='Option for submitting the rescue file.')
     args = p.parse_args()
 
-    script = os.getcwd() + '/run_gp_analysis.py'
+    script = os.getcwd() + '/run_template_analysis.py'
 
     if args.test:
         cmd = 'python '+script 

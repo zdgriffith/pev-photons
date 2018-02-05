@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Test the sensitivity to a galactic plane flux template. 
+# Test the sensitivity to a flux template. 
 ########################################################################
 
 import argparse
@@ -20,7 +20,7 @@ def mu2flux(inj, args):
     print('E^2dN/dE = %s' % conv)
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(description='Test galactic plane sensitivity.',
+    p = argparse.ArgumentParser(description='Test template sensitivity.',
                    formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='The name of the template.')
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         mu2flux(inj, args)
 
     #Directory where plots will go
-    path = (fig_dir+'galactic_plane/'+args.name+'/')
+    path = (fig_dir+'template/'+args.name+'/')
 
     results = estimate_sensitivity(template_llh, inj,
                                    nstep=11, 

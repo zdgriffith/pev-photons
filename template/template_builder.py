@@ -30,7 +30,7 @@ def template_builder(args):
       ext = '_exp'
       weights = None
 
-    output = (prefix + '/galactic_plane/' + args.year + '/' 
+    output = (prefix + '/template/' + args.year + '/' 
               + args.inFile + ext)
 
     os.system('mkdir -p ' + output)

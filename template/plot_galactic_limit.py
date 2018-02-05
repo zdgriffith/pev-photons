@@ -127,9 +127,9 @@ if __name__ == "__main__":
     ax.legend()
     if args.fermi_limit:
         ax.set_ylabel(r'$E^2\Phi_{template}$ [GeV cm${}^{-2}$ s${}^{-1}$]')
-        plt.savefig(fig_dir+'galactic_plane/fermi_integrated_limit.pdf')
+        plt.savefig(fig_dir+'template/fermi_integrated_limit.pdf')
         plt.savefig(fig_dir+'paper/fermi_integrated_limit.pdf')
     else:
         ax.set_ylabel(r'$E^2J_\gamma$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]')
-        plt.savefig(fig_dir+'galactic_plane/per_str_limit.pdf')
+        plt.savefig(fig_dir+'template/per_str_limit.pdf')
     plt.close()

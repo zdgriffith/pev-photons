@@ -24,7 +24,7 @@ def sensitivity(args):
                            seed=1)
     inj.fill(template_llh.exp, template_llh.mc, template_llh.livetime)
 
-    files = glob(prefix+'galactic_plane/sens_trials/*.npy') 
+    files = glob(prefix+'template/sens_trials/'+args.name+'/*.npy') 
     inj_list =[20.,   98.,  176.,  254.,  332.,  410.,
                488.,  566.,  644., 722.,  800.]
 
@@ -39,7 +39,7 @@ def sensitivity(args):
     ni, ni_err, images = fit(inj_list, frac, tot,
                              0.9, ylabel="fraction TS > 0.90",
                              npar = 2, par = None,
-                             image_base=fig_dir+'galactic_plane/fermi_pi0_sens')
+                             image_base=fig_dir+'template/fermi_pi0_sens')
     flux = inj.mu2flux(ni)
     flux_err = flux * ni_err / ni
 
@@ -55,7 +55,7 @@ def sensitivity(args):
     sens_result['ni_err'] = ni_err
     sens_result['flux'] = flux
     sens_result['flux_err'] = flux_err
-    np.save(prefix+'galactic_plane/fermi_pi0_sens.npy', sens_result)
+    np.save(prefix+'template/fermi_pi0_sens.npy', sens_result)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Perform a sensitivity calculation fit',

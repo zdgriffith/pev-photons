@@ -1,6 +1,6 @@
-# galactic_plane
+# template
 
-The scripts related to the galactic plane component of the gamma-ray analysis.
+The scripts related to the template components of the gamma-ray analysis.
 
 ## Constructing the Templates
 
@@ -11,7 +11,7 @@ The scripts related to the galactic plane component of the gamma-ray analysis.
 
 ## Template Analysis
 
-* run_gp_analysis.py
+* run_template_analysis.py
     : produces the fitted TS and n_sources for the correlation with the given template.
 * cluster_bg_trials.py (run on submitter)
     : produces scrambled background trials on the cluster.

@@ -11,15 +11,15 @@ from utils.support import prefix, fig_dir
 def make_file_dirs():
     # All second level directories
     dir_list = ['all_sky', 'datasets', 'event_selection',
-                'galactic_plane', 'performance_checks',
+                'template', 'performance_checks',
                 'TeVCat', 'HESE', 'dagman']
 
     sub_dirs = dict()
     sub_dirs['all_sky'] = ['dec_trials', 'sens_jobs/index_2.0',
                            'sens_jobs/index_2.7', 'all_sky_trials']
 
-    sub_dirs['galactic_plane'] = ['2011', '2012', '2013', '2014', '2015',
-                                  'source_templates', 'trials', 'sens_trials']
+    sub_dirs['template'] = ['2011', '2012', '2013', '2014', '2015',
+                            'source_templates', 'trials', 'sens_trials']
 
     sub_dirs['HESE'] = ['2011', '2012', '2013', '2014', '2015',
                         'source_templates', 'trials', 'sens_trials']
@@ -40,7 +40,7 @@ def make_file_dirs():
 def make_fig_dirs():
     # All second level directories
     dir_list = ['all_sky', 'event_selection',
-                'galactic_plane', 'performance_checks',
+                'template', 'performance_checks',
                 'TeVCat', 'HESE', 'paper']
 
     if not os.path.exists(fig_dir):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-## Submit a dagman to the cluster for galactic plane sensitivity trials
+## Submit a dagman to the cluster for template sensitivity trials
 ########################################################################
 
 import os

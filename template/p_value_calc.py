@@ -1,7 +1,7 @@
 #!/usr/bin/env/python
 
 ########################################################################
-# Plot the TS distribution of background trials.
+# Calculate the p-value, optionally plot trials
 ########################################################################
 
 import argparse
@@ -56,13 +56,15 @@ def plot_trials(args, bg_trials, n_trials, true_TS):
     plt.xlabel('Test Statistic', fontweight = 'bold')
     plt.ylabel('Trials', fontweight = 'bold')
     plt.tight_layout()
-    plt.savefig(fig_dir+'galactic_plane/bg_trials.pdf')
+    plt.savefig(fig_dir+'template/'+args.name+'_bg_trials.pdf')
     plt.close()
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Plot scrambled trials.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--name', type = str, default='fermi_pi0',
+                   help='name of the template')
     p.add_argument('--plot_trials', action='store_true', default=False,
                    help='if True, plot TS distribution.')
     p.add_argument('--chi2_ndf', type=int, nargs='*',
@@ -77,9 +79,9 @@ if __name__ == "__main__":
 
     #Load in scrambled trials
     if args.use_original_trials:
-        job_list = glob('/data/user/zgriffith/pev_photons/galactic_plane/trials/*') 
+        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*') 
     else:
-        job_list = glob(prefix+'/galactic_plane/trials/*') 
+        job_list = glob(prefix+'/template/trials/'+args.name+'/*') 
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)
@@ -87,7 +89,7 @@ if __name__ == "__main__":
     n_trials = float(len(bg_trials))
 
     #Calculate true result p-value
-    fit_result = np.load(prefix+'/galactic_plane/fermi_pi0_fit_result.npy')
+    fit_result = np.load(prefix+'/template/'+args.name+'_fit_result.npy')
     true_TS  = fit_result['TS']
 
     p_value = np.sum(np.greater(bg_trials, fit_result['TS']))/n_trials
@@ -100,7 +102,7 @@ if __name__ == "__main__":
                                                           data=[p_value],
                                                           dtypes=np.float,
                                                           usemask=False)
-        np.save(prefix+'/galactic_plane/fermi_pi0_fit_result.npy',
+        np.save(prefix+'/template/'+args.name+'_fit_result.npy',
                 fit_result)
 
     #Plot if desired
