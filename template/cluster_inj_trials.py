@@ -6,6 +6,7 @@
 
 import os
 import sys
+import random
 import argparse
 
 from utils.support import prefix, resource_dir
@@ -51,6 +52,7 @@ if __name__ == "__main__":
     for n_inj in inj_list:
         for job in range(args.nJobs):
             arg  = ' --job %s --n_inj %s' % (job_num, n_inj)
+            arg += ' --seed %s ' % random.randint(0,10**8)
             arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
             if args.test:
                 ex  = ' '.join([cmd, arg])
