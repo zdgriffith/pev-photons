@@ -12,7 +12,7 @@ import numpy as np
 
 from skylab.datasets import Datasets
 from skylab.template import Template
-from utils.support import prefix, resource_dir
+from utils.support import prefix, resource_dir, fig_dir
 
 def template_builder(args):
     """Build the template for a given year."""
@@ -32,8 +32,11 @@ def template_builder(args):
 
     output = (prefix + '/template/' + args.year + '/' 
               + args.inFile + ext)
+    fig_out = (fig_dir + '/template/' + args.year + '/' 
+               + args.inFile + ext)
 
     os.system('mkdir -p ' + output)
+    os.system('mkdir -p ' + fig_out)
     sinDec_min = -1
     sinDec_max = -0.8
     sinDec_bins = np.linspace(-1., -0.80, 21)
@@ -57,7 +60,7 @@ def template_builder(args):
                    smoothings=np.arange(0.45, 1.05, 0.05),
                    selection=[-180,180,-90,90], selection_coords='galactic')
 
-    template.display(output, 13, 3)
+    template.display(fig_out, 13, 3)
     template.write(output + '.npy')
 
 if __name__ == '__main__':
