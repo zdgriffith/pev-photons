@@ -25,18 +25,21 @@ def sensitivity(args):
     inj.fill(template_llh.exp, template_llh.mc, template_llh.livetime)
 
     files = glob(prefix+'template/sens_trials/'+args.name+'/*.npy') 
-    inj_list =[20.,   98.,  176.,  254.,  332.,  410.,
-               488.,  566.,  644., 722.,  800.]
 
-    frac = np.zeros(len(inj_list))
-    tot = np.zeros(len(inj_list))
+    inj_list = {'fermi_pi0':[20., 98., 176., 254., 332., 410.,
+                             488., 566., 644., 722., 800.],
+                'ingelman':range(0,601,50),
+                'cascades':range(0,501,50)}
+
+    frac = np.zeros(len(inj_list[args.name]))
+    tot = np.zeros(len(inj_list[args.name]))
     for fname in files:
         a = np.load(fname)
-        index = inj_list.index(a[0])
+        index = inj_list[args.name].index(a[0])
         frac[index] += a[1]
         tot[index] += a[2]
         
-    ni, ni_err, images = fit(inj_list, frac, tot,
+    ni, ni_err, images = fit(inj_list[args.name], frac, tot,
                              0.9, ylabel="fraction TS > 0.90",
                              npar = 2, par = None,
                              image_base=fig_dir+'template/'+args.name+'_sens')

@@ -25,6 +25,8 @@ if __name__ == "__main__":
                    help='Name of the template.')
     p.add_argument('--maxjobs', type=str, default='1200',
                    help='Max jobs running on the cluster.')
+    p.add_argument("--alpha", type=float, default=3.0,
+                    help="Power law index")
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
     p.add_argument('--rescue', action='store_true', default=False,
@@ -48,6 +50,7 @@ if __name__ == "__main__":
     
     for job in range(args.nJobs):
         arg  = ' --job %s ' % job
+        arg += ' --alpha %s ' % args.alpha
         arg += ' --seed %s ' % random.randint(0,10**8)
         arg += ' --bg_trials %s --name %s' % (args.nTrials, args.name)
         if args.test:
