@@ -21,6 +21,8 @@ if __name__ == "__main__":
                    help='The number of jobs to submit.')
     p.add_argument('--nTrials', type=int, default=200,
                    help='The number of trials run per job.')
+    p.add_argument("--alpha", type=float, default=3.0,
+                   help='Spectral index of signal.')
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='Name of the template.')
     p.add_argument('--maxjobs', type=str, default='1200',
@@ -46,13 +48,15 @@ if __name__ == "__main__":
     
     # Range, intervals of injected events best found through a course
     # run on sensitivity_test.py first. 
-    inj_list =[20.,   98.,  176.,  254.,  332.,  410.,
-               488.,  566.,  644., 722.,  800.]
+    inj_list = {'fermi_pi0':[20., 98., 176., 254., 332., 410.,
+                             488., 566., 644., 722., 800.],
+                'ingelman':range(0,601,50),
+                'cascades':range(0,501,50)}
     job_num = 0 
-    for n_inj in inj_list:
+    for n_inj in inj_list[args.name]:
         for job in range(args.nJobs):
             arg  = ' --job %s --n_inj %s' % (job_num, n_inj)
-            arg += ' --seed %s ' % random.randint(0,10**8)
+            arg += ' --alpha %s --seed %s ' % (args.alpha, random.randint(0,10**8))
             arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
             if args.test:
                 ex  = ' '.join([cmd, arg])
