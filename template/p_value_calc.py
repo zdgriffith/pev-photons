@@ -79,9 +79,9 @@ if __name__ == "__main__":
 
     #Load in scrambled trials
     if args.use_original_trials:
-        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*') 
+        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*.npy') 
     else:
-        job_list = glob(prefix+'/template/trials/'+args.name+'/*') 
+        job_list = glob(prefix+'/template/trials/'+args.name+'/*.npy') 
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)

@@ -7,7 +7,7 @@
 import argparse
 import numpy as np
 
-from skylab.sensitivity_utils import estimate_sensitivity
+from skylab.sensitivity_utils import estimate_sensitivity, sensitivity_flux
 from skylab.template_injector import TemplateInjector
 
 from utils.load_datasets import load_dataset
@@ -36,7 +36,10 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    template_llh = load_dataset('galactic_plane', args)
+    if args.name == 'cascades':
+        template_llh = load_dataset('HESE', args)
+    else:
+        template_llh = load_dataset('galactic_plane', args)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,

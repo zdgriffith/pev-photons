@@ -44,7 +44,10 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    template_llh = load_dataset('galactic_plane', args)
+    if args.name == 'cascades':
+        template_llh = load_dataset('HESE', args)
+    else:
+        template_llh = load_dataset('galactic_plane', args)
 
     if args.bg_trials:
         run_bg_trials(template_llh, args)
