@@ -1,15 +1,10 @@
 #!/usr/bin/env python 
 
-#######################################
-####   Write Analysis Datasets   ######
-#######################################
-
 import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import dashi
 from utils.support import resource_dir, fig_dir, plot_setter, plot_style
 from sklearn.externals import joblib
 
@@ -17,13 +12,12 @@ def plot_fraction(level3, level4, label):
     bin_width = 0.1
     bin_vals = np.arange(5.7,8.1,bin_width)
 
-    hist = {}
-    hist['level3'] = dashi.factory.hist1d(np.log10(level3['laputop_E'].values), bin_vals,
-                                          weights=(level3['primary_E'].values**-2.0)*level3['weights'].values)
-    hist['level4'] = dashi.factory.hist1d(np.log10(level4['laputop_E'].values), bin_vals,
-                                          weights=(level4['primary_E'].values**-2.0)*level4['weights'].values)
+    l3_hist, l3_edges = np.histogram(np.log10(level3['laputop_E'].values), bin_vals,
+                                     weights=(level3['primary_E'].values**-2.0)*level3['weights'].values)
+    l4_hist, l4_edges = np.histogram(np.log10(level4['laputop_E'].values), bin_vals,
+                                     weights=(level4['primary_E'].values**-2.0)*level4['weights'].values)
 
-    passed = hist['level3'].bincontent-hist['level4'].bincontent
+    passed = l3_hist-l4_hist
 
     # An error formulation which avoids forbidden space.
     # See Ullrich and Xu 2008:
@@ -33,24 +27,23 @@ def plot_fraction(level3, level4, label):
     percent = np.zeros(bin_num)
     for i in range(bin_num):
         k = np.float(passed[i])
-        n = np.float(hist['level3'].bincontent[i])
-        percent[i] = hist['level4'].bincontent[i]/float(hist['level3'].bincontent[i])
+        n = np.float(l3_hist[i])
+        percent[i] = l4_hist[i]/float(l3_hist[i])
         error[i] = np.sqrt(((k+1)*(k+2)) / ((n+2)*(n+3))
                            - ((k+1)**2) / ((n+2)**2))
 
-
     if '1.00' in label:
-        lines = ax0.step(hist['level3'].binedges, np.append(percent[0],percent),
+        lines = ax0.step(l3_edges, np.append(percent[0],percent),
                          label=label, ls='-', zorder=-1)
         lc = lines[0].get_color()
-        ax0.errorbar(hist['level3'].binedges[:-1]+bin_width/2., percent,
+        ax0.errorbar(l3_edges[:-1]+bin_width/2., percent,
                      yerr=error, fmt='none', color=lc,
                      ecolor=lc, ms=0, capthick=2, zorder=-1)
     else:
-        lines = ax0.step(hist['level3'].binedges, np.append(percent[0],percent),
+        lines = ax0.step(l3_edges, np.append(percent[0],percent),
                          label=label, ls='-')
 
-    return hist['level3'].binedges, np.append(percent[0],percent)
+    return l3_edges, np.append(percent[0],percent), np.append(error[0], error)
 
 def prediction(f, selection, year, cut_val):
     hard_trainer = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_2.0.pkl')
@@ -102,13 +95,13 @@ if __name__ == "__main__":
                    default='point_source', help='event selection')
     args = p.parse_args()
 
-    dashi.visual()
     plt.style.use(plot_style)
     colors = plt.rcParams['axes.color_cycle']
+    plt.rcParams['axes.labelsize'] = 16
+    plt.rcParams['xtick.labelsize'] = 10
+    plt.rcParams['ytick.labelsize'] = 10
 
     years = ['2011', '2012', '2013', '2014', '2015']
-    #years = ['2012']
-    l3_sim_cuts = {'standard':1, 'laputop_it':1, 's125':10**(-0.25)}
 
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
@@ -123,19 +116,28 @@ if __name__ == "__main__":
             passing_gammas = prediction(gammas, args.selection, year, args.cut_val)
             level4.append(passing_gammas)
 
-        x, vals = plot_fraction(pd.concat(level3), pd.concat(level4),
-                                label='%.2f*Charge' % charge_fraction)
+        x, vals, error = plot_fraction(pd.concat(level3), pd.concat(level4),
+                                       label='%.2f*Charge' % charge_fraction)
         comp.append(vals)
+        if charge_fraction == 1.0:
+            base_error = error
 
     for i, c in enumerate(comp):
         ratio = c/comp[1] 
         ax1.step(x, ratio, color=colors[i])
+    
+    ax1.fill_between(x, 1 - base_error/comp[1],
+                     1 + base_error/comp[1], step='pre',
+                     color=colors[1], alpha=0.5)
 
     ax0.set_xticklabels([])
     ax0.set_xlim([5.7,8])
     ax0.set_ylim([0.4, 1])
     ax0.set_ylabel('Passing Fraction')
-    l = ax0.legend(loc='lower right')
+    if args.selection == 'point_source':
+        l = ax0.legend(loc='lower right')
+    else:
+        l = ax0.legend(loc='upper left')
     plot_setter(ax0, l)
 
     ax1.set_xlim([5.7,8])
