@@ -113,13 +113,19 @@ class PolarSkyMap(object):
         """ Plot HESE Cascades """
         events = pd.read_hdf(resource_dir+'HESE.hdf5')
 
-        events = events[events['is_cascade']]
-        sc = self.basemap.scatter(events['ra'], events['dec'],
+        sc = self.basemap.scatter(events[events['is_cascade']]['ra'].values,
+                                  events[events['is_cascade']]['dec'].values,
                                   latlon=True, marker ='+', s=2**7,
                                   color='k', zorder=2, linewidths=2,
                                   label='HESE Cascades')
 
+        sc = self.basemap.scatter(events[~events['is_cascade']]['ra'].values,
+                                  events[~events['is_cascade']]['dec'].values,
+                                  latlon=True, marker ='^', s=2**5,
+                                  color='k', zorder=2, linewidths=2,
+                                  label='HESE Tracks')
+
         for i, ra in enumerate(events['ra']):
-            self.basemap.tissot(ra, events['dec'][i], events['err'][i],
+            self.basemap.tissot(ra, events['dec'].values[i], events['err'].values[i],
                                 40, edgecolor='k', facecolor='none',
                                 linewidth=2, zorder=4)

@@ -15,7 +15,7 @@ from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
-def load_dataset(name, args):
+def load_dataset(name, args, llh_args={}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -37,13 +37,14 @@ def load_dataset(name, args):
 
     if name == 'point_source':
         dataset = 'GammaRays5yr_PointSrc'
-    elif name == 'galactic_plane':
+    elif name in ['galactic_plane', 'HESE']:
         dataset = 'GammaRays5yr_GalPlane'
     else:
-        raise(ValueError, 'Name must be "point_source" or "galactic_plane".')
+        raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
 
-    llh_args = {'ncpu':args.ncpu, 'scramble':False}
-    model_args = {}
+    llh_args['ncpu'] = args.ncpu
+    llh_args['scramble'] = False
+
     years = ['2011', '2012', '2013', '2014', '2015']
 
     if name == 'point_source':
@@ -71,7 +72,7 @@ def load_dataset(name, args):
         if name == 'point_source':
             llh_year = PointSourceLLH(exp, mc, livetime, llh_model, **llh_args)
         else:
-            template = Template((prefix+'/'+name+'/'+year+
+            template = Template((prefix+'/template/'+year+
                                  '/'+args.name+'_exp.npy'), reduced=True)
             llh_year = TemplateLLH(exp, mc, livetime, llh_model,
                                    template=template, **llh_args)
