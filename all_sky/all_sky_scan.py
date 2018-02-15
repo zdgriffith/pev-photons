@@ -48,6 +48,10 @@ if __name__ == "__main__":
                    help='rng seed')
     p.add_argument("--nside", type=int, default=512,
                    help='The healpix resolution.')
+    p.add_argument('--bg_trials', type=int, default=0,
+                   help='if nonzero, run this number of background trials.')
+    p.add_argument("--job", type=int, default=0,
+                   help='job number if running background trials.')
     p.add_argument('--extension', type=float, default=0,
                    help='Spatial extension to source hypothesis in degrees.')
     p.add_argument('--coarse_scan', action='store_true', default=False,
@@ -55,19 +59,30 @@ if __name__ == "__main__":
                          'a coarser scan first, then a follow up'))
     args = p.parse_args()
 
-    # Load the dataset.
-    ps_llh = load_dataset('point_source', args)
-
-    # Set the logging output file.
-    logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
-    logging.basicConfig(filename=prefix+'all_sky/scan.log',
-                        filemode='w', level=logging.INFO)
-
-    if args.coarse_scan:
-        for i, scan in enumerate(psllh.all_sky_scan()):
-            if i > 0:
-                m = scan[0]['TS']
-                break
-        np.save(prefix+args.outFile, m)
+    if args.bg_trials:
+        ts_list = np.full(args.bg_trials, np.nan)
+        for trial in range(args.bg_trials):
+            args.seed = np.random.randint(0, 10**6)
+            ps_llh = load_dataset('point_source', args,
+                                  llh_args={'scramble':True})
+            for i, scan in enumerate(ps_llh.all_sky_scan()):
+                if i > 0:
+                    ts_list[trial] = scan[1]['South']['fit']['TS']
+                    break
+            np.save(prefix+'all_sky/scan_trials/job_%s.npy' % args.job, ts_list)
     else:
-        manual_scan(ps_llh, args)
+        # Load the dataset.
+        ps_llh = load_dataset('point_source', args)
+
+        # Set the logging output file.
+        logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
+        logging.basicConfig(filename=prefix+'all_sky/scan.log',
+                            filemode='w', level=logging.INFO)
+        if args.coarse_scan:
+            for i, scan in enumerate(ps_llh.all_sky_scan()):
+                if i > 0:
+                    m = scan[0]['TS']
+                    break
+            np.save(prefix+args.outFile, m)
+        else:
+            manual_scan(ps_llh, args)
