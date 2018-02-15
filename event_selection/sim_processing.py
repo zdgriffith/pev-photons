@@ -8,6 +8,8 @@ from icecube.icetop_Level3_scripts.functions import count_stations
 
 from icecube.recclasses import I3LaputopParams, LaputopParameter
 
+from run_laputop import laputop_migrad
+
 def get_keys():
     # Keys already in the frame
     keys = ['IceTopMaxSignal',
@@ -15,6 +17,7 @@ def get_keys():
             'IceTopMaxSignalString',
             'IceTopNeighbourMaxSignal',
             'Laputop', 'LaputopParams',
+            'LaputopMigrad', 'LaputopMigradParams',
             'Laputop_FractionContainment',
             'MCPrimary',
             'StationDensity']
@@ -109,6 +112,7 @@ def main(options, inputFiles):
     tray.AddModule(laputop_energy, 'reco_energy')
     tray.AddModule(count_icetop_stations,'count_icetop_stations')
     tray.AddModule(opening_angle, 'opening_angle')
+    tray.AddSegment(laputop_migrad, 'laputop_migrad')
 
     #--------------------------------------------
 

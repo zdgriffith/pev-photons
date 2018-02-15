@@ -9,20 +9,17 @@ import glob
 from utils.support import prefix
 
 def make_batches(files):
-    batches = {}
+    j = 0
+    batches = []
     for f in files:
-        run = re.split('\_', os.path.basename(f))[3]
-        if run in batches:
-            new_batch = 0
-            for i in range(len(batches[run])):
-                if len(batches[run][i]) < args.n:
-                    batches[run][i].append(f)
-                    new_batch += 1
-            if new_batch == 0:
-                batches[run].append([f])
-        else:
-            batches[run] = [[f]]
-
+        if j == 0:
+            batch = []
+        batch.append(f)
+        j += 1
+        if j == args.n:
+            batches.append(batch)
+            j = 0
+        
     return batches
 
 if __name__ == "__main__":
@@ -71,21 +68,19 @@ if __name__ == "__main__":
     script = "/home/zgriffith/pev_photons/event_selection/sim_processing.py"
     outDir = os.path.join(prefix, 'datasets', args.dataset)
 
-    count = 0
-    for k, key in enumerate(batches.keys()):
-        for j, batch in enumerate(batches[key]):
-        
-            run   = re.split('\_', os.path.basename(batch[0]))[3]
-            out = os.path.join(outDir, '{}_{}.hdf5'.format(run, j))
+    for j, batch in enumerate(batches):
+    
+        first = re.split('\_', os.path.basename(batch[0]))[3][:-6]
+        last = re.split('\_', os.path.basename(batch[-1]))[3][:-6]
+        out = os.path.join(outDir, '{}_{}.hdf5'.format(first, last))
 
-            arg  = ' {} {} -g {} -o {} '.format(script, ' '.join(batch), gcd, out)
+        arg  = ' {} {} -g {} -o {} '.format(script, ' '.join(batch), gcd, out)
 
-            if args.test:
-                ex = 'python ' + arg
-                break
-            else:
-                dag.write("JOB " + str(count) + " /data/user/zgriffith/dagman/new_icerec.submit\n")
-                dag.write("VARS " + str(count) + " ARGS=\"" + arg + "\"\n")
-            count += 1
+        if args.test:
+            ex = 'python ' + arg
+            break
+        else:
+            dag.write("JOB " + str(j) + " /data/user/zgriffith/dagman/new_icerec.submit\n")
+            dag.write("VARS " + str(j) + " ARGS=\"" + arg + "\"\n")
 
     os.system(ex)
