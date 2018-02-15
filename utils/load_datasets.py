@@ -15,7 +15,7 @@ from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
-def load_dataset(name, args, llh_args={}, model_args={}):
+def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -26,8 +26,9 @@ def load_dataset(name, args, llh_args={}, model_args={}):
 
     args : Namespace object with argparse arguments from the parent script.
            Needs to include:
-               ncpu : number of cores to use.
-               seed : random number seed.
+               ncpu  : number of cores to use.
+               seed  : random number seed.
+               alpha : spectral index to fix to in the template likelihood
 
     Returns
     ----------
@@ -43,16 +44,15 @@ def load_dataset(name, args, llh_args={}, model_args={}):
         raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
 
     llh_args['ncpu'] = args.ncpu
-    llh_args['scramble'] = False
 
     years = ['2011', '2012', '2013', '2014', '2015']
 
     if name == 'point_source':
-        llh = MultiPointSourceLLH(seed=args.seed)
+        llh = MultiPointSourceLLH(seed=args.seed, ncpu=args.ncpu)
         llh_args['mode'] = 'box'
         llh_args['delta_ang'] = np.radians(4.0)
     else:
-        llh = MultiTemplateLLH(seed=args.seed)
+        llh = MultiTemplateLLH(seed=args.seed, ncpu=args.ncpu)
         model_args['bounds'] = [args.alpha, args.alpha]
         model_args['fix_index'] = True
 
