@@ -13,10 +13,10 @@ from scipy import interpolate
 from utils.support import plot_style, fig_dir, resource_dir
 
 def convert_limit(data):
-    g = np.array([[1.66,1.58,1.63,1.67,1.63], np.full(5,1.4)])
-    a = np.array([[7860,3550,2200,1430,2120],
-                  [20.,20.,13.4,13.4,13.4]])
-    Z = np.array([1.,2.,7.,19.5,26.])
+    g = np.array([[1.66, 1.58, 1.63, 1.67, 1.63], np.full(5, 1.4)])
+    a = np.array([[7860, 3550, 2200, 1430, 2120],
+                  [20., 20., 13.4, 13.4, 13.4]])
+    Z = np.array([1., 2., 7., 19.5, 26.])
     Y = np.array([4e6, 30e6])
 
     conversion = np.zeros(len(data))
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     fermi_ratio = np.load(resource_dir+'fermi_ratio_dict.npz')
 
     exp = {}
-    exp['CASA-MIA'] = {'data':np.array([[140,180,310,650,1300],
-                                        [3.4e-5,2.6e-5,2.4e-5,2.6e-5,3.5e-5]]),
+    exp['CASA-MIA'] = {'data':np.array([[140, 180, 310, 650, 1300],
+                                        [3.4e-5 ,2.6e-5, 2.4e-5, 2.6e-5, 3.5e-5]]),
                       'color':colors[1], 'marker':'D',
                       'convert': True, 'label':'CASA-MIA'}
     exp['IC40'] = {'data':np.array([[3e3], [1.2e-3]]),
@@ -93,6 +93,7 @@ if __name__ == "__main__":
         value = 1.044e-9
     else:
         value = 4.20419751853e-09 #((3.42e-22)*(2*10**6)**2)/(0.2*np.pi)
+
     exp['IC86'] = {'data':np.array([[2e3], [value]]),
                    'color':colors[0], 'marker':'p',
                    'E_0':2e3, 'E_min':0.683e3, 'E_max': 2.73e3,
@@ -120,11 +121,12 @@ if __name__ == "__main__":
         plot_flux_model(models[model])
     
     ax.set_xlim([10, 5e4])
-    ax.set_ylim([1e-9,5e-6])
+    ax.set_ylim([1e-9, 5e-6])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$E_\gamma$ [TeV]')
     ax.legend()
+
     if args.fermi_limit:
         ax.set_ylabel(r'$E^2\Phi_{template}$ [GeV cm${}^{-2}$ s${}^{-1}$]')
         plt.savefig(fig_dir+'template/fermi_integrated_limit.pdf')
