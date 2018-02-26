@@ -9,6 +9,7 @@ import argparse
 import scipy
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import interpolate
 from glob import glob
 
 from pev_photons.utils.support import prefix, resource_dir
