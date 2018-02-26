@@ -30,6 +30,8 @@ if __name__ == "__main__":
                    help='normalization energy in GeV')
     p.add_argument("--mu", type=float, default=0.,
                    help='number of signal events')
+    p.add_argument("--n_max", type=float, default=2000.,
+                   help='maximum bound on injected signal events')
     p.add_argument("--ncpu", type=int, default=1,
                     help="Number of cores to run on.")
     p.add_argument("--seed", type=int, default=1,
@@ -56,6 +58,6 @@ if __name__ == "__main__":
 
     results = estimate_sensitivity(template_llh, inj,
                                    nstep=11, 
-                                   ni_bounds=[0,2000], 
+                                   ni_bounds=[0,args.n_max], 
                                    nsample=100, 
                                    path=path)
