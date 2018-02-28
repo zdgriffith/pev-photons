@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     batches = make_batches(files)
 
-    script = "/home/zgriffith/pev_photons/event_selection/sim_processing.py"
+    script = os.getcwd()+"/sim_processing.py"
     outDir = os.path.join(prefix, 'datasets', args.dataset)
 
     for j, batch in enumerate(batches):
