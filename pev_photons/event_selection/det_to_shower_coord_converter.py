@@ -47,7 +47,7 @@ class PulsesInShowerCS(tableio.I3Converter):
         return desc
     def Convert(self, pulses, row, frame):
         from icecube.dataclasses import I3Constants
-        from tools import to_shower_cs, tank_geometry
+        from pev_photons.event_selection.llh_ratio_scripts.tools import to_shower_cs, tank_geometry
         import math
         import numpy
 
