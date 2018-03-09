@@ -2,7 +2,7 @@
 
 import numpy as np
 from I3Tray import I3Tray
-from icecube import icetray, dataio, dataclasses, recclasses, toprec
+from icecube import icetray, dataio, dataclasses, recclasses, toprec, phys_services
 from icecube import coinc_twc, static_twc, SeededRTCleaning
 from icecube.icetop_Level3_scripts.functions import count_stations 
 
@@ -11,41 +11,39 @@ from icecube.recclasses import I3LaputopParams, LaputopParameter
 from run_laputop import laputop_migrad
 
 def get_keys():
-    # Keys already in the frame
     keys = ['IceTopMaxSignal',
             'IceTopMaxSignalInEdge',
             'IceTopMaxSignalString',
             'IceTopNeighbourMaxSignal',
-            'Laputop', 'LaputopParams',
-            'LaputopMigrad', 'LaputopMigradParams',
-            'Laputop_FractionContainment',
+            'IceTop_StandardFilter',
             'MCPrimary',
-            'StationDensity']
+            'StationDensity',
+            'NStation']
 
-    # Keys created in this job
-    keys += ['NStation',
-             'Laputop_E',
-             'opening_angle']
+    lap_keys = ['', 'Params', '_FractionContainment', '_E',
+                '_opening_angle', '_quality_cuts']
+    for reco in ['Laputop', 'LaputopMigrad']:
+        keys += [reco+key for key in lap_keys]
 
     return keys
 
-def opening_angle(frame):
-    lap_zen = frame['Laputop'].dir.zenith
-    lap_azi = frame['Laputop'].dir.azimuth
+def opening_angle(frame, reco='Laputop'):
+    lap_zen = frame[reco].dir.zenith
+    lap_azi = frame[reco].dir.azimuth
     mc_zen = frame['MCPrimary'].dir.zenith
     mc_azi = frame['MCPrimary'].dir.azimuth
 
     par = {}
-    for key in ['Laputop', 'MCPrimary']:
+    for key in [reco, 'MCPrimary']:
         par[key] = {'x': np.sin(frame[key].dir.zenith)*np.cos(frame[key].dir.azimuth),
                     'y': np.sin(frame[key].dir.zenith)*np.sin(frame[key].dir.azimuth),
                     'z': np.cos(frame[key].dir.zenith)}
 
-    opening_angle = np.arccos(par['Laputop']['x']*par['MCPrimary']['x']
-                              + par['Laputop']['y']*par['MCPrimary']['y']
-                              + par['Laputop']['z']*par['MCPrimary']['z'])
+    opening_angle = np.arccos(par[reco]['x']*par['MCPrimary']['x']
+                              + par[reco]['y']*par['MCPrimary']['y']
+                              + par[reco]['z']*par['MCPrimary']['z'])
 
-    frame.Put('opening_angle', dataclasses.I3Double(opening_angle))
+    frame.Put(reco+'_opening_angle', dataclasses.I3Double(opening_angle))
     return
 
 def count_icetop_stations(frame):
@@ -57,13 +55,13 @@ def count_icetop_stations(frame):
 
     return 
 
-def laputop_energy(frame):
+def laputop_energy(frame, reco='Laputop'):
 
     Par = LaputopParameter
-    params = I3LaputopParams.from_frame(frame, 'LaputopParams')
+    params = I3LaputopParams.from_frame(frame, reco+'Params')
     s125 = 10 ** params.value(Par.Log10_S125)
 
-    coszen=np.cos(frame['Laputop'].dir.zenith)
+    coszen=np.cos(frame[reco].dir.zenith)
 
     if coszen > 0.95 and coszen <= 1.:
         mixed_energy= 0.933316*np.log10(s125) + 6.010569
@@ -76,26 +74,53 @@ def laputop_energy(frame):
     else:
         mixed_energy= np.nan
 
-    frame.Put("Laputop_E" , dataclasses.I3Double(10**mixed_energy))
+    frame.Put(reco+"_E" , dataclasses.I3Double(10**mixed_energy))
 
     return
 
-def quality_cuts(frame):
-    keep = True
+def quality_cuts(frame, reco='Laputop'):
+    keys = [
+            'IceTopMaxSignalAbove6',
+            'IceTopMaxSignalInside',
+            'IceTopNeighbourMaxSignalAbove4',
+            'IceTop_StandardFilter',
+            'StationDensity_passed',
+           ]
     cuts = frame['IT73AnalysisIceTopQualityCuts']
-    for key in cuts.keys():
-        if key != 'Laputop_FractionContainment':
-            keep = keep&cuts[key]
-    keep = keep&(frame['Laputop_FractionContainment'] <1.0)
-    laputop = frame['Laputop']
-    laputop_params = frame['LaputopParams']
-    keep = keep&(laputop.dir.zenith < np.arccos(0.8))
+    quality_cuts = dataclasses.I3MapStringBool()
+    for key in keys:
+        quality_cuts[key] = cuts[key]
+
+    quality_cuts['fit_status'] = frame[reco].fit_status_string == "OK"
+    quality_cuts['containment_cut'] = frame[reco+'_FractionContainment'] < 1.0
+
+    laputop = frame[reco]
+    laputop_params = frame[reco+'Params']
+
+    quality_cuts['zenith_cut'] = laputop.dir.zenith < float(np.arccos(0.8))
 
     Par = LaputopParameter
-    params = I3LaputopParams.from_frame(frame, 'LaputopParams')
+    params = I3LaputopParams.from_frame(frame, reco+'Params')
     s125 = 10 ** params.value(Par.Log10_S125)
-    keep = keep&(s125 > 10**-0.25)
-    return keep
+    quality_cuts['s125_cut'] = s125 > 10**-0.25
+    quality_cuts['beta_cut'] = (params.value(Par.Beta) > 1.4) & (params.value(Par.Beta) < 9.5)
+    frame.Put(reco+'_quality_cuts', quality_cuts)
+
+    return
+
+def calculate_containment(frame, particle='Laputop'):
+    """ Calculate geometry containment values using Kath's method. """
+
+    scaling = phys_services.I3ScaleCalculator(frame['I3Geometry'])
+    if particle in frame:
+        if particle+'_FractionContainment' not in frame:
+            frame.Put(particle+'_FractionContainment',
+                      dataclasses.I3Double(scaling.scale_icetop(frame[particle])))
+        if particle+'_inice_FractionContainment' not in frame:
+            frame.Put(particle+'_inice_FractionContainment',
+                      dataclasses.I3Double(scaling.scale_inice(frame[particle])))
+
+    return
 
 def main(options, inputFiles):
     
@@ -108,11 +133,14 @@ def main(options, inputFiles):
     from icecube.frame_object_diff.segments import uncompress
     tray.AddSegment(uncompress, "uncompress")
 
-    tray.AddModule(quality_cuts,'quality_cuts')
-    tray.AddModule(laputop_energy, 'reco_energy')
     tray.AddModule(count_icetop_stations,'count_icetop_stations')
-    tray.AddModule(opening_angle, 'opening_angle')
+
     tray.AddSegment(laputop_migrad, 'laputop_migrad')
+    for reco in ['Laputop', 'LaputopMigrad']:
+        tray.AddModule(calculate_containment, 'containment_'+reco, particle=reco)
+        tray.AddModule(laputop_energy, 'reco_energy_'+reco, reco=reco)
+        tray.AddModule(opening_angle, 'opening_angle_'+reco, reco=reco)
+        tray.AddModule(quality_cuts,'quality_cuts_'+reco, reco=reco)
 
     #--------------------------------------------
 

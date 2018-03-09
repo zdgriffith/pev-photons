@@ -73,6 +73,7 @@ analysis_keys = ['hlc_count_TWC','slc_count_TWC','nchannel_TWC',
                             'MCPrimary_inice_FractionContainment', 'MCPrimary_FractionContainment',
                             Frame_object_llh,
                             'Laputop_cleanedHLC_FractionContainment','Laputop_cleanedHLC_inice_FractionContainment',
+                            'quality_cut',
                             'alpha_2_0_score', 'alpha_2_7_score', 'alpha_3_0_score',
                             'Laputop_E','NStation', 'Laputop_inice_FractionContainment']
 
