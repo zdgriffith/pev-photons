@@ -35,7 +35,7 @@ class IceTop_LLH_Ratio(icetray.I3ConditionalModule):
                           False)
         self.AddParameter('GeometryHDF5','I3Geometry booked in HDF file',
                           'geometry.h5')
-        self.AddParameter('TwoDPDFPickle','Pickle that contains 3 x 2D PDFs for Gamma Sim and Data for all s125/zen bins',
+        self.AddParameter('TwoDPDFPickleYear','Year to get pickle that contains 3 x 2D PDFs for Gamma Sim and Data for all s125/zen bins',
                           None)
         #self.AddOutbox('OutBox')
 
@@ -44,10 +44,21 @@ class IceTop_LLH_Ratio(icetray.I3ConditionalModule):
         self.slcpulses = self.GetParameter('SLCTankPulses')
         self.hlcpulses = self.GetParameter('HLCTankPulses')
         self.slc_time_corr = self.GetParameter('SLCTimeCorrectionPickle')
-        self.histpickle = self.GetParameter('TwoDPDFPickle')
         self.objname = self.GetParameter('Output')
         self.geoh5 = self.GetParameter('GeometryHDF5')
         self.highE = self.GetParameter('highEbins')
+        year = self.GetParameter('TwoDPDFPickleYear')
+
+        if year == None:
+            self.histpickle = None
+        else:
+            pf = '/data/user/hpandya/gamma_combined_scripts/resources/'
+            pickles = {'2011':pf+'12622_2011GammaSim_BurnSample_2011.pickle',
+                       '2012':pf+'12533_2012GammaSim_BurnSample_2012.pickle',
+                       '2013':pf+'12612_2013GammaSim_BurnSample_2013.pickle',
+                       '2014':pf+'12613_2014GammaSim_BurnSample_2014.pickle',
+                       '2015':pf+'12614_2015GammaSim_BurnSample_2015.pickle'}
+            self.histpickle = pickles[year]
 
         # Initiate LLH Ratio Test class
         self.llh = llh_ratio_test()

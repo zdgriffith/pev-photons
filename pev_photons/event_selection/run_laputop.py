@@ -13,7 +13,7 @@ from icecube.recclasses import I3LaputopParams
 load("libgulliver")
 load("liblilliput")
 
-def laputop_migrad(tray, name):
+def run_laputop(tray, name, algorithm='SIMPLEX', lambda_val=2.1, laputop_name='Laputop'):
     ########## SERVICES FOR GULLIVER ##########
 
     datareadoutName = "CleanedHLCTankPulses"
@@ -21,32 +21,30 @@ def laputop_migrad(tray, name):
     excludedTanksName = "ClusterCleaningExcludedTanks"  #<-- created on the fly!
 
     ## The "simple lambda" snowservice
-    tray.AddService("I3SimpleSnowCorrectionServiceFactory","SimpleSnow21")(
-        ("Lambda", 2.1)
+    tray.AddService("I3SimpleSnowCorrectionServiceFactory",laputop_name+'Snow')(
+        ("Lambda", lambda_val)
         )
 
     ## This one is the standard one.
-    tray.AddService("I3GulliverMinuitFactory","Minuit")(
+    tray.AddService("I3GulliverMinuitFactory",laputop_name+"Minuit")(
         ("MinuitPrintLevel",-2),  
         ("FlatnessCheck",True),  
-        #("Algorithm","SIMPLEX"),  
-        ("Algorithm","MIGRAD"),  
+        ("Algorithm",algorithm),  
         ("MaxIterations",1000),
         ("MinuitStrategy",2),
         ("Tolerance",0.01),    
         )
 
-    tray.AddService("I3LaputopSeedServiceFactory","ToprecSeed")(
+    tray.AddService("I3LaputopSeedServiceFactory",laputop_name+"ToprecSeed")(
         ("InCore", "ShowerCOG"),
         ("InPlane", "ShowerPlane"),
-        #("SnowCorrectionFactor", 1.5),   # Now obsolete
         ("Beta",2.6),                    # first guess for Beta
         ("InputPulses",datareadoutName)  # this'll let it first-guess at S125 automatically
     )
 
     fixcore = False   #always
 
-    tray.AddService("I3LaputopParametrizationServiceFactory","ToprecParam2")(
+    tray.AddService("I3LaputopParametrizationServiceFactory",laputop_name+"ToprecParam2")(
         ("FixCore", fixcore),        
         ("FixTrackDir", True),
         ("IsBeta", True),
@@ -55,7 +53,7 @@ def laputop_migrad(tray, name):
         ("CoreXYLimits", 1000.0)
         )
 
-    tray.AddService("I3LaputopParametrizationServiceFactory","ToprecParam3")(
+    tray.AddService("I3LaputopParametrizationServiceFactory",laputop_name+"ToprecParam3")(
         ("FixCore", fixcore),        
         ("FixTrackDir", False),      # FREE THE DIRECTION!
         ("IsBeta", True),
@@ -68,7 +66,7 @@ def laputop_migrad(tray, name):
         ("BetaStepsize",0.15)        # default is 0.6    
         )
 
-    tray.AddService("I3LaputopParametrizationServiceFactory","ToprecParam4")(
+    tray.AddService("I3LaputopParametrizationServiceFactory",laputop_name+"ToprecParam4")(
         ("FixCore", fixcore),        
         ("FixTrackDir", True),
         ("IsBeta", True),
@@ -82,12 +80,12 @@ def laputop_migrad(tray, name):
         ("BetaStepsize",0.15)        # default is 0.6 
         )
 
-    tray.AddService("I3LaputopLikelihoodServiceFactory","ToprecLike2")(
+    tray.AddService("I3LaputopLikelihoodServiceFactory",laputop_name+"ToprecLike2")(
         ("datareadout", datareadoutName),
         ("badtanks", excludedTanksName),
         ("dynamiccoretreatment",11.0),     # do the 11-meter core cut
         ("curvature",""),      # NO timing likelihood
-        ("SnowServiceName","SimpleSnow21")
+        ("SnowServiceName",laputop_name+"Snow")
         )
 
     #**************************************************
@@ -129,7 +127,7 @@ def laputop_migrad(tray, name):
             self.PushFrame(frame,"OutBox")
 
 
-    tray.AddModule(createBadTankList,"convert_badlist")(
+    tray.AddModule(createBadTankList,laputop_name+"convert_badlist")(
         ("InputBadStationsName", excludedName),
         ("OutputBadTanksName", excludedTanksName)
     )
@@ -137,16 +135,15 @@ def laputop_migrad(tray, name):
     #**************************************************
     #                  The Laputop Fitter
     #**************************************************
-    #tray.AddModule("I3LaputopFitter","Laputop")(
-    tray.AddModule("I3LaputopFitter","LaputopMigrad")(
-        ("SeedService","ToprecSeed"),
+    tray.AddModule("I3LaputopFitter",laputop_name)(
+        ("SeedService",laputop_name+"ToprecSeed"),
         ("NSteps",3),                    # <--- tells it how many services to look for and perform
-        ("Parametrization1","ToprecParam2"),   # the three parametrizations
-        ("Parametrization2","ToprecParam3"),
-        ("Parametrization3","ToprecParam4"),
+        ("Parametrization1",laputop_name+"ToprecParam2"),   # the three parametrizations
+        ("Parametrization2",laputop_name+"ToprecParam3"),
+        ("Parametrization3",laputop_name+"ToprecParam4"),
         ("StoragePolicy","OnlyBestFit"),
-        ("Minimizer","Minuit"),
-        ("LogLikelihoodService","ToprecLike2"),     # the three likelihoods
+        ("Minimizer",laputop_name+"Minuit"),
+        ("LogLikelihoodService",laputop_name+"ToprecLike2"),     # the three likelihoods
         ("LDFFunctions",["dlp","dlp","dlp"]),
         ("CurvFunctions",["","gausspar","gausspar"])   # VERY IMPORTANT : use time Llh for step 3, but fix direction!
         )
