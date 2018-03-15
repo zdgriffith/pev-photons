@@ -23,9 +23,9 @@ def get_weights(sim, energy, nstations):
 
     def int_area(E, theta_max):
         #Integrated Area times Solid Angle
-        radius = 800*np.greater_equal(E, 10**5)
-                 + 300*np.greater_equal(E,10**6)
-                 + 300*np.greater_equal(E,10**7)
+        radius = (800*np.greater_equal(E, 10**5)
+                  + 300*np.greater_equal(E,10**6)
+                  + 300*np.greater_equal(E,10**7))
 
         return ((radius*100)**2)*(1-np.cos(np.radians(theta_max))**2)*np.pi**2
     
