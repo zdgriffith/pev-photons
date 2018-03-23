@@ -18,5 +18,14 @@
 # TO USE: Run "source enter_environment.sh" 
 
 eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
-source /data/user/zgriffith/pev_photons/resources/photon_env/bin/activate
+
+# If you want matplotlib 2 but everything else the same,
+# enter "mpl_2" as a cl argument
+if [ $# -gt 0 ] && [ $1 = "mpl_2" ]
+then
+    source /data/user/zgriffith/pev_photons/resources/mpl_2_env/bin/activate
+else
+    source /data/user/zgriffith/pev_photons/resources/photon_env/bin/activate
+fi
+
 export PYTHONPATH=$PYTHONPATH:"$(pwd)"
