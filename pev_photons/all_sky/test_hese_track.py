@@ -9,12 +9,13 @@ import numpy as np
 import healpy as hp
 import pandas as pd
 
-from utils.load_datasets import load_dataset
-from utils.support import prefix, resource_dir
+from pev_photons.utils.load_datasets import load_dataset
+from pev_photons.utils.support import prefix, resource_dir
 
 def bg_trials(ra, dec, args):
-
-    ps_llh = load_dataset('point_source', args)
+    llh_args = {}
+    llh_args['capscramble'] = True
+    ps_llh = load_dataset('point_source', args, llh_args=llh_args)
 
     trials = ps_llh.do_trials(args.n_trials, src_ra=ra,
                               src_dec=dec)
@@ -22,11 +23,9 @@ def bg_trials(ra, dec, args):
     np.save(prefix+'all_sky/hese_track_trials.npy',
              trials['TS'])
 
-def test_source(ra, dec, args):
 
+def test_source(ra, dec, args):
     llh_args = {}
-    llh_args['capscramble'] = True
-    llh_args['exp_bootstrap_scramble'] = True
     ps_llh = load_dataset('point_source', args, llh_args=llh_args)
 
     source = np.empty((1,),
@@ -34,7 +33,7 @@ def test_source(ra, dec, args):
                              ('TS', np.float), ('nsources', np.float),
                              ('gamma', np.float)])
 
-    fit = ps_llh.fit_source(ra, dec, scramble = False)
+    fit = ps_llh.fit_source(ra, dec, scramble=False)
 
     source['ra'] = np.degrees(ra)
     source['dec'] = np.degrees(dec)
@@ -46,6 +45,7 @@ def test_source(ra, dec, args):
     for pair in pairs:
         print(pair)
     np.save(prefix+'all_sky/hese_track.npy', source)
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -59,11 +59,12 @@ if __name__ == "__main__":
                    help='Number of trials')
     args = p.parse_args()
 
-    
     events = pd.read_hdf(resource_dir+'HESE.hdf5')
     events = events[~events['is_cascade']]
     ra = np.radians(events['ra'].values[0])
     dec = np.radians(events['dec'].values[0])
 
-    #test_source(ra, dec, args)
-    bg_trials(ra, dec, args)
+    if args.n_trials is not None:
+        test_source(ra, dec, args)
+    else:
+        bg_trials(ra, dec, args)
