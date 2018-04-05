@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Process Level3 Data files 
+# Run analysis-level processing on I3 Files, store as HDF Files
 ########################################################################
 
+import os
+import copy
+import sys
+from optparse import OptionParser
 import numpy as np
+from sklearn.externals import joblib
 
 from I3Tray import I3Tray
 from icecube import icetray, dataio, dataclasses, phys_services, toprec
@@ -19,45 +24,46 @@ from pev_photons.event_selection.llh_ratio_scripts.llh_ratio_i3_module import Ic
 from pev_photons.event_selection.icecube_cleaning import icecube_cleaning
 from pev_photons.event_selection.run_laputop import run_laputop
 
-lambdas = {'2011': 2.1, '2012': 2.25, '2013': 2.25,
-           '2014': 2.3, '2015': 2.3}
-def select_keys(isMC=True):
-    it_keys=['I3EventHeader', 'IT73AnalysisIceTopQualityCuts',
-             'IceTopMaxSignal', 'StationDensity',
-             'IceTopNeighbourMaxSignal', 'IceTopLLHRatio']
+def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
+    # Keep these no matter what.
+    keys = ['I3EventHeader', 'charges', 'IceTopLLHRatio']
 
-    lap_keys = ['', 'Params', '_FractionContainment',
-                '_inice_FractionContainment', '_E',
-                '_opening_angle', '_quality_cuts']
-    for reco in ['', 'Migrad', 'LambdaUp', 'LambdaDown']:
-        it_keys += ['Laputop'+reco+key for key in lap_keys]
+    # Reconstruction related keys.
+    reco_keys = ['', 'Params', '_FractionContainment',
+                 '_inice_FractionContainment', '_E',
+                 '_opening_angle', '_quality_cuts', '_passing']
+    for reco in recos:
+        keys += [reco+key for key in reco_keys]
+        for alpha in [2.0, 2.7, 3.0]:
+            analysis_keys += [reco+'_alpha_{}_score'.format(alpha)]
 
-    MC_keys=['MCPrimary', 'MCPrimaryInfo',
-             'MCPrimary_inice_FractionContainment',
-             'MCPrimary_FractionContainment']
-
-    analysis_keys = ['hlc_count_TWC','slc_count_TWC','nchannel_TWC',
-                     'hlc_charge_TWC', 'slc_charge_TWC', 'mjd_time'
-                     'alpha_2_0_score', 'alpha_2_7_score', 'alpha_3_0_score',
-                     'NStation', 'quality_cut', 'IceTopLLhRatio']
-    for pulsename in ['SRTCoincPulses', 'InIcePulses', 'CoincPulses']:
-        analysis_keys += ['all_hlcs_'+pulsename, 'all_slcs_'+pulsename,
-                          'all_hlc_charge_'+pulsename, 'all_slc_charge_'+pulsename,
-                          'nchannel_'+pulsename]
-
-    book_keys=it_keys+analysis_keys
     if isMC:
-        book_keys+=MC_keys
-    return book_keys
+        keys += ['MCPrimary', 'MCPrimaryInfo',
+                 'MCPrimary_inice_FractionContainment',
+                 'MCPrimary_FractionContainment']
 
-def quality_cuts(frame, isMC=False, reco='Laputop'):
-    keys = [
-            'IceTopMaxSignalAbove6',
-            'IceTopMaxSignalInside',
+    if store_extra:
+        # Information not necessary for the final analysis.
+        keys += ['IT73AnalysisIceTopQualityCuts',
+                 'IceTopMaxSignal', 'StationDensity',
+                 'IceTopNeighbourMaxSignal', 'hlc_count_TWC',
+                 'slc_count_TWC','nchannel_TWC', 'hlc_charge_TWC',
+                 'slc_charge_TWC', 'mjd_time', 'NStation']
+
+        for pulsename in ['SRTCoincPulses', 'InIcePulses', 'CoincPulses']:
+            keys += ['all_hlcs_'+pulsename, 'all_slcs_'+pulsename,
+                     'all_hlc_charge_'+pulsename,
+                     'all_slc_charge_'+pulsename,
+                     'nchannel_'+pulsename]
+    return keys
+
+
+def quality_cuts(frame, reco='Laputop'):
+    """ Calculate quality cuts using the given reconstruction """
+
+    keys = ['IceTopMaxSignalAbove6', 'IceTopMaxSignalInside',
             'IceTopNeighbourMaxSignalAbove4',
-            'IceTop_StandardFilter',
-            'StationDensity_passed',
-           ]
+            'IceTop_StandardFilter', 'StationDensity_passed']
     cuts = frame['IT73AnalysisIceTopQualityCuts']
     quality_cuts = dataclasses.I3MapStringBool()
     for key in keys:
@@ -67,29 +73,26 @@ def quality_cuts(frame, isMC=False, reco='Laputop'):
         nstation = count_stations(dataclasses.I3RecoPulseSeriesMap.from_frame(frame, 'IceTopHLCSeedRTPulses')) 
         if 'NStation' not in frame:
             frame.Put('NStation', icetray.I3Int(nstation))
-        quality_cuts['NStation_cut'] = frame['NStation'] >= 5
+        quality_cuts['NStation_cut'] = (frame['NStation'] >= 5)
     else:
         quality_cuts['NStation_cut'] = False
 
-    quality_cuts['fit_status'] = frame[reco].fit_status_string == "OK"
-    quality_cuts['containment_cut'] = frame[reco+'_FractionContainment'] < 1.0
+    quality_cuts['fit_status'] = (frame[reco].fit_status_string == "OK")
+    quality_cuts['containment_cut'] = (frame[reco+'_FractionContainment'] < 1.0)
 
     laputop = frame[reco]
     laputop_params = frame[reco+'Params']
 
-    quality_cuts['zenith_cut'] = laputop.dir.zenith < float(np.arccos(0.8))
+    quality_cuts['zenith_cut'] = (laputop.dir.zenith < float(np.arccos(0.8)))
 
-    Par = LaputopParameter
     params = I3LaputopParams.from_frame(frame, reco+'Params')
-    s125 = 10 ** params.value(Par.Log10_S125)
-    quality_cuts['s125_cut'] = s125 > 10**-0.25
+    log_S125 = params.value(LaputopParameter.Log10_S125)
+    quality_cuts['s125_cut'] = (log_S125 > -0.25)
     quality_cuts['beta_cut'] = (params.value(Par.Beta) > 1.4) & (params.value(Par.Beta) < 9.5)
 
-    if isMC:
-        frame.Put(reco+'_quality_cuts', quality_cuts)
-        return
-    else:
-        return np.all(quality_cuts.values())
+    frame.Put(reco+'_quality_cuts', quality_cuts)
+    frame.Put(reco+'_passing', icetray.I3Bool(bool(np.all(quality_cuts.values()))))
+
 
 def calculate_containment(frame, particle='Laputop'):
     """ Calculate geometry containment values using Kath's method. """
@@ -103,9 +106,10 @@ def calculate_containment(frame, particle='Laputop'):
             frame.Put(particle+'_inice_FractionContainment',
                       dataclasses.I3Double(scaling.scale_inice(frame[particle])))
 
-    return
 
 def opening_angle(frame, reco='Laputop'):
+    """ Calculate the opening angle for a given reconstruction. """
+
     lap_zen = frame[reco].dir.zenith
     lap_azi = frame[reco].dir.azimuth
     mc_zen = frame['MCPrimary'].dir.zenith
@@ -122,13 +126,12 @@ def opening_angle(frame, reco='Laputop'):
                               + par[reco]['z']*par['MCPrimary']['z'])
 
     frame.Put(reco+'_opening_angle', dataclasses.I3Double(opening_angle))
-    return
+
 
 def laputop_energy(frame, reco='Laputop'):
-
-    Par = LaputopParameter
+    """ Convert Laputop S125 to energy based on cosmic-ray simulation studies. """
     params = I3LaputopParams.from_frame(frame, reco+'Params')
-    s125 = 10 ** params.value(Par.Log10_S125)
+    s125 = 10 ** params.value(LaputopParameter.Log10_S125)
 
     coszen=np.cos(frame[reco].dir.zenith)
 
@@ -145,94 +148,153 @@ def laputop_energy(frame, reco='Laputop'):
 
     frame.Put(reco+"_E" , dataclasses.I3Double(10**mixed_energy))
 
-    return
 
-def main(args, inputFiles):
+def shift_s125(frame, shift=0.03):
+    """ Makes new reconstructions that only differ from the standard
+        by a shift in S125. """
+    recos = ['LaputopS125Down', 'LaputopS125Up']
+    for i, ratio in enumerate([1-shift, 1+shift]):
+        params = I3LaputopParams.from_frame(frame, 'LaputopParams')
+        shift_params = copy.deepcopy(params)
+        shift_params.set_value(LaputopParameter.Log10_S125,
+                               np.log10(ratio*10**params.value(LaputopParameter.Log10_S125)))
+
+        frame[recos[i]+'Params'] = shift_params
+        frame[recos[i]] = frame['Laputop']
+
+
+def calculate_inice_charge(frame):
+    """ Calculates the total charge deposited in IceCube. """
+    if frame.Has('SRTCoincPulses'):
+        # If the event had an IceCube trigger, use the SeededRT pulses
+        # to determine the charge feature.  Otherwise, use the
+        # optimized cleaning described in the wiki.
+        trigger = np.greater(frame['all_hlcs_SRTCoincPulses'],0)
+        charges = (trigger*(frame['all_hlc_charge_SRTCoincPulses'].value
+                            + frame['all_slc_charge_SRTCoincPulses'].value)
+                   + np.invert(trigger)*(frame['hlc_charge_TWC'].value
+                                         + frame['slc_charge_TWC'].value))
+    else:
+        # If there are no events in a file with SeededRT applied, all
+        # charges come from the optimized cleaning.
+        charges = frame['hlc_charge_TWC'].value + frame['slc_charge_TWC'].value
+
+    frame['charges'] = dataclasses.I3Double(charges)
+
+
+def apply_random_forest(frame, random_forests, isMC=False, reco='Laputop'):
+    """ Calculates Random Forest scores. """
+    if not frame[reco+'_passing']:
+        for alpha in ['2.0', '2.7', '3.0']:
+            frame[reco+'_alpha_'+alpha+'_score'] = dataclasses.I3Double(0)
+        return
+
+    laputop = frame[reco]
+    params = I3LaputopParams.from_frame(frame, reco+'Params')
+    log_S125 = params.value(Par.Log10_S125)
+
+    features = np.array([frame['charges'],
+                         frame[reco+'_inice_FractionContainment'].value,
+                         frame[reco+'_IceTopLLHRatio']['LLH_Ratio'],
+                         log_S125, np.sin(laputop.dir.zenith - np.pi/2.)]).T
+                
+    for alpha in ['2.0', '2.7', '3.0']:
+        score = random_forests['alpha_'+alpha].predict_proba(features).T[1][0]
+        frame['{}_alpha_{}_score'.format(reco, alpha)] = dataclasses.I3Double(score)
+
+def cut_events(frame, recos=[], threshold=0.7):
+    """ Cuts all events which are below threshold for all classifiers."""
+    for reco in recos:
+        for alpha in ['2.0', '2.7', '3.0']:
+            if frame['{}_alpha_{}_score'.format(reco, alpha)] > threshold:
+                return True
+    return False
+
+
+def main(in_files, out_file, year, isMC=False, systematics=False,
+         run_migrad=False, store_extra=False):
     
     tray = I3Tray()
-    tray.AddModule('I3Reader', 'Reader',
-                   FilenameList=[args.gcdfile] + inputFiles)
+    tray.AddModule('I3Reader', 'Reader', FilenameList=in_files)
     tray.AddSegment(uncompress, 'uncompress')
 
+    tray.AddSegment(icecube_cleaning, 'icecube_cleaning')
+
+    rf = {}
+    for alpha in ['2.0', '2.7', '3.0']:
+        rf['alpha_'+alpha] = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_'+alpha+'.pkl')
+        rf['alpha_'+alpha].verbose = 0
+
     recos = ['Laputop']
-    if args.run_migrad:
+    if run_migrad:
         tray.AddSegment(run_laputop, 'laputop_migrad', algorithm='MIGRAD',
                         laputop_name='LaputopMigrad')
         recos.append('LaputopMigrad')
-    if args.run_lambdas:
+    if systematics:
+        lambdas = {'2011': 2.1, '2012': 2.25, '2013': 2.25,
+                   '2014': 2.3, '2015': 2.3}
         tray.AddSegment(run_laputop, 'laputop_lambda_up',
-                        lambda_val=lambdas[args.year]+0.2,
+                        lambda_val=lambdas[year]+0.2,
                         laputop_name='LaputopLambdaUp')
-        recos.append('LaputopLambdaUp')
         tray.AddSegment(run_laputop, 'laputop_lambda_down',
-                        lambda_val=lambdas[args.year]-0.2,
+                        lambda_val=lambdas[year]-0.2,
                         laputop_name='LaputopLambdaDown')
-        recos.append('LaputopLambdaDown')
+        tray.AddModule(shift_s125, 'shift_s125')
+        recos.extend(['LaputopLambdaUp', 'LaputopLambdaDown',
+                      'LaputopS125Up', 'LaputopS125Down'])
 
     for reco in recos:
-        tray.AddModule(calculate_containment, 'containment_'+reco, particle=reco)
-        tray.AddModule(quality_cuts,'quality_cuts_'+reco, reco=reco,
-                       isMC=args.isMC)
+        tray.AddModule(calculate_containment, 'containment_'+reco,
+                       particle=reco)
+        tray.AddModule(quality_cuts, 'quality_cuts_'+reco, reco=reco)
         tray.AddModule(laputop_energy, 'reco_energy_'+reco, reco=reco)
-        if args.isMC:
+        tray.AddModule(IceTop_LLH_Ratio, 'IceTop_LLH_ratio_'+reco)(
+                       ("Track", reco), 
+                       ("Output", reco+'_IceTopLLHRatio'),
+                       ("TwoDPDFPickleYear", args.year),
+                       ("GeometryHDF5", '/data/user/zgriffith/llhratio_files/geometry.h5'),
+                       ("highEbins", True))
+        tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
+                       random_forests=rf, reco=reco)
+        if isMC:
             tray.AddModule(opening_angle, 'opening_angle_'+reco, reco=reco)
 
-    if args.isMC:
+    if isMC:
         tray.AddModule(calculate_containment, 'True_containment',
                        particle='MCPrimary')
-
-    '''
-    tray.AddModule(IceTop_LLH_Ratio, 'IceTop_LLH_ratio')(
-                   ("TwoDPDFPickleYear", args.year),
-                   ("GeometryHDF5", '/data/user/zgriffith/llhratio_files/geometry.h5'),
-                   ("highEbins", True))
-
-    tray.AddSegment(icecube_cleaning, 'icecube_cleaning')
-    '''
+    else:
+        tray.AddModule(cut_events, 'cut_events',
+                       recos=recos)
 
     # Write events to an HDF file
-    wanted = select_keys(args.isMC)
-    hdf = I3HDFTableService(args.output)
+    keys = select_keys(isMC=isMC, store_extra=store_extra, recos=recos)
+    hdf = I3HDFTableService(out_file)
     tray.AddModule(I3TableWriter, tableservice=hdf,
-                   keys=wanted, SubEventStreams=['ice_top'])
+                   keys=keys, SubEventStreams=['ice_top'])
 
     tray.AddModule('TrashCan', 'Done')
     tray.Execute()
     tray.Finish()
 
 if __name__ == "__main__":
-    import sys, os.path
-    from optparse import OptionParser
-
     parser = OptionParser(usage='%s [args] -o <filename>.i3[.bz2|.gz] {i3 file list}'%os.path.basename(sys.argv[0]))
+    parser.add_option('-g', '--gcdfile', help='The GCD file to be used.')
     parser.add_option("-o", "--output", action="store", type="string",
                       help="Output file name", metavar="BASENAME")
     parser.add_option("--year", help="dataset year")
     parser.add_option('--isMC', action='store_true', default=False,
-                   help='MC dataset?')
+                   help='Is this a Monte Carlo dataset?')
     parser.add_option('--run_migrad', action='store_true', default=False,
                    help='Run Laputop with MIGRAD?')
-    parser.add_option('--run_lambdas', action='store_true', default=False,
-                   help='Run Laputop with up and down lambdas?')
-    parser.add_option('-g', '--gcdfile',
-                      default='/Users/javierg/IceCubeData/GeoCalibDetectorStatus_IC79.55380_L2a.i3',
-                      help='Manually specify the GCD file to be used.  For data, you should generate a GCD first.')
+    parser.add_option('--systematics', action='store_true', default=False,
+                   help='Process with systematic reconstructions?')
+    parser.add_option('--store_extra', action='store_true', default=False,
+                   help='Store additional keys in HDF files?')
 
-    (args, inputFiles) = parser.parse_args()
+    (args, event_files) = parser.parse_args()
 
-    #Check everything is okay and run
-    ok = True
-    if not os.path.exists(args.gcdfile):
-        print " - GCD file %s not found!" % args.gcdfile
-        ok = False
+    in_files = [args.gcd_file] + event_files
 
-    if not args.output:
-        print " - Output file not specified!"
-        ok = False
-
-    if not ok:
-        print ''
-        parser.print_help()
-
-    if ok and len(inputFiles) > 0:
-        main(args, inputFiles)
+    main(in_files, out_file=args.output, year=args.year, isMC=args.isMC,
+         systematics=args.systematics, run_migrad=args.run_migrad,
+         store_extra=args.store_extra)

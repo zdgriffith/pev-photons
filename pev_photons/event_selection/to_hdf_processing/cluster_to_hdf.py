@@ -17,6 +17,9 @@ def write_dag_MC(batches, GCD, out_dir):
         arg += '-g {} --year {} -o {} --isMC'.format(GCD, args.year, out)
         arg += ' --run_lambdas'
 
+        if args.systematics:
+            arg += ' --systematics '
+
         if args.test:
             cmd = 'python '+script
             ex  = ' '.join([cmd, arg])
@@ -45,6 +48,9 @@ def write_dag_data(batches, GCD_files, out_dir):
 
             GCD = [GCD for GCD in GCD_files if run in GCD_files][0]
             arg += '-g {} --year {} -o {}'.format(GCD, args.year, out)
+
+            if args.systematics:
+                arg += ' --systematics '
 
             if args.test:
                 cmd = 'python '+script
@@ -101,6 +107,8 @@ if __name__ == "__main__":
                    help='max jobs running on cluster')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
+    p.add_argument('--systematics', action='store_true', default=False,
+                   help='Process with systematic reconstructions?')
     args = p.parse_args()
 
     script = os.path.join(os.getcwd(), 'to_hdf_processing.py')
@@ -145,5 +153,8 @@ if __name__ == "__main__":
         files = get_data_files()
         batches = make_data_batches(files)
         GCD_files = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*_GCD.i3.gz' % args.year)
-        out_dir = prefix+'/datasets/data/'+args.year
+        if args.systematics:
+            out_dir = prefix+'/datasets/systematics/data/'+args.year
+        else:
+            out_dir = prefix+'/datasets/data/'+args.year
         write_dag_data(batches, GCD_files, out_dir)
