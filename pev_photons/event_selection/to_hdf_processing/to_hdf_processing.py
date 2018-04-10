@@ -23,6 +23,7 @@ from icecube.frame_object_diff.segments import uncompress
 from pev_photons.event_selection.llh_ratio_scripts.llh_ratio_i3_module import IceTop_LLH_Ratio
 from pev_photons.event_selection.icecube_cleaning import icecube_cleaning
 from pev_photons.event_selection.run_laputop import run_laputop
+from pev_photons.utils.support import resource_dir
 
 def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     # Keep these no matter what.
@@ -35,7 +36,7 @@ def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     for reco in recos:
         keys += [reco+key for key in reco_keys]
         for alpha in [2.0, 2.7, 3.0]:
-            analysis_keys += [reco+'_alpha_{}_score'.format(alpha)]
+            keys += [reco+'_alpha_{}_score'.format(alpha)]
 
     if isMC:
         keys += ['MCPrimary', 'MCPrimaryInfo',
@@ -58,9 +59,8 @@ def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     return keys
 
 
-def quality_cuts(frame, reco='Laputop'):
-    """ Calculate quality cuts using the given reconstruction """
-
+def base_quality_cuts(frame):
+    """ Calculate quality cuts """
     keys = ['IceTopMaxSignalAbove6', 'IceTopMaxSignalInside',
             'IceTopNeighbourMaxSignalAbove4',
             'IceTop_StandardFilter', 'StationDensity_passed']
@@ -77,6 +77,13 @@ def quality_cuts(frame, reco='Laputop'):
     else:
         quality_cuts['NStation_cut'] = False
 
+    return np.all(quality_cuts.values())
+
+
+def reco_quality_cuts(frame, reco='Laputop'):
+    """ Calculate quality cuts using the given reconstruction """
+    quality_cuts = dataclasses.I3MapStringBool()
+
     quality_cuts['fit_status'] = (frame[reco].fit_status_string == "OK")
     quality_cuts['containment_cut'] = (frame[reco+'_FractionContainment'] < 1.0)
 
@@ -88,7 +95,7 @@ def quality_cuts(frame, reco='Laputop'):
     params = I3LaputopParams.from_frame(frame, reco+'Params')
     log_S125 = params.value(LaputopParameter.Log10_S125)
     quality_cuts['s125_cut'] = (log_S125 > -0.25)
-    quality_cuts['beta_cut'] = (params.value(Par.Beta) > 1.4) & (params.value(Par.Beta) < 9.5)
+    quality_cuts['beta_cut'] = (params.value(LaputopParameter.Beta) > 1.4) & (params.value(LaputopParameter.Beta) < 9.5)
 
     frame.Put(reco+'_quality_cuts', quality_cuts)
     frame.Put(reco+'_passing', icetray.I3Bool(bool(np.all(quality_cuts.values()))))
@@ -191,13 +198,18 @@ def apply_random_forest(frame, random_forests, isMC=False, reco='Laputop'):
 
     laputop = frame[reco]
     params = I3LaputopParams.from_frame(frame, reco+'Params')
-    log_S125 = params.value(Par.Log10_S125)
+    log_S125 = params.value(LaputopParameter.Log10_S125)
 
-    features = np.array([frame['charges'],
+    features = np.array([frame['charges'].value,
                          frame[reco+'_inice_FractionContainment'].value,
                          frame[reco+'_IceTopLLHRatio']['LLH_Ratio'],
-                         log_S125, np.sin(laputop.dir.zenith - np.pi/2.)]).T
-                
+                         log_S125, np.sin(laputop.dir.zenith - np.pi/2.)]).T.reshape(1,-1)
+
+    if np.any(np.isnan(features)):
+        for alpha in ['2.0', '2.7', '3.0']:
+            frame[reco+'_alpha_'+alpha+'_score'] = dataclasses.I3Double(0)
+        return
+        
     for alpha in ['2.0', '2.7', '3.0']:
         score = random_forests['alpha_'+alpha].predict_proba(features).T[1][0]
         frame['{}_alpha_{}_score'.format(reco, alpha)] = dataclasses.I3Double(score)
@@ -218,7 +230,10 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
     tray.AddModule('I3Reader', 'Reader', FilenameList=in_files)
     tray.AddSegment(uncompress, 'uncompress')
 
+    tray.AddModule(base_quality_cuts, 'base_quality_cuts')
+
     tray.AddSegment(icecube_cleaning, 'icecube_cleaning')
+    tray.AddModule(calculate_inice_charge, 'icecube_charge')
 
     rf = {}
     for alpha in ['2.0', '2.7', '3.0']:
@@ -246,13 +261,12 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
     for reco in recos:
         tray.AddModule(calculate_containment, 'containment_'+reco,
                        particle=reco)
-        tray.AddModule(quality_cuts, 'quality_cuts_'+reco, reco=reco)
+        tray.AddModule(reco_quality_cuts, 'quality_cuts_'+reco, reco=reco)
         tray.AddModule(laputop_energy, 'reco_energy_'+reco, reco=reco)
         tray.AddModule(IceTop_LLH_Ratio, 'IceTop_LLH_ratio_'+reco)(
-                       ("Track", reco), 
-                       ("Output", reco+'_IceTopLLHRatio'),
-                       ("TwoDPDFPickleYear", args.year),
-                       ("GeometryHDF5", '/data/user/zgriffith/llhratio_files/geometry.h5'),
+                       ("Track", reco), ("Output", reco+'_IceTopLLHRatio'),
+                       ("TwoDPDFPickleYear", year),
+                       ("GeometryHDF5", resource_dir+'/geometry.h5'),
                        ("highEbins", True))
         tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
                        random_forests=rf, reco=reco)
@@ -293,7 +307,7 @@ if __name__ == "__main__":
 
     (args, event_files) = parser.parse_args()
 
-    in_files = [args.gcd_file] + event_files
+    in_files = [args.gcdfile] + event_files
 
     main(in_files, out_file=args.output, year=args.year, isMC=args.isMC,
          systematics=args.systematics, run_migrad=args.run_migrad,

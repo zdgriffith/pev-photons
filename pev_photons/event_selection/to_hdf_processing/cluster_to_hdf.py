@@ -4,93 +4,141 @@ import os
 import sys
 import re
 import glob
+from datetime import datetime
+startTime = datetime.now()
 
-from pev_photons.utils.support import prefix
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
 
-def write_dag_MC(batches, GCD, out_dir):
-    for k, batch in enumerate(batches):
+def fileCleaner(runFile, fileList, reverse = False):
 
-        # Name outfile
-        out = '{}/{}_{}.hdf5'.format(out_dir, args.MC_dataset, k)
+    f = open(runFile, 'r')
+    lines = f.readlines()
+    goodRunList = []
 
-        arg  = '{} '.format(' '.join(batch))
-        arg += '-g {} --year {} -o {} --isMC'.format(GCD, args.year, out)
-        arg += ' --run_lambdas'
+    for line in lines:
 
-        if args.systematics:
-            arg += ' --systematics '
+        # Lines with run info need at least 6 parts
+        line_info = line.split()
+        try:
+            test = int(line_info[0])
+        except ValueError:
+            continue
+        # Make sure run is good
+        if int(line_info[2]) == 1:
+            run  = '00'+line_info[0]
+            goodRunList.append(run)
+    f.close()
+    goodRunList.sort()
+    cleanList = []
+    for file in fileList:
+        run_st = file.find('Run') + 3
+        run = file[run_st:run_st+8]
+        if reverse:
+            if run not in goodRunList:
+                cleanList.append(file)
+        else:
+            if run in goodRunList:
+                cleanList.append(file)
 
-        if args.test:
+    return cleanList
+
+
+def write_job(script, batches, gcd_file, year,
+              out_dir, out_name, dag_name,
+              isMC=False, test=False, systematics=False, job=0):
+    """Submit a dag file for Monte Carlo.
+
+    Parameters
+    ----------
+    script : string
+        Script which performs event processing.
+    batches : array-like, shape = [batch_length, n_batches]
+        Batches of event files, each corresponding
+        to a job on the cluster.
+    gcd_file : string
+        The GCD file corresponding to the event files.
+    out_dir : string
+        The directory where the output files are written.
+    out_name : name
+        Name of the output file.
+    isMC : boolean
+        Flag for Monte Carlo simulation.
+    test : boolean
+        Flag for testing on Cobalt before submitting
+        to the cluster.
+    systematics : boolean
+        Flag for running systematic processing on the events.
+
+    """
+    for i, batch in enumerate(batches):
+        out = '{}/{}_{}.hdf5'.format(out_dir, out_name, i)
+        arg = '{}'.format(' '.join(batch))
+        arg += ' -g {} --year {} -o {}'.format(gcd_file, year, out)
+
+        if isMC:
+            arg += ' --isMC'
+        if systematics:
+            arg += ' --systematics'
+
+        if test:
             cmd = 'python '+script
             ex  = ' '.join([cmd, arg])
-            if k == 5:
-                break
+            os.system(ex)
+            sys.exit(str(datetime.now() - startTime))
+            break
         else:
-            arg  = script+' '+arg
-            dag.write("JOB " + str(k) + " /data/user/zgriffith/dagman/new_icerec.submit\n")
-            dag.write("VARS " + str(k) + " ARGS=\"" + arg + "\"\n")
+            arg = script+' '+arg
+            dag.write('JOB {} {}/icerec.submit\n'.format(job, resource_dir))
+            dag.write('VARS {} ARGS=\"{}\"\n'.format(job, arg))
+            dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(job, dag_dir, dag_name))
+            dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(job, prefix, dag_name))
+            job += 1
+    return job
 
-    ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_name)
-    os.system(ex)
-    return
 
-def write_dag_data(batches, GCD_files, out_dir):
-    count = 0
-    for k, key in enumerate(batches.keys()):
-        for j, batch in enumerate(batches[key]):
-            count += 1
+def get_data_batches(files, batch_length):
+    """Construct batches for each run of data.
+    
+    Parameters
+    ----------
+    files : array-like, shape = [n_files]
+        File containing events, where n_files
+        is the number of files in the year.
+    batch_length : int
+        The number of files run over in one batch.
 
-            # Name outfile
-            run = re.split('\_', os.path.basename(batch[0]))[3]
-            out = '{}/{}_{}.hdf5'.format(out_dir, run, j)
+    Returns
+    -------
+    run_batches : dict of string -> array-like
+        Batches grouped by run number.
 
-            arg = '{} '.format(' '.join(batch))
-
-            GCD = [GCD for GCD in GCD_files if run in GCD_files][0]
-            arg += '-g {} --year {} -o {}'.format(GCD, args.year, out)
-
-            if args.systematics:
-                arg += ' --systematics '
-
-            if args.test:
-                cmd = 'python '+script
-                ex  = ' '.join([cmd, arg])
-                if j == 5:
-                    break
-            else:
-                arg  = script+' '+arg
-                dag.write("JOB " + str(count) + " /data/user/zgriffith/dagman/new_icerec.submit\n")
-                dag.write("VARS " + str(count) + " ARGS=\"" + arg + "\"\n")
-
-    ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_name)
-    os.system(ex)
-    return
-
-def get_data_batches(files):
-    batches = {}
+    """
+    run_batches = {}
     for fname in files:
         run = re.split('\_', os.path.basename(fname))[3]
-        if run in batches:
+        if run in run_batches:
             new_batch = 0
-            for i in range(len(batches[run])):
-                if len(batches[run][i]) < args.n:
-                    batches[run][i].append(fname)
+            for i in range(len(run_batches[run])):
+                if len(run_batches[run][i]) < batch_length:
+                    run_batches[run][i].append(fname)
                     new_batch += 1
             if new_batch == 0:
-                batches[run].append([fname])
+                run_batches[run].append([fname])
         else:
-            batches[run] = [[fname]]
-    return batches
+            run_batches[run] = [[fname]]
+    return run_batches
 
-def get_data_files():
-    if args.year == '2011':
-        file_list   = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/IC86.%s/*/*/*/*.i3.bz2' % args.year)
+
+def get_data_files(year):
+    if year == '2011':
+        file_list = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/IC86.%s/*/*/*/*.i3.bz2' % year)
     else:
-        file_list   = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*.i3.bz2' % args.year)
+        file_list = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*.i3.bz2' % year)
     file_list.sort()
 
-    goodRunList = prefix+'run_files/non_burn_runs_%s.txt' % args.year
+    goodRunList = prefix+'run_files/burn_runs_%s.txt' % year
     return fileCleaner(goodRunList, file_list)
+
 
 if __name__ == "__main__":
 
@@ -99,7 +147,7 @@ if __name__ == "__main__":
     p.add_argument('--year', help='Detector year.')
     p.add_argument('--MC_dataset', default=None,
                    help='If simulation, the dataset to run over.')
-    p.add_argument('--n', type=int, default=10,
+    p.add_argument('--n', type=int, default=4,
                    help='Number of files to run per batch')
     p.add_argument('--test', action='store_true', default=False,
                    help='Option for running test off cluster')
@@ -114,47 +162,56 @@ if __name__ == "__main__":
     script = os.path.join(os.getcwd(), 'to_hdf_processing.py')
     isMC = args.MC_dataset is not None
 
-    #-------------------------------------------------------------------------
-    # Set up Dag info
-
     if args.test:
         args.n = 2
+        dag_name = ''
     else:
         if isMC:
-            dag_name = os.path.join(prefix, 'dagman', args.MC_dataset+'_to_hdf.dag')
+            dag_name = args.MC_dataset+'_to_hdf'
         else:
-            dag_name = os.path.join(prefix, 'dagman', args.year+'_to_hdf.dag')
+            dag_name = args.year+'_to_hdf'
 
         if args.rm_old:
-            print('Deleting '+dag_name[:-4]+' files...')
-            os.system('rm '+dag_name[:-4]+'*')
-        dag = open(dag_name, "w+")
+            print('Deleting '+dag_name+' files...')
+            os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
 
-    #-------------------------------------------------------------------------
-    # Get the list of files to be processed
+        dag_file = os.path.join(dag_dir, dag_name+'.dag')
+        dag = open(dag_file, "w+")
 
+    job = 0
     if isMC:
         if args.MC_dataset in ['12622', '12533', '12612', '12613', '12614']:
             files = glob.glob('/data/user/zgriffith/Level3/IT81_sim/%s/*.i3.gz' % args.MC_dataset)
-            GCD = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
+            gcd_file = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
         elif args.MC_dataset in ['12360']:
-            files = glob.glob('/data/user/zgriffith/Level3/IT81_sim/%s/*.i3.gz' % args.MC_dataset)
             path = '/data/ana/CosmicRay/IceTop_level3/sim/IC86.2012/'
             files = glob.glob(os.path.join(path, '{}/*.i3.gz'.format(args.MC_dataset)))
-            GCD = os.path.join(path, 'GCD/Level3_{}_GCD.i3.gz'.format(args.dataset))
+            gcd_file = os.path.join(path, 'GCD/Level3_{}_GCD.i3.gz'.format(args.dataset))
         else:
             files = glob.glob(prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
-            GCD = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
+            gcd_file = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
         batches = [files[i:i+args.n] for i in range(0, len(files), args.n)]
-        out_dir = prefix+'datasets/%s/' % args.MC_dataset
-
-        write_dag_MC(batches, GCD, out_dir)
+        if args.systematics:
+            out_dir = prefix+'datasets/systematics/%s/' % args.MC_dataset
+        else:
+            out_dir = prefix+'datasets/%s/' % args.MC_dataset
+        write_job(script, batches, gcd_file, args.year, out_dir,
+                  out_name=args.MC_dataset, dag_name=dag_name,
+                  isMC=isMC, test=args.test, systematics=args.systematics)
     else:
-        files = get_data_files()
-        batches = make_data_batches(files)
-        GCD_files = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*_GCD.i3.gz' % args.year)
+        files = get_data_files(args.year)
+        run_batches = get_data_batches(files, args.n)
+        gcd_files = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*_GCD.i3.gz' % args.year)
         if args.systematics:
             out_dir = prefix+'/datasets/systematics/data/'+args.year
         else:
             out_dir = prefix+'/datasets/data/'+args.year
-        write_dag_data(batches, GCD_files, out_dir)
+        for i, (run, batches) in enumerate(run_batches.iteritems()):
+            gcd_file = [gcd for gcd in gcd_files if run in gcd][0]
+            job = write_job(script, batches, gcd_file, args.year, out_dir,
+                            out_name=run, dag_name=dag_name, test=args.test,
+                            systematics=args.systematics, job=job)
+
+    if not args.test:
+        ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_file)
+        os.system(ex)
