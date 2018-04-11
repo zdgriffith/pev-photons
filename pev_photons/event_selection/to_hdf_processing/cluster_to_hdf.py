@@ -104,7 +104,7 @@ def get_data_files(year, systematics=False):
         run_files = prefix+'resources/run_files/{}_good_run_files.txt'.format(year)
     with open(run_files) as f:
         for fname in f:
-            files.append(fname)
+            files.append(fname[:-1])
     with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
         gcd_files = json.load(f)
     return files, gcd_files
