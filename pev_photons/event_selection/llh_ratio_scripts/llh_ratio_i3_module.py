@@ -35,6 +35,8 @@ class IceTop_LLH_Ratio(icetray.I3ConditionalModule):
                           False)
         self.AddParameter('GeometryHDF5','I3Geometry booked in HDF file',
                           'geometry.h5')
+        self.AddParameter('checkQuality','Check if this event passed quality cuts.',
+                          False)
         self.AddParameter('TwoDPDFPickleYear','Year to get pickle that contains 3 x 2D PDFs for Gamma Sim and Data for all s125/zen bins',
                           None)
         #self.AddOutbox('OutBox')
@@ -47,6 +49,7 @@ class IceTop_LLH_Ratio(icetray.I3ConditionalModule):
         self.objname = self.GetParameter('Output')
         self.geoh5 = self.GetParameter('GeometryHDF5')
         self.highE = self.GetParameter('highEbins')
+        self.checkQuality = self.GetParameter('checkQuality')
         year = self.GetParameter('TwoDPDFPickleYear')
 
         if year == None:
@@ -80,6 +83,9 @@ class IceTop_LLH_Ratio(icetray.I3ConditionalModule):
 
 
     def Physics(self,frame):
+        if self.checkQuality and not frame[self.track+'_passing']:
+            frame.Put(self.objname, dataclasses.I3MapStringDouble({}))
+            return
         # Load reconstructed quantities
         laputop=frame[self.track]
         coszen = np.cos(laputop.dir.zenith)

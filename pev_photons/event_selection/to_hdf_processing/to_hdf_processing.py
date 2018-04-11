@@ -267,6 +267,7 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
                        ("Track", reco), ("Output", reco+'_IceTopLLHRatio'),
                        ("TwoDPDFPickleYear", year),
                        ("GeometryHDF5", resource_dir+'/geometry.h5'),
+                       ("checkQuality", True),
                        ("highEbins", True))
         tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
                        random_forests=rf, reco=reco)
