@@ -96,9 +96,13 @@ def get_data_batches(files, batch_length):
     return run_batches
 
 
-def get_data_files(year):
+def get_data_files(year, systematics=False):
     files = []
-    with open(prefix+'resources/run_files/{}_good_run_files.txt'.format(year)) as f:
+    if systematics:
+        run_files = prefix+'resources/run_files/{}_systematic_run_files.txt'.format(year)
+    else:
+        run_files = prefix+'resources/run_files/{}_good_run_files.txt'.format(year)
+    with open(run_files) as f:
         for fname in f:
             files.append(fname)
     with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
@@ -162,7 +166,7 @@ if __name__ == "__main__":
                   out_name=args.MC_dataset, dag_name=dag_name,
                   isMC=isMC, test=args.test, systematics=args.systematics)
     else:
-        files, gcd_files = get_data_files(args.year)
+        files, gcd_files = get_data_files(args.year, systematics=args.systematics)
         run_batches = get_data_batches(files, args.n)
         if args.systematics:
             out_dir = prefix+'/datasets/systematics/data/'+args.year
