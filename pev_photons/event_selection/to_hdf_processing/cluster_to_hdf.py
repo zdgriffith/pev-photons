@@ -4,44 +4,11 @@ import os
 import sys
 import re
 import glob
+import json
 from datetime import datetime
 startTime = datetime.now()
 
 from pev_photons.utils.support import prefix, resource_dir, dag_dir
-
-def fileCleaner(runFile, fileList, reverse = False):
-
-    f = open(runFile, 'r')
-    lines = f.readlines()
-    goodRunList = []
-
-    for line in lines:
-
-        # Lines with run info need at least 6 parts
-        line_info = line.split()
-        try:
-            test = int(line_info[0])
-        except ValueError:
-            continue
-        # Make sure run is good
-        if int(line_info[2]) == 1:
-            run  = '00'+line_info[0]
-            goodRunList.append(run)
-    f.close()
-    goodRunList.sort()
-    cleanList = []
-    for file in fileList:
-        run_st = file.find('Run') + 3
-        run = file[run_st:run_st+8]
-        if reverse:
-            if run not in goodRunList:
-                cleanList.append(file)
-        else:
-            if run in goodRunList:
-                cleanList.append(file)
-
-    return cleanList
-
 
 def write_job(script, batches, gcd_file, year,
               out_dir, out_name, dag_name,
@@ -130,14 +97,13 @@ def get_data_batches(files, batch_length):
 
 
 def get_data_files(year):
-    if year == '2011':
-        file_list = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/IC86.%s/*/*/*/*.i3.bz2' % year)
-    else:
-        file_list = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*.i3.bz2' % year)
-    file_list.sort()
-
-    goodRunList = prefix+'run_files/burn_runs_%s.txt' % year
-    return fileCleaner(goodRunList, file_list)
+    files = []
+    with open(prefix+'resources/run_files/{}_good_run_files.txt'.format(year)) as f:
+        for fname in f:
+            files.append(fname)
+    with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
+        gcd_files = json.load(f)
+    return files, gcd_files
 
 
 if __name__ == "__main__":
@@ -174,22 +140,19 @@ if __name__ == "__main__":
         if args.rm_old:
             print('Deleting '+dag_name+' files...')
             os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
-
         dag_file = os.path.join(dag_dir, dag_name+'.dag')
         dag = open(dag_file, "w+")
 
     job = 0
     if isMC:
-        if args.MC_dataset in ['12622', '12533', '12612', '12613', '12614']:
-            files = glob.glob('/data/user/zgriffith/Level3/IT81_sim/%s/*.i3.gz' % args.MC_dataset)
-            gcd_file = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
-        elif args.MC_dataset in ['12360']:
-            path = '/data/ana/CosmicRay/IceTop_level3/sim/IC86.2012/'
+        if args.MC_dataset in next(os.walk(prefix+'datasets/level3/'))[1]:
+            files = glob.glob(prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
+            gcd_file = os.path.join(prefix, 'GCD/IT_{}_GCD.i3.gz'.format(args.year))
+        else:
+            path = '/data/ana/CosmicRay/IceTop_level3/sim/IC86.'+args.year
             files = glob.glob(os.path.join(path, '{}/*.i3.gz'.format(args.MC_dataset)))
             gcd_file = os.path.join(path, 'GCD/Level3_{}_GCD.i3.gz'.format(args.dataset))
-        else:
-            files = glob.glob(prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
-            gcd_file = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
+
         batches = [files[i:i+args.n] for i in range(0, len(files), args.n)]
         if args.systematics:
             out_dir = prefix+'datasets/systematics/%s/' % args.MC_dataset
@@ -199,15 +162,14 @@ if __name__ == "__main__":
                   out_name=args.MC_dataset, dag_name=dag_name,
                   isMC=isMC, test=args.test, systematics=args.systematics)
     else:
-        files = get_data_files(args.year)
+        files, gcd_files = get_data_files(args.year)
         run_batches = get_data_batches(files, args.n)
-        gcd_files = glob.glob('/data/ana/CosmicRay/IceTop_level3/exp/test_data/IC86.%s/*/*/*/*_GCD.i3.gz' % args.year)
         if args.systematics:
             out_dir = prefix+'/datasets/systematics/data/'+args.year
         else:
             out_dir = prefix+'/datasets/data/'+args.year
         for i, (run, batches) in enumerate(run_batches.iteritems()):
-            gcd_file = [gcd for gcd in gcd_files if run in gcd][0]
+            gcd_file = gcd_files[run]
             job = write_job(script, batches, gcd_file, args.year, out_dir,
                             out_name=run, dag_name=dag_name, test=args.test,
                             systematics=args.systematics, job=job)
