@@ -81,7 +81,8 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
 
     return llh
 
-def load_systematic_dataset(name, model, args, year = '2012', llh_args={'scramble':False}, model_args={}):
+def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
+                            llh_args={'scramble':False}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -90,7 +91,8 @@ def load_systematic_dataset(name, model, args, year = '2012', llh_args={'scrambl
     name : string which describes the event selection used for the desired dataset
            Allowed entries: "point_source", "galactic_plane"
 
-    model : hadronic interaction model (sybll, qgs)
+    model : either hadronic interaction model (sybll, qgs) or type of
+            reconstruction (e.g. LaputopLambdaUp, LaputopLambdaDown)
 
     args : Namespace object with argparse arguments from the parent script.
            Needs to include:
@@ -104,14 +106,24 @@ def load_systematic_dataset(name, model, args, year = '2012', llh_args={'scrambl
 
     """
 
-    if name == 'point_source':
-        exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
-        mc = np.load(prefix+'/datasets/systematics/{}_{}_ps.npy'.format(year, model))
-    elif name in ['galactic_plane', 'HESE']:
-        exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(year))
-        mc = np.load(prefix+'/datasets/systematics/{}_{}_gal.npy'.format(year, model))
+    if reco_test == True:
+        if name == 'point_source':
+            exp = np.load(prefix+'/datasets/systematics/skylab/{}_data_{}_ps.npy'.format(year, model))
+            mc = np.load(prefix+'/datasets/systematics/skylab/{}_mc_{}_ps.npy'.format(year, model))
+        elif name in ['galactic_plane', 'HESE']:
+            exp = np.load(prefix+'/datasets/systematics/skylab/{}_data_{}_gal.npy'.format(year, model))
+            mc = np.load(prefix+'/datasets/systematics/skylab/{}_mc_{}_gal.npy'.format(year, model))
+        else:
+            raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
     else:
-        raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
+        if name == 'point_source':
+            exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
+            mc = np.load(prefix+'/datasets/systematics/{}_{}_ps.npy'.format(year, model))
+        elif name in ['galactic_plane', 'HESE']:
+            exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(year))
+            mc = np.load(prefix+'/datasets/systematics/{}_{}_gal.npy'.format(year, model))
+        else:
+            raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
 
     llh_args['ncpu'] = args.ncpu
     llh_args['seed'] = args.seed
@@ -129,7 +141,10 @@ def load_systematic_dataset(name, model, args, year = '2012', llh_args={'scrambl
                  '2014': 28139667.,
                  '2015': 28097975.}
 
-    livetime = livetimes[year]*1.157*10**-5 # days
+    if reco_test == True:
+        livetime = 0.05*livetimes[year]*1.157*10**-5 # days
+    else:
+        livetime = livetimes[year]*1.157*10**-5 # days
 
     energy_bins = np.linspace(5.7, 8, 24)
     energy_range = [energy_bins[0], energy_bins[-1]]
