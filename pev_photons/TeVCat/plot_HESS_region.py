@@ -275,6 +275,7 @@ if __name__ == "__main__":
     ax.yaxis.set_ticks(yts)
     ax.set_xlabel('l [$^\circ$]')
     ax.set_ylabel('b [$^\circ$]')
+    ax.text(-30.5, -4.75, 'IceCube Preliminary', color='r', fontsize=14, zorder=5)
     plt.gca().invert_yaxis()
     plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.pdf')
     plt.savefig(fig_dir+'paper/hess_sources.pdf')

@@ -64,6 +64,7 @@ if __name__ == "__main__":
                     edgecolor='g', facecolor='none')
 
     ax.legend()
+    skymap.plot_prelim()
     plt.savefig(fig_dir+'all_sky/'+outFile)
     if args.HESE:
         plt.savefig(fig_dir+'paper/hese_events.pdf')

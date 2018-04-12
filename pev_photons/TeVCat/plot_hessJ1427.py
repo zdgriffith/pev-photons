@@ -163,6 +163,7 @@ if __name__ == "__main__":
         outFile = 'hessJ1427_with_fermi_and_abs.pdf'
         l = ax.legend(handles, labels, loc='lower left',
                       fontsize=16, prop={'weight':'bold'})
+        plt.text(1.5e-3,7*10**-12, 'IceCube Preliminary', color='r', fontsize=14)
     else:
         plt.xlim([5*10**-1, 10**4])
         plt.ylim([10**-21, 0.5*10**-11])
@@ -170,10 +171,10 @@ if __name__ == "__main__":
         outFile = 'hessJ1427.pdf'
         l = ax.legend(handles,labels, loc='upper right',
                       fontsize=16, prop={'weight':'bold'})
+        plt.text(1,10**-20, 'IceCube Preliminary', color='r', fontsize=14)
 
     plot_setter(plt.gca(),l)
     plt.xlabel('Energy [TeV]', fontweight='bold')
-    plt.text(1,10**-20, 'IceCube Preliminary', color='r', fontsize=14)
     plt.xscale('log')
     plt.yscale('log')
     plt.tight_layout()
