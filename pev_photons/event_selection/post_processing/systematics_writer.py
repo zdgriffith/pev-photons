@@ -12,6 +12,12 @@ import pandas as pd
 
 from pev_photons.utils.support import prefix
 
+def check_testing(x, y, E, events):
+    a = np.any((np.isclose(events['primary_x'].values[:,np.newaxis],x)
+                & np.isclose(events['primary_y'].values[:,np.newaxis],y)
+                & np.isclose(events['primary_E'].values[:,np.newaxis],E)), axis=0)
+    return a
+
 def get_weights(sim, energy):
     """ Create the MC weights for the given dataset generation parameters """
 
@@ -57,6 +63,12 @@ def rewrite(file_list, outFile, set_name, isMC):
     dataframe_dict = {}
     t_sim = time.time()
     err   = 0
+    if isMC:
+        f = pd.read_hdf('/data/user/zgriffith/datasets/12533.hdf5')
+        cut = np.equal(np.ones_like(f['llh_ratio']),1)
+        cut = cut&~np.random.choice(2,len(f['laputop_E']),p=[0.2, 0.8])
+        cut = np.equal(cut,1)
+        qc  = f[cut]
 
     for i, fname in enumerate(file_list):
         print(i)
@@ -88,6 +100,9 @@ def rewrite(file_list, outFile, set_name, isMC):
             f['primary_azi'] = store.select('MCPrimary').azimuth
             f['primary_zen'] = store.select('MCPrimary').zenith
             f['primary_E']   = store.select('MCPrimary').energy
+            f['testing'] = check_testing(store.select('MCPrimary').x,
+                                         store.select('MCPrimary').y,
+                                         f['primary_E'], qc)
 
             energy = store.select('MCPrimary').energy
             f['weights'] = get_weights(set_name, energy)
