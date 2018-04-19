@@ -151,7 +151,7 @@ if __name__ == "__main__":
     if isMC:
         if args.MC_dataset in next(os.walk(prefix+'datasets/level3/'))[1]:
             files = glob.glob(prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
-            gcd_file = os.path.join(prefix, 'GCD/IT_{}_GCD.i3.gz'.format(args.year))
+            gcd_file = os.path.join(prefix, 'datasets/level3/GCD/IT_{}_GCD.i3.gz'.format(args.year))
         else:
             path = '/data/ana/CosmicRay/IceTop_level3/sim/IC86.'+args.year
             files = glob.glob(os.path.join(path, '{}/*.i3.gz'.format(args.MC_dataset)))
