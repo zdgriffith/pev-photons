@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
 from sklearn.externals import joblib
 
 def plot_fraction(level3, level4, label):
@@ -98,6 +98,9 @@ def plot_dists():
             gammas[args.param] = param_val*gammas[args.param]
             passing_gammas = prediction(gammas, args.selection,
                                         year, args.cut_val)
+            if args.save_hdf:
+                passing_gammas.to_hdf(prefix+'/datasets/systematics/sim_only/2012_%s_%s.hdf5' % (args.param, param_val),
+                                      'dataframe', mode='w')
             level3.append(gammas)
             level4.append(passing_gammas)
 
@@ -137,13 +140,16 @@ if __name__ == "__main__":
     p.add_argument('--param_name', type=str,
                    default='S$_{125}$', help='Parameter name')
     p.add_argument('--param_range', type=float, nargs='+',
-                   default=[1.15, 1.00, 0.85],
+                   default=[1.02, 1.00, 0.98],
                    help='Parameter values to test.')
     p.add_argument('--years', type=str, nargs='+',
                    default=['2011', '2012', '2013', '2014', '2015'],
                    help='Year(s) to include.')
     p.add_argument('--selection', type=str,
                    default='point_source', help='event selection')
+    p.add_argument('--save_hdf', action='store_true',
+                   default=False,
+                   help='If True, save systematic selections as hdf files.')
     args = p.parse_args()
 
     plt.style.use(plot_style)
