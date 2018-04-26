@@ -24,6 +24,9 @@ eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
 if [ $# -gt 0 ] && [ $1 = "mpl_2" ]
 then
     source /data/user/zgriffith/pev_photons/resources/mpl_2_env/bin/activate
+elif [ $# -gt 0 ] && [ $1 = "trunk_skylab" ]
+then
+    source /data/user/zgriffith/pev_photons/resources/trunk_skylab/bin/activate
 else
     source /data/user/zgriffith/pev_photons/resources/photon_env/bin/activate
 fi
