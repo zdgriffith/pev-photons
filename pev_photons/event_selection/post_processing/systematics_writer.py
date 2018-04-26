@@ -4,6 +4,7 @@
 # Combine HDF files into a single Pandas dataframe for analysis
 ########################################################################
 
+import os
 import argparse
 import time
 import glob
@@ -58,17 +59,11 @@ def get_weights(sim, energy):
     weights = int_area(energy,max_zen)*energy/n_thrown(energy)
     return weights
 
-def rewrite(file_list, outFile, set_name, isMC):
+def rewrite(file_list, outFile, set_name, isMC, systematics):
 
     dataframe_dict = {}
     t_sim = time.time()
     err   = 0
-    if isMC:
-        f = pd.read_hdf('/data/user/zgriffith/datasets/12533.hdf5')
-        cut = np.equal(np.ones_like(f['llh_ratio']),1)
-        cut = cut&~np.random.choice(2,len(f['laputop_E']),p=[0.2, 0.8])
-        cut = np.equal(cut,1)
-        qc  = f[cut]
 
     for i, fname in enumerate(file_list):
         print(i)
@@ -83,8 +78,10 @@ def rewrite(file_list, outFile, set_name, isMC):
 
         #f['mjd_time'] = store.select('I3EventHeader').time_start_mjd
 
-        recos = ['Laputop', 'LaputopLambdaUp', 'LaputopLambdaDown',
-                 'LaputopS125Up', 'LaputopS125Down']
+        recos = ['Laputop']
+        if systematics:
+            recos += ['LaputopLambdaUp', 'LaputopLambdaDown',
+                      'LaputopS125Up', 'LaputopS125Down']
         for reco in recos:
             f[reco+'_azimuth'] = store.select(reco).azimuth
             f[reco+'_zenith'] = store.select(reco).zenith
@@ -100,9 +97,6 @@ def rewrite(file_list, outFile, set_name, isMC):
             f['primary_azi'] = store.select('MCPrimary').azimuth
             f['primary_zen'] = store.select('MCPrimary').zenith
             f['primary_E']   = store.select('MCPrimary').energy
-            f['testing'] = check_testing(store.select('MCPrimary').x,
-                                         store.select('MCPrimary').y,
-                                         f['primary_E'], qc)
 
             energy = store.select('MCPrimary').energy
             f['weights'] = get_weights(set_name, energy)
@@ -129,15 +123,21 @@ if __name__ == "__main__":
             description='Rewrite HDF files for analysis purposes',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--dataset',
-            help='Set to run over')
+            help='The dataset with which to create a dataframe.')
     p.add_argument('--isMC', action="store_true", default = False, dest='isMC',
-            help='Is this simulation')
+            help='Is this simulation?')
+    p.add_argument('--systematics', action="store_true", default = False, dest='systematics',
+            help='Is this a systematics set?')
     args = p.parse_args()
     
-    if args.isMC:
-        file_list = glob.glob(prefix+'datasets/systematics/'+args.dataset+'/*.hdf5')
+    if args.systematics:
+        file_prefix = prefix+'datasets/systematics/'
     else:
-        file_list = glob.glob(prefix+'datasets/systematics/data/'+args.dataset+'/*.hdf5')
+        file_prefix = prefix+'datasets/'
+    if args.isMC:
+        file_list = glob.glob(os.path.join(file_prefix, args.dataset, '*.hdf5'))
+    else:
+        file_list = glob.glob(os.path.join(file_prefix, 'data', args.dataset, '*.hdf5'))
 
-    outFile = prefix+'datasets/systematics/'+args.dataset+'.hdf5'
-    rewrite(file_list, outFile, args.dataset, args.isMC)
+    outFile = os.path.join(file_prefix, args.dataset+'.hdf5')
+    rewrite(file_list, outFile, args.dataset, args.isMC, args.systematics)
