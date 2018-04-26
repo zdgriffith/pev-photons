@@ -82,6 +82,7 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
     return llh
 
 def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
+                            sim_only=None,
                             llh_args={'scramble':False}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
@@ -106,7 +107,13 @@ def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
 
     """
 
-    if reco_test == True:
+    if sim_only is not None:
+        if name == 'point_source':
+            exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
+            mc = np.load(prefix+'/datasets/systematics/sim_only/{}_{}_{}.npy'.format(year, model, sim_only))
+        else:
+            raise(ValueError, 'Name must be point_source')
+    elif reco_test == True:
         if name == 'point_source':
             exp = np.load(prefix+'/datasets/systematics/skylab/{}_data_{}_ps.npy'.format(year, model))
             mc = np.load(prefix+'/datasets/systematics/skylab/{}_mc_{}_ps.npy'.format(year, model))
@@ -118,10 +125,10 @@ def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
     else:
         if name == 'point_source':
             exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
-            mc = np.load(prefix+'/datasets/systematics/{}_{}_ps.npy'.format(year, model))
+            mc = np.load(prefix+'/datasets/systematics/hadronic_models/{}_{}_ps.npy'.format(year, model))
         elif name in ['galactic_plane', 'HESE']:
             exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(year))
-            mc = np.load(prefix+'/datasets/systematics/{}_{}_gal.npy'.format(year, model))
+            mc = np.load(prefix+'/datasets/systematics/hadronic_models/{}_{}_gal.npy'.format(year, model))
         else:
             raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
 
