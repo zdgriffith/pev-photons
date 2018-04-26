@@ -76,7 +76,6 @@ if __name__ == "__main__":
     ax1.plot(dec_list, f[2]/f[1], color=colors[2], ls='-')
     ax1.plot(dec_list, f[3]/f[1], color=colors[3], ls='-')
     ax1.plot(dec_list, f[4]/f[1], color=colors[4], ls='-')
-    #ax1.plot(dec_list, disc[1]/disc[0], color=colors[1], ls='--')
 
     ax0.set_xticklabels([])
     ax0.set_xlim([-81, -54])
