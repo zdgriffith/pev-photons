@@ -26,11 +26,11 @@ def error(df, mc_quality, x, x_bins):
 
     bin_size = x_bins[1]-x_bins[0]
 
-    if x == 'laputop_E':
-        bin_sigmas, bin_edges, binnumber = stats.binned_statistic(np.log10(mc_quality[x]),mc_quality['opening_angle'], statistic = sigma, bins = x_bins)
+    if x == 'Laputop_E':
+        bin_sigmas, bin_edges, binnumber = stats.binned_statistic(np.log10(mc_quality[x]),np.degrees(mc_quality['Laputop_opening_angle']), statistic = sigma, bins = x_bins)
         vals = np.log10(df[x])
     else:
-        bin_sigmas, bin_edges, binnumber = stats.binned_statistic(mc_quality[x],mc_quality['opening_angle'], statistic = sigma, bins = x_bins)
+        bin_sigmas, bin_edges, binnumber = stats.binned_statistic(mc_quality[x],np.degrees(mc_quality['Laputop_opening_angle']), statistic = sigma, bins = x_bins)
         vals = df[x]
 
     bin_center = bin_edges[:-1] + bin_size/2.
@@ -44,16 +44,16 @@ def error(df, mc_quality, x, x_bins):
 def construct_arr(mc_quality, mc, testing_fraction=1):
     """ Construct correctly formated data for Skylab """
     from icecube import astro
-    s_arr = np.empty((len(mc['laputop_E']), ), dtype=[("ra", np.float), ("sinDec", np.float),
+    s_arr = np.empty((len(mc['Laputop_E']), ), dtype=[("ra", np.float), ("sinDec", np.float),
                                                       ("dec", np.float),
                                                       ("sigma", np.float), ("logE", np.float),
                                                       ("trueRa", np.float), ("trueDec", np.float),
                                                       ("trueE", np.float), ("ow", np.float)])
-    s_arr['dec'] = mc['laputop_zen'] - np.pi/2.
+    s_arr['dec'] = mc['Laputop_zenith'] - np.pi/2.
     s_arr['sinDec'] = np.sin(s_arr['dec']) 
-    s_arr['ra'] = mc['laputop_azi']
-    s_arr['logE'] = np.log10(mc['laputop_E'])
-    s_arr['sigma'] = error(mc, mc_quality, 'laputop_E', np.arange(5.5, 8.5, 0.05))
+    s_arr['ra'] = mc['Laputop_azimuth']
+    s_arr['logE'] = np.log10(mc['Laputop_E'])
+    s_arr['sigma'] = error(mc, mc_quality, 'Laputop_E', np.arange(5.5, 8.5, 0.05))
 
     s_arr['trueDec'] = mc['primary_zen'] - np.pi/2.
     s_arr['trueRa'] = mc['primary_azi'] 
@@ -72,11 +72,14 @@ if __name__ == "__main__":
     for i, year in enumerate(years): 
         for selection in selections:
             for j, model in enumerate(models):
-                gammas = pd.read_hdf(prefix+'datasets/systematics/{}_{}_quality.hdf5'.format(year, model))
-                passing_gammas = pd.read_hdf(prefix+'datasets/systematics/{}_{}_{}.hdf5'.format(year, model, selection))
+                gammas = pd.read_hdf(prefix+'datasets/systematics/hadronic_models/{}_{}_quality.hdf5'.format(year, model))
+                if selection == 'ps':
+                    passing_gammas = gammas[(gammas['Laputop_alpha_2.0_score'] > 0.7) | (gammas['Laputop_alpha_2.7_score'] > 0.7)]
+                else:
+                    passing_gammas = gammas[(gammas['Laputop_alpha_3.0_score'] > 0.7)]
                 if model == 'sybll':
                     final = construct_arr(gammas, passing_gammas, testing_fraction=0.2)
                 else:
                     final = construct_arr(gammas, passing_gammas)
-                np.save(prefix+'datasets/systematics/{}_{}_{}.npy'.format(year, model, selection), final)
-                np.save(prefix+'datasets/systematics/{}_{}_{}.npy'.format(year, model, selection), final)
+                np.save(prefix+'datasets/systematics/hadronic_models/{}_{}_{}.npy'.format(year, model, selection), final)
+                np.save(prefix+'datasets/systematics/hadronic_models/{}_{}_{}.npy'.format(year, model, selection), final)
