@@ -22,8 +22,8 @@ if __name__ == "__main__":
                    help='Max jobs running on the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
-    p.add_argument("--model", help='hadronic interaction model.')
-    p.add_argument("--sim_value")
+    p.add_argument("--systematic", help='Systematic to test.')
+    p.add_argument("--year", help='Data year.')
     args = p.parse_args()
 
     script = os.getcwd() + '/sens_on_cluster.py'
@@ -32,10 +32,7 @@ if __name__ == "__main__":
         cmd = 'python '+script 
         dag_name = ''
     else:
-        if args.sim_value:
-            dag_name = 'ps_sens_{}_{}'.format(args.model, args.sim_value)
-        else:
-            dag_name = 'ps_sens_{}'.format(args.model)
+        dag_name = 'ps_sens_{}'.format(args.systematic)
 
         if args.rm_old:
             print('Deleting '+dag_name[:-3]+' files...')
@@ -49,9 +46,8 @@ if __name__ == "__main__":
     decs = [dec_0 + i/10. for i in range(int((dec_1-dec_0)*10))]
 
     for job, (index, dec) in enumerate(product(indices, decs)):
-        arg = '--dec {} --index {} --model {}'.format(dec, index, args.model)
-        if args.sim_value:
-            arg += ' --sim_value {}'.format(args.sim_value)
+        arg = '--dec {} --index {} --systematic {}'.format(dec, index, args.systematic)
+        arg += ' --year {}'.format(args.year)
         if args.test:
             ex  = ' '.join([cmd, arg])
             os.system(ex)

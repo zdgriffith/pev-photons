@@ -23,15 +23,14 @@ if __name__ == "__main__":
                    help='declination in degrees')
     p.add_argument("--index", type=float, default=2.0,
                    help='spectral index')
-    p.add_argument("--model", help='hadronic interaction model.')
-    p.add_argument("--sim_value")
+    p.add_argument("--systematic", help='Systematic to test.')
+    p.add_argument("--year", help='Data year.')
     args = p.parse_args()
 
     # Initialization of multi-year LLH object.
-    if args.sim_value is not None:
-        exp, mc, livetime, ps_llh = load_systematic_dataset('point_source', args.model, args, sim_only=args.sim_value)
-    else:
-        exp, mc, livetime, ps_llh = load_systematic_dataset('point_source', args.model, args)
+    exp, mc, livetime, ps_llh = load_systematic_dataset('point_source', args.systematic,
+                                                        ncpu=args.ncpu, seed=args.seed,
+                                                        year=args.year)
 
     inj= PointSourceInjector(args.index, E0=10**6,
                              sinDec_bandwidth=np.sin(np.radians(2)))
@@ -50,9 +49,6 @@ if __name__ == "__main__":
     flux['dec'] = args.dec
     flux['sens'] = result[0]['flux'][0]
     flux['disc'] = result[0]['flux'][1]
-    if args.sim_value is not None:
-        np.save(prefix+'systematics/sens_jobs/index_%s/%s_%s_dec_%s.npy' % (args.index, args.model, args.sim_value, args.dec),
-                flux)
-    else:
-        np.save(prefix+'systematics/sens_jobs/index_%s/%s_dec_%s.npy' % (args.index, args.model, args.dec),
-                flux)
+
+    np.save(prefix+'systematics/sens_jobs/{}/index_{}/{}_dec_{}.npy'.format(args.year, args.index, args.systematic, args.dec),
+            flux)

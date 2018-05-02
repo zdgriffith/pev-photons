@@ -94,13 +94,32 @@ def plot_dists():
         level3 = []
         level4 = []
         for year in args.years: 
-            gammas = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
+            gammas = pd.read_hdf(resource_dir+'datasets/level3/{}_mc.hdf5'.format(year))
+            cut = gammas['standard_filter_cut']&gammas['beta_cut']&gammas['laputop_cut']
+            cut = cut&gammas['Q_cut']&gammas['loudest_cut']&np.greater_equal(gammas['Nstations'],5)
+            cut = cut&np.isfinite(gammas['llh_ratio'])&np.less_equal(gammas['laputop_zen'], np.arccos(0.8))
+            cut = cut&np.less_equal(gammas['laputop_it'], 1)&np.greater_equal(gammas['s125'], 10**-0.25)
+            np.random.seed(1337)
+            training_fraction = 0.8
+            cut = cut&~np.random.choice(2,len(gammas['laputop_E']),p=[1-training_fraction, training_fraction])
+            gammas = gammas[cut]
+            gammas['Laputop_azimuth'] = gammas['laputop_azi']
+            gammas['Laputop_zenith'] = gammas['laputop_zen']
+            gammas['Laputop_E'] = gammas['laputop_E']
+            gammas['Laputop_opening_angle'] = np.radians(gammas['opening_angle'])
+
             gammas[args.param] = param_val*gammas[args.param]
+            gammas.to_hdf(prefix+'/datasets/systematics/sim_only/{}/{}_{:.2f}_quality.hdf5'.format(year, args.param, param_val),
+                          'dataframe', mode='w')
             passing_gammas = prediction(gammas, args.selection,
                                         year, args.cut_val)
             if args.save_hdf:
-                passing_gammas.to_hdf(prefix+'/datasets/systematics/sim_only/2012_%s_%s.hdf5' % (args.param, param_val),
-                                      'dataframe', mode='w')
+                if args.selection == 'point_source':
+                    passing_gammas.to_hdf(prefix+'/datasets/systematics/sim_only/{}/{}_{:.2f}_ps.hdf5'.format(year, args.param, param_val),
+                                          'dataframe', mode='w')
+                else:
+                    passing_gammas.to_hdf(prefix+'/datasets/systematics/sim_only/{}/{}_{:.2f}_diffuse.hdf5'.format(year, args.param, param_val),
+                                          'dataframe', mode='w')
             level3.append(gammas)
             level4.append(passing_gammas)
 

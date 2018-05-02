@@ -81,9 +81,9 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
 
     return llh
 
-def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
-                            sim_only=None,
-                            llh_args={'scramble':False}, model_args={}):
+def load_systematic_dataset(name, systematic, year='2012', index=3.0,
+                            seed=1, ncpu=1, llh_args={'scramble':False},
+                            model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -107,51 +107,27 @@ def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
 
     """
 
-    if sim_only is not None:
-        if name == 'point_source':
-            exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
-            mc = np.load(prefix+'/datasets/systematics/sim_only/{}_{}_{}.npy'.format(year, model, sim_only))
-        else:
-            raise(ValueError, 'Name must be point_source')
-    elif reco_test == True:
-        if name == 'point_source':
-            exp = np.load(prefix+'/datasets/systematics/skylab/{}_data_{}_ps.npy'.format(year, model))
-            mc = np.load(prefix+'/datasets/systematics/skylab/{}_mc_{}_ps.npy'.format(year, model))
-        elif name in ['galactic_plane', 'HESE']:
-            exp = np.load(prefix+'/datasets/systematics/skylab/{}_data_{}_gal.npy'.format(year, model))
-            mc = np.load(prefix+'/datasets/systematics/skylab/{}_mc_{}_gal.npy'.format(year, model))
-        else:
-            raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
+    sel = {'point_source':'ps', 'galactic_plane':'diffuse'}
+    livetimes = {'2011': 26673776., '2012': 25569773.,
+                 '2013': 27769791., '2014': 28139667.,
+                 '2015': 28097975.}
+
+    if 'Laputop' in systematic:
+        exp = np.load(prefix+'/datasets/systematics/skylab/{}/{}_exp_{}.npy'.format(year, systematic, sel[name]))
+        livetime = 0.05*livetimes[year]*1.157*10**-5 # days
     else:
-        if name == 'point_source':
-            exp = np.load(prefix+'/resources/datasets/{}_exp_ps.npy'.format(year))
-            mc = np.load(prefix+'/datasets/systematics/hadronic_models/{}_{}_ps.npy'.format(year, model))
-        elif name in ['galactic_plane', 'HESE']:
-            exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(year))
-            mc = np.load(prefix+'/datasets/systematics/hadronic_models/{}_{}_gal.npy'.format(year, model))
-        else:
-            raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
+        exp = np.load(prefix+'/resources/datasets/{}_exp_{}.npy'.format(year, sel[name]))
+        livetime = livetimes[year]*1.157*10**-5 # days
+    mc = np.load(prefix+'/datasets/systematics/skylab/{}/{}_mc_{}.npy'.format(year, systematic, sel[name]))
 
-    llh_args['ncpu'] = args.ncpu
-    llh_args['seed'] = args.seed
-
+    llh_args['ncpu'] = ncpu
+    llh_args['seed'] = seed
     if name == 'point_source':
         llh_args['mode'] = 'box'
         llh_args['delta_ang'] = np.radians(4.0)
     else:
-        model_args['bounds'] = [args.alpha, args.alpha]
+        model_args['bounds'] = [index, index]
         model_args['fix_index'] = True
-
-    livetimes = {'2011': 26673776.,
-                 '2012': 25569773.,
-                 '2013': 27769791.,
-                 '2014': 28139667.,
-                 '2015': 28097975.}
-
-    if reco_test == True:
-        livetime = 0.05*livetimes[year]*1.157*10**-5 # days
-    else:
-        livetime = livetimes[year]*1.157*10**-5 # days
 
     energy_bins = np.linspace(5.7, 8, 24)
     energy_range = [energy_bins[0], energy_bins[-1]]
@@ -161,6 +137,7 @@ def load_systematic_dataset(name, model, args, year='2012', reco_test=False,
     llh_model = EnergyLLH(twodim_bins=[energy_bins, sinDec_bins],
                           twodim_range=[energy_range, sinDec_range],
                           sinDec_bins=sinDec_bins,
+                          allow_empty=True,
                           sinDec_range=sinDec_range, **model_args)
 
     if name == 'point_source':
