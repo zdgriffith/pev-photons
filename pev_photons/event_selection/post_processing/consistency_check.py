@@ -67,9 +67,13 @@ if __name__ == "__main__":
             cut = cut&~np.random.choice(2,len(mc['laputop_E']),p=[1-training_fraction, training_fraction])
 
         mc = mc[cut]
+        mc['Laputop_azimuth'] = mc['laputop_azi']
+        mc['Laputop_zenith'] = mc['laputop_zen']
+        mc['Laputop_E'] = mc['laputop_E']
+        mc['Laputop_opening_angle'] = np.radians(mc['opening_angle'])
         
-        mc.to_hdf(prefix+'datasets/systematics/2012_'+out+'_quality.hdf5', 'dataframe', mode='w')
+        mc.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_quality.hdf5', 'dataframe', mode='w')
         ps = prediction(mc, 'ps', '2012', 0.7)
-        ps.to_hdf(prefix+'datasets/systematics/2012_'+out+'_ps.hdf5', 'dataframe', mode='w')
+        ps.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_ps.hdf5', 'dataframe', mode='w')
         gal = prediction(mc, 'galactic', '2012', 0.7)
-        gal.to_hdf(prefix+'datasets/systematics/2012_'+out+'_gal.hdf5', 'dataframe', mode='w')
+        gal.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_diffuse.hdf5', 'dataframe', mode='w')
