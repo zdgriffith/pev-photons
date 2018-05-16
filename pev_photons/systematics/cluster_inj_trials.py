@@ -8,8 +8,9 @@ import os
 import sys
 import random
 import argparse
+from itertools import product
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
 
 if __name__ == "__main__":
 
@@ -23,8 +24,8 @@ if __name__ == "__main__":
                    help='The number of trials run per job.')
     p.add_argument("--alpha", type=float, default=3.0,
                    help='Spectral index of signal.')
-    p.add_argument('--name', type=str, default='sybll',
-                   help='Name of the template.')
+    p.add_argument("--systematic", help='Systematic to test.')
+    p.add_argument("--year", help='Data year.', default='2012')
     p.add_argument('--maxjobs', type=str, default='1200',
                    help='Max jobs running on the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
@@ -32,36 +33,41 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     script = os.getcwd() + '/inj_trials.py'
-
     if args.test:
         cmd = 'python '+script 
+        dag_name = ''
     else:
-        dag_name = prefix+'dagman/'+args.name+'_sens_trials.dag'
-        ex       = ('condor_submit_dag -f -maxjobs '
-                    + args.maxjobs + ' ' + dag_name)
+        dag_name = 'gp_sens_{}_{}'.format(args.systematic, args.year)
 
         if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
-            os.system('rm '+dag_name[:-3]+'*')
+            print('Deleting '+dag_name+' files...')
+            os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
+            os.system('rm '+os.path.join(prefix, 'dagman', dag_name)+'*')
+        dag_file = os.path.join(dag_dir, dag_name+'.dag')
+        dag = open(dag_file, "w+")
 
-        dag = open(dag_name, "w+")
-    
     # Range, intervals of injected events best found through a course
     # run on sensitivity_test.py first. 
-    inj_list = {'sybll':range(0,551,50),
-                'qgs':range(0,551,50)}
-    job_num = 0 
-    for n_inj in inj_list[args.name]:
-        for job in range(args.nJobs):
-            arg  = ' --job %s --n_inj %s' % (job_num, n_inj)
-            arg += ' --alpha %s --seed %s ' % (args.alpha, random.randint(0,10**8))
-            arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
-            if args.test:
-                ex  = ' '.join([cmd, arg])
-            else:
-                dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'extra_memory.submit\n')
-                dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
-            job_num += 1
-    os.system(ex)
+    #inj_list = {'sybll':range(0,551,50),
+    #            'qgs':range(0,551,50)}
+    if 'Laputop' in args.systematic:
+        inj_list = range(0,171,17)
+    else:
+        inj_list = range(0,551,50)
+    for i, (n_inj, job) in enumerate(product(inj_list, range(args.nJobs))):
+        arg =  '{} '.format(script)
+        arg += ' --job %s --n_inj %s' % (i, n_inj)
+        arg += ' --alpha %s --seed %s ' % (args.alpha, random.randint(0,10**8))
+        arg += ' --n_trials %s --systematic %s' % (args.nTrials, args.systematic)
+        if args.test:
+            ex  = ' '.join([cmd, arg])
+            os.system(ex)
+        else:
+            dag.write('JOB ' + str(i) + ' ' + resource_dir+'extra_memory.submit\n')
+            dag.write('VARS ' + str(i) + ' ARGS=\"' + arg + '\"\n')
+            dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(i, dag_dir, dag_name))
+            dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(i, prefix, dag_name))
+
+    if not args.test:
+        ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_file)
+        os.system(ex)
