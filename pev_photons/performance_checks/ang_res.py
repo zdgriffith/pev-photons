@@ -13,9 +13,11 @@ from scipy import stats
 from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
+    """ Returns the nearest bin value. """
     return  (np.abs(array-value)).argmin()
 
 def sigma(y):
+    """ Calculate the 68% containment value. """
     values, base = np.histogram(y, bins=np.arange(0,20,0.01),
                                 weights=[1/float(len(y))]*len(y))
     cumulative = np.cumsum(values)
@@ -25,6 +27,7 @@ def sigma(y):
             return base[i]/1.51
 
 def error(f, label, key, x_bins):
+    """ Estimate the angular error for each event. """
     bin_size = x_bins[1]-x_bins[0]
 
     if key in ['laputop_E', 'primary_E']:
