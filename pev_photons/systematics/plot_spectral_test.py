@@ -59,8 +59,32 @@ def events_x_events():
     plt.savefig(fig_dir+'systematics/ns_index_test.png')
     plt.close()
 
+def plot_bias(kind='ns'):
+    energy_bias = 100*np.arange(0.1, 2.00, 0.1)
+    ns_fits = np.load(prefix+'all_sky/{}_fit_test_bias.npy'.format(kind))
+    low = np.percentile(ns_fits, 16, axis=1)
+    high = np.percentile(ns_fits, 84, axis=1)
+    plt.plot(energy_bias, np.median(ns_fits, axis=1),
+             color=colors[0], label = 'n$_{inj}$=20')
+    plt.fill_between(energy_bias, low, high,
+                     color=colors[0], edgecolor='none',
+                     rasterized=True, alpha=0.5)
+    plt.tight_layout()
+    plt.xlabel('Added bias to E$_{reco}$ [\%]')
+    if kind=='ns':
+        plt.axhline(y=20, color=colors[0], ls='--')
+        plt.ylim([0,40])
+        plt.ylabel('Fitted n$_s$')
+    else:
+        plt.ylabel('Fitted Flux')
+    plt.legend()
+    plt.savefig(fig_dir+'systematics/{}_bias.png'.format(kind))
+    plt.close()
+
 if __name__ == "__main__":
     plt.style.use(plot_style)
     colors = plt.rcParams['axes.color_cycle']
-    index_x_events()
-    events_x_events()
+    #index_x_events()
+    #events_x_events()
+    plot_bias()
+    plot_bias(kind='flux')
