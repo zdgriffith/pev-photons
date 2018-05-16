@@ -11,9 +11,8 @@ import healpy as hp
 from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix
 
-def test_hotspot(ra, dec, args):
-
-    ps_llh = load_dataset('point_source', args)
+def test_hotspot(ps_llh, ra, dec):
+    """ fit for a point source at the location of the all-sky-scan hotspot """
 
     hotspot = np.empty((1,),
                        dtype=[('ra', np.float), ('dec', np.float),
@@ -33,7 +32,9 @@ def test_hotspot(ra, dec, args):
         print(pair)
     np.save(prefix+'all_sky/hotspot.npy', hotspot)
 
-def get_hotspot_direction(args):
+
+def get_hotspot_direction():
+    """ returns the direction in right ascension and declination. """
     m = np.load(prefix+'all_sky/skymap.npy')
     npix = len(m)
     nside = hp.npix2nside(npix)
@@ -46,6 +47,7 @@ def get_hotspot_direction(args):
 
     return (ra[mask][index][0], dec[mask][index][0])
 
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
             description='Test hotspot',
@@ -56,5 +58,6 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    ra, dec = get_hotspot_direction(args)
-    test_hotspot(ra, dec, args)
+    ps_llh = load_dataset('point_source', args)
+    ra, dec = get_hotspot_direction()
+    test_hotspot(ps_llh, ra, dec)
