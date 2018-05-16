@@ -32,28 +32,30 @@ if __name__ == "__main__":
         cmd = 'python '+script 
         dag_name = ''
     else:
-        dag_name = 'ps_sens_{}'.format(args.systematic)
+        dag_name = 'ps_sens_{}_{}'.format(args.systematic, args.year)
 
         if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
+            print('Deleting '+dag_name+' files...')
             os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
+            os.system('rm '+os.path.join(prefix, 'dagman', dag_name)+'*')
         dag_file = os.path.join(dag_dir, dag_name+'.dag')
         dag = open(dag_file, "w+")
 
-    indices = [2.0, 2.7]
+    indices = [2.0]#, 2.7]
     dec_0 = -85
     dec_1 = -53.4
     decs = [dec_0 + i/10. for i in range(int((dec_1-dec_0)*10))]
 
     for job, (index, dec) in enumerate(product(indices, decs)):
-        arg = '--dec {} --index {} --systematic {}'.format(dec, index, args.systematic)
+        arg =  '{} '.format(script)
+        arg += '--dec {} --index {} --systematic {}'.format(dec, index, args.systematic)
         arg += ' --year {}'.format(args.year)
         if args.test:
             ex  = ' '.join([cmd, arg])
             os.system(ex)
         else:
             dag.write('JOB {} {}/basic.submit\n'.format(job, resource_dir))
-            dag.write('VARS {} script=\"{}\"\n'.format(job, script))
+            #dag.write('VARS {} script=\"{}\"\n'.format(job, script))
             dag.write('VARS {} ARGS=\"{}\"\n'.format(job, arg))
             dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(job, dag_dir, dag_name))
             dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(job, prefix, dag_name))
