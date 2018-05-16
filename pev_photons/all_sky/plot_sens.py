@@ -17,7 +17,7 @@ from pev_photons.utils.support import fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
-    sources = np.load(resource_dir+'hess_sources.npz')
+    sources = np.load(prefix+'hgps_sources.npz')
 
     # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
