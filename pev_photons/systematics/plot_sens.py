@@ -15,45 +15,24 @@ from glob import glob
 from pev_photons.utils.support import prefix, resource_dir
 from pev_photons.utils.support import fig_dir, plot_setter, plot_style
 
-def plot_sens(args, model, color, index, value=None):
+def plot_sens(label, color):
+    arrs = []
+    for fname in files:
+        a = np.load(fname)
+        arrs.append([item for item in a[0]])
+    arrs = np.array(sorted(arrs))
+
     kind_labels = ['Sensitivity', 'Discovery Potential']
     linestyle = ['-', '--']
-
-    if args.coarse:
-        kinds = ['sens', 'disc']
-        dec_list = np.linspace(-84.,-54.,10)
-        for j, kind in enumerate(kinds):
-            flux = np.load(prefix+'systematics/{}_{}_index_{}.npy'.format(model, kind, index))
-            ax0.plot(dec_list, flux*(1e3),
+    for j, sens_label in enumerate(kind_labels):
+        if j == 0:
+            ax0.plot(arrs.T[0], arrs.T[j+1]*1e3,
                      color=color, ls=linestyle[j],
-                     label='%s E$^{-%s}$ %s' % (model, index, kind_labels[j]))
-            if kind == 'sens':
-                sens = flux
-            else:
-                disc = flux
-    else:
-        arrs = []
-        if value is not None:
-            if value == 1.00:
-                files = glob(prefix+'systematics/sens_jobs/index_%s/s125_1.00_*' % index)
-            else:
-                files = glob(prefix+'systematics/sens_jobs/index_%s/%s_%.2f_*' % (index, model, value))
+                     label='%s' % label)
         else:
-            files = glob(prefix+'systematics/sens_jobs/index_%s/%s_*' % (index, model))
-        for fname in files:
-            a = np.load(fname)
-            arrs.append([item for item in a[0]])
-
-        arrs = np.array(sorted(arrs))
-        for j, label in enumerate(kind_labels):
-            if j == 0:
-                ax0.plot(arrs.T[0], arrs.T[j+1]*1e3,
-                         color=color, ls=linestyle[j],
-                         label='%s x %s E$^{-%s}$' % (value, model, index))
-            else:
-                ax0.plot(arrs.T[0], arrs.T[j+1]*1e3,
-                         color=color, ls=linestyle[j])
-        dec_list, sens, disc = arrs.T
+            ax0.plot(arrs.T[0], arrs.T[j+1]*1e3,
+                     color=color, ls=linestyle[j])
+    dec_list, sens, disc = arrs.T
             
     return dec_list, sens, disc
 
@@ -62,13 +41,8 @@ if __name__ == "__main__":
             description='Plot the sensitivity as a function of declination.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--systematic', default='hadronic')
+    p.add_argument('--year', default='2012')
     p.add_argument('--alpha', default=2.0, type=float)
-    p.add_argument('--coarse', action='store_true',
-                   default=False,
-                   help='if True, plot coarse sens. result from test run.')
-    p.add_argument('--plot_hess_sens', action='store_true',
-                   default=False,
-                   help='if True, plot HESS 90% limits.')
     args = p.parse_args()
 
     plt.style.use(plot_style)
@@ -79,30 +53,42 @@ if __name__ == "__main__":
 
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
+    models = {'hadronic': ['qgs', 'sybll'],
+              'lambda': ['LaputopLambdaUp', 'LaputopLambdaDown', 'Laputop'],
+              'LaputopS125': ['LaputopS125Up', 'LaputopS125Down', 'Laputop'],
+              'charges': ['charges_0.90', 'charges_1.10', 's125_1.00'],
+              's125': ['s125_0.98', 's125_1.02', 's125_1.00']}
+
+    labels = {'hadronic': ['QGSJet II-04', 'SYBLL 2.1'],
+              'lambda': ['$\lambda$ + 0.2', '$\lambda$ - 0.2', '$\lambda$'],
+              'LaputopS125': [r'1.03$\times$S$_{125}$', r'0.97$\times$S$_{125}$', r'1.00$\times$S$_{125}$'],
+              'charges': [r'0.90$\times$(InIce Charge)', r'1.10$\times$(InIce Charge)', r'1.00$\times$(InIce Charge)'],
+              's125': [r'1.02$\times$S$_{125}$', r'0.98$\times$S$_{125}$', r'1.00$\times$S$_{125}$']}
+
     f = []
-    if args.systematic == 'hadronic':
-        for i, model in enumerate(['sybll', 'qgs']):
-            dec_list, sens, disc = plot_sens(args, model, colors[i], args.alpha)
-            f.append(sens)
-    elif args.systematic == 'charges':
-        values = [0.90, 1.00, 1.10]
-        for i, value in enumerate(values):
-            dec_list, sens, disc = plot_sens(args, args.systematic, colors[i],
-                                             args.alpha, value=value)
-            f.append(sens)
-    elif args.systematic == 's125':
-        values = [0.98, 1.00, 1.02]
-        for i, value in enumerate(values):
-            dec_list, sens, disc = plot_sens(args, args.systematic, colors[i],
-                                             value=value)
-            f.append(sens)
+    for i, model in enumerate(models[args.systematic]):
+        if args.systematic in ['lambda', 'LaputopS125']:
+            files = glob(prefix+'systematics/sens_jobs/%s/index_%s/%s_*' % (args.year, args.alpha, model))
+        else:
+            files = glob(prefix+'systematics/sens_jobs/index_%s/%s_*' % (args.alpha, model))
+        dec_list, sens, disc = plot_sens(labels[args.systematic][i], colors[i])
+        f.append(sens)
         
     for i, sens in enumerate(f):
-        ax1.plot(dec_list, sens/f[1], color=colors[i], ls='-')
+        ax1.plot(dec_list, sens/f[-1], color=colors[i], ls='-')
 
     ax0.set_xticklabels([])
     ax0.set_xlim([-81, -54])
-    ax0.set_ylim([1e-21, 5e-17])
+    if args.systematic in ['lambda', 'LaputopS125']:
+        #ax0.set_title('%s E$^{-%s}$ Point Source Sensitivity' % (args.year, args.alpha))
+        ax0.set_title('E$^{-%s}$ Point Source Sensitivity' % (args.alpha))
+        ax0.set_ylim([1e-20, 5e-17])
+    elif args.systematic == 'hadronic':
+        ax0.set_title('%s E$^{-%s}$ Point Source Sensitivity' % (args.year, args.alpha))
+        ax0.set_ylim([1e-21, 5e-18])
+    else:
+        ax0.set_title('E$^{-%s}$ Point Source Sensitivity' % (args.alpha))
+        ax0.set_ylim([1e-21, 5e-18])
     ax0.set_ylabel('Flux [cm$^{-2}$s$^{-1}$TeV$^{-1}$]')
     ax0.set_yscale('log')
     l = ax0.legend(loc='upper left')
@@ -110,41 +96,33 @@ if __name__ == "__main__":
 
     ax1.set_xlabel(r'Declination [$^{\circ}$]')
     ax1.set_xlim([-81, -54])
-    ax1.set_ylim([0.6, 1.4])
+    ax1.set_ylim([0.65, 1.35])
     ax1.set_ylabel('Ratio', fontsize=12)
     ax1.set_yticks([0.7,0.8,0.9,1.0,1.1,1.2,1.3])
     ax1.set_yticklabels([0.7,0.8,0.9,1.0,1.1,1.2,1.3], fontsize=8)
     ax1.grid(alpha=0.2)
     fig.tight_layout()
-    plt.savefig(fig_dir+'systematics/%s_%s_sensitivity.png' % (args.systematic, args.alpha))
+    plt.savefig(fig_dir+'systematics/{}_{}_{}_sensitivity.png'.format(args.systematic, args.alpha, args.year))
     plt.close()
 
     fig, ax = plt.subplots()
-    if args.systematic == 'hadronic':
-        ratio = f[0]/f[1]
-        ax.hist(ratio, bins=np.arange(0.1,1.5,0.01), histtype='step')
-        median = np.median(ratio)
-        r_min = np.min(ratio)
-        r_max = np.max(ratio)
-        ax.axvline(x=median, label='Median')
-        textstr = 'median = %.2f\nmax = %.2f\nmin = %.2f' % (median, r_max, r_min)
-        ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=20,
-                verticalalignment='top')
-        ax.set_xlim([0.5, 1.5])
-        ax.set_ylim([0, 60])
-    else:
-        for i, sens in enumerate(f):
-            if i != 1:
-                ratio = sens/f[1]
-                #ax.hist(ratio, bins=np.arange(0.1,1.5,0.01), histtype='step',
-                ax.hist(ratio, bins=np.arange(0.1,1.5,0.005), histtype='step',
-                        label='{} x {}: median={:.3f}'.format(values[i], args.systematic,
-                                                        np.median(ratio)))
-        ax.set_xlim([0.8, 1.2])
-        ax.set_ylim([0, 50])
+
+    bins=np.arange(0.1,1.5,0.01)
+    for i, sens in enumerate(f):
+        if i != len(f)-1:
+            ratio = sens/f[-1]
+            median = np.median(ratio)
+            ax.axvline(x=median, color=colors[i])
+            ax.hist(ratio, bins=bins,
+                    histtype='stepfilled', color=colors[i], alpha=0.4,
+                    label='{}\nmedian={:.3f}'.format(labels[args.systematic][i], median))
+        else:
+            ax.axvline(x=1, color=colors[i])
+    #ax.set_xlim([0.80, 1.35])
+    ax.set_xlim([0.80, 1.20])
 
     ax.set_xlabel('Ratio to Standard')
-    ax.legend()
+    ax.legend(loc='upper left')
     fig.tight_layout()
-    plt.savefig(fig_dir+'systematics/%s_%s_sens_ratio_bins.png' % (args.systematic, args.alpha))
+    plt.savefig(fig_dir+'systematics/{}_{}_{}_sens_ratio_bins.png'.format(args.systematic, args.alpha, args.year))
     plt.close()
