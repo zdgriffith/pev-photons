@@ -24,10 +24,15 @@ def template_builder(args):
                  '2014': 28139667.,
                  '2015': 28097975.}
 
-    livetime = livetimes[args.year]*1.157*10**-5 # days
+    if 'Laputop' in args.model:
+        exp = np.load(prefix+'/datasets/systematics/skylab/{}/{}_exp_diffuse.npy'.format(args.year, args.model))
+        livetime = 0.05*livetimes[args.year]*1.157*10**-5 # days
+    else:
+        exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(args.year))
+        livetime = livetimes[args.year]*1.157*10**-5 # days
 
-    exp = np.load(prefix+'/resources/datasets/{}_exp_diffuse.npy'.format(args.year))
-    mc = np.load(prefix+'/datasets/systematics/{}_{}_gal.npy'.format(args.year, args.model))
+    mc = np.load(prefix+'/datasets/systematics/skylab/{}/{}_mc_diffuse.npy'.format(args.year, args.model))
+
 
     if args.mcBackground:
       ev  = mc

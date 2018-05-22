@@ -14,7 +14,8 @@ from pev_photons.utils.load_datasets import load_systematic_dataset
 from pev_photons.utils.support import prefix
 
 def fit_ts(args):
-    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, args)
+    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.systematic, ncpu=args.ncpu,
+                                                                        seed=args.seed, year=args.year)
 
     inj = TemplateInjector(template=template,
                            gamma=args.alpha,
@@ -29,14 +30,16 @@ def fit_ts(args):
     n = trials['TS'][ trials['TS'] > 0].size
     ntot = trials['TS'].size
 
-    np.save(prefix+'template/sens_trials/'+args.name+'/'+args.name+'_job_'+str(args.job)+'.npy',
+    np.save(prefix+'systematics/template_sens/{}/{}_job_{}.npy'.format(args.year, args.systematic, args.job),
             [args.n_inj, n, ntot])
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Template signal-injected trials.',
                    formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--name', type=str, default='fermi_pi0',
+    p.add_argument('--systematic', type=str, default='fermi_pi0',
                    help='The name of the template.')
+    p.add_argument('--year', type=str, default='2012',
+                   help='The analysis year.')
     p.add_argument("--alpha", type=float, default=3.0,
                    help='Spectral index of signal.')
     p.add_argument("--E0", type=float, default=2e6,
