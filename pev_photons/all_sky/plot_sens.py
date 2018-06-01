@@ -17,7 +17,7 @@ from pev_photons.utils.support import fig_dir, plot_setter, plot_style
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
-    sources = np.load(prefix+'hgps_sources.npz')
+    sources = np.load(resource_dir+'hgps_sources.npz')
 
     # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
@@ -110,11 +110,10 @@ if __name__ == "__main__":
     plot_hess_sources(args)
 
     plt.xlim([-81, -54])
-    plt.ylim([1e-21, 5e-17])
+    plt.ylim([1e-22, 5e-17])
     plt.xlabel(r'Declination [$^{\circ}$]')
     plt.ylabel('Flux at 1 PeV [cm$^{-2}$s$^{-1}$TeV$^{-1}$]')
     plt.yscale('log')
-    plt.text(-80, 2e-21, 'IceCube Preliminary', color='r', fontsize=14)
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
     plt.savefig(fig_dir+'all_sky/sensitivity.pdf', bbox_inches='tight')
