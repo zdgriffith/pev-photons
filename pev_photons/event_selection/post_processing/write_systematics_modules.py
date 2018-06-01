@@ -77,6 +77,7 @@ if __name__ == "__main__":
     selections = ['ps', 'diffuse']
     recos = ['Laputop', 'LaputopLambdaUp', 'LaputopLambdaDown',
              'LaputopS125Up', 'LaputopS125Down']
+
     for year in years: 
         for data in dataset:
             if data == 'exp':
@@ -117,7 +118,7 @@ if __name__ == "__main__":
             passing_gammas = pd.read_hdf(prefix+'datasets/systematics/hadronic_models/{}/{}_{}.hdf5'.format(year, model, selection))
 
             if model == 'sybll':
-                final = construct_arr(gammas, passing_gammas, testing_fraction=0.2)
+                final = construct_arr(gammas, passing_gammas, isMC=True, testing_fraction=0.2)
             else:
-                final = construct_arr(gammas, passing_gammas)
+                final = construct_arr(gammas, passing_gammas, isMC=True)
             np.save(prefix+'datasets/systematics/skylab/{}/{}_mc_{}.npy'.format(year, model, selection), final)
