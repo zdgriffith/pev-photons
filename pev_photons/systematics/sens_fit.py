@@ -15,7 +15,8 @@ from pev_photons.utils.load_datasets import load_systematic_dataset
 from pev_photons.utils.support import prefix, fig_dir
 
 def sensitivity(args):
-    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, args)
+    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, ncpu=args.ncpu,
+                                                                        seed=args.seed, year='2012')
 
     inj = TemplateInjector(template=template,
                            gamma=args.alpha,
@@ -24,23 +25,22 @@ def sensitivity(args):
                            seed=1)
     inj.fill(exp, mc, livetime)
 
-    files = glob(prefix+'template/sens_trials/'+args.name+'/*.npy') 
+    files = glob(prefix+'systematics/template_sens/2012/'+args.name+'_*.npy') 
 
-    inj_list = {'sybll':range(0,551,50),
-                'qgs':range(0,551,50)}
+    if 'Laputop' in args.name:
+        inj_list = range(0,171,17)
+    else:
+        inj_list = range(0,551,50)
 
-    frac = np.zeros(len(inj_list[args.name]))
-    tot = np.zeros(len(inj_list[args.name]))
+    frac = np.zeros(len(inj_list))
+    tot = np.zeros(len(inj_list))
     for fname in files:
         a = np.load(fname)
-        index = inj_list[args.name].index(a[0])
+        index = inj_list.index(a[0])
         frac[index] += a[1]
         tot[index] += a[2]
         
-    print(inj_list)
-    print(frac)
-    print(tot)
-    ni, ni_err, images = fit(inj_list[args.name], frac, tot,
+    ni, ni_err, images = fit(inj_list, frac, tot,
                              0.9, ylabel="fraction TS > 0.90",
                              npar = 2, par = None,
                              image_base=fig_dir+'template/'+args.name+'_sens')
@@ -59,7 +59,7 @@ def sensitivity(args):
     sens_result['ni_err'] = ni_err
     sens_result['flux'] = flux
     sens_result['flux_err'] = flux_err
-    np.save(prefix+'template/'+args.name+'_sens.npy', sens_result)
+    np.save(prefix+'/systematics/template/'+args.name+'_sens.npy', sens_result)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Perform a sensitivity calculation fit',

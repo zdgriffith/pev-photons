@@ -38,7 +38,8 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, args)
+    exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, ncpu=args.ncpu,
+                                                                        seed=args.seed, year='2012')
 
     inj = TemplateInjector(template=template,
                            gamma=args.alpha,

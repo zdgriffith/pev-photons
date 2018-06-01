@@ -54,12 +54,14 @@ if __name__ == "__main__":
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
     models = {'hadronic': ['qgs', 'sybll'],
+              'data_check': ['standard_Laputop', 'Laputop'],
               'lambda': ['LaputopLambdaUp', 'LaputopLambdaDown', 'Laputop'],
               'LaputopS125': ['LaputopS125Up', 'LaputopS125Down', 'Laputop'],
               'charges': ['charges_0.90', 'charges_1.10', 's125_1.00'],
               's125': ['s125_0.98', 's125_1.02', 's125_1.00']}
 
     labels = {'hadronic': ['QGSJet II-04', 'SYBLL 2.1'],
+              'data_check': [r'random 10$\%$', 'systematic runs'],
               'lambda': ['$\lambda$ + 0.2', '$\lambda$ - 0.2', '$\lambda$'],
               'LaputopS125': [r'1.03$\times$S$_{125}$', r'0.97$\times$S$_{125}$', r'1.00$\times$S$_{125}$'],
               'charges': [r'0.90$\times$(InIce Charge)', r'1.10$\times$(InIce Charge)', r'1.00$\times$(InIce Charge)'],
@@ -67,7 +69,7 @@ if __name__ == "__main__":
 
     f = []
     for i, model in enumerate(models[args.systematic]):
-        if args.systematic in ['lambda', 'LaputopS125']:
+        if args.systematic in ['lambda', 'LaputopS125', 'data_check']:
             files = glob(prefix+'systematics/sens_jobs/%s/index_%s/%s_*' % (args.year, args.alpha, model))
         else:
             files = glob(prefix+'systematics/sens_jobs/index_%s/%s_*' % (args.alpha, model))
@@ -79,7 +81,7 @@ if __name__ == "__main__":
 
     ax0.set_xticklabels([])
     ax0.set_xlim([-81, -54])
-    if args.systematic in ['lambda', 'LaputopS125']:
+    if args.systematic in ['lambda', 'LaputopS125', 'data_check']:
         #ax0.set_title('%s E$^{-%s}$ Point Source Sensitivity' % (args.year, args.alpha))
         ax0.set_title('E$^{-%s}$ Point Source Sensitivity' % (args.alpha))
         ax0.set_ylim([1e-20, 5e-17])
