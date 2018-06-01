@@ -106,7 +106,7 @@ if __name__ == "__main__":
     #IceCube Upper limit
     b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
-    sens = np.load(prefix+'/TeVCat/hess_sens_new.npz')
+    sens = np.load(prefix+'/TeVCat/hess_sens.npz')
     y0 = sens['sensitivity'][args.index]*1e9
     y = y0*(x**(2-gamma))
 

@@ -26,32 +26,28 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_dataset('point_source', args)
 
-    hess = np.load(resource_dir+'hess_sources.npz')
+    hess = np.load(prefix+'hgps_sources.npz')
     sens = list()
-    disc = list()
 
     for i, alpha in enumerate(hess['alpha']):
         if np.isnan(alpha):
             sens.append(np.nan)
-            disc.append(np.nan)
         else:
             dec = np.radians(hess['dec'][i])
             inj= PointSourceInjector(alpha, E0=1e6,
                                      sinDec_bandwidth=np.sin(np.radians(2)))
             inj.fill(dec, ps_llh.exp, ps_llh.mc, ps_llh.livetime)
-            result = ps_llh.weighted_sensitivity([0.5, 2.87e-7], [0.9, 0.5],
+            result = ps_llh.weighted_sensitivity([0.5], [0.9],
                                                  inj=inj,
                                                  eps=1.e-2,
                                                  n_bckg=10000,
                                                  n_iter=1000,
                                                  src_ra=np.pi, src_dec=dec)
             sens.append(result[0]["flux"][0])
-            disc.append(result[0]["flux"][1])
             print(sens)
 
     a = dict()
     a['name'] = hess['name']
     a['sensitivity'] = sens
-    a['discovery_potential'] = disc
 
     np.savez(prefix+'TeVCat/hess_sens.npz', **a)
