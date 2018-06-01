@@ -15,7 +15,7 @@ from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
-def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
+def load_dataset(name, args, llh_args={'scramble':False}, model_args={}, bias=1.00):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -59,7 +59,10 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}):
     for i, year in enumerate(years): 
         season = 'IC86.'+year
         exp, mc, livetime = Datasets[dataset].season(season)
-        energy_bins = Datasets[dataset].energy_bins(season)
+        exp['logE'] = np.log10(bias*10**exp['logE'])
+        mc['logE'] = np.log10(bias*10**mc['logE'])
+        #energy_bins = Datasets[dataset].energy_bins(season)
+        energy_bins = np.log10(bias*10**Datasets[dataset].energy_bins(season))
         energy_range = [energy_bins[0], energy_bins[-1]]
         sinDec_bins = Datasets[dataset].sinDec_bins(season)
         sinDec_range = [sinDec_bins[0], sinDec_bins[-1]]
@@ -112,13 +115,19 @@ def load_systematic_dataset(name, systematic, year='2012', index=3.0,
                  '2013': 27769791., '2014': 28139667.,
                  '2015': 28097975.}
 
-    if 'Laputop' in systematic:
+    mc = np.load(prefix+'/datasets/systematics/skylab/{}/{}_mc_{}.npy'.format(year, systematic, sel[name]))
+    if 'standard_Laputop' in systematic:
+        dataset = 'GammaRays5yr_PointSrc'
+        exp, dump, full_livetime = Datasets[dataset].season('IC86.'+year)
+        livetime = 2626947.0*1.157*10**-5
+        exp = np.random.choice(exp, int(len(exp)*(livetime/full_livetime)))
+        mc = np.load(prefix+'/datasets/systematics/skylab/{}/Laputop_mc_{}.npy'.format(year, sel[name]))
+    elif 'Laputop' in systematic:
         exp = np.load(prefix+'/datasets/systematics/skylab/{}/{}_exp_{}.npy'.format(year, systematic, sel[name]))
-        livetime = 0.05*livetimes[year]*1.157*10**-5 # days
+        livetime = 2626947.0*1.157*10**-5 # days
     else:
         exp = np.load(prefix+'/resources/datasets/{}_exp_{}.npy'.format(year, sel[name]))
         livetime = livetimes[year]*1.157*10**-5 # days
-    mc = np.load(prefix+'/datasets/systematics/skylab/{}/{}_mc_{}.npy'.format(year, systematic, sel[name]))
 
     llh_args['ncpu'] = ncpu
     llh_args['seed'] = seed
@@ -145,7 +154,7 @@ def load_systematic_dataset(name, systematic, year='2012', index=3.0,
         return exp, mc, livetime, llh
     else:
         template = Template((prefix+'/template/'+year+
-                             '/'+model+'_exp.npy'), reduced=True)
+                             '/'+systematic+'_exp.npy'), reduced=True)
         llh = TemplateLLH(exp, mc, livetime, llh_model,
                           template=template, **llh_args) 
         return exp, mc, livetime, llh, template
