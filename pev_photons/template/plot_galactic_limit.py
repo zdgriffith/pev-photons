@@ -46,6 +46,18 @@ def plot_limits(exp, key):
 
     plot_arrow(exp)
 
+def plot_data(exp, key):
+    if args.fermi_limit:
+        exp['data'][1] *= fermi_ratio[key]
+
+    ax.errorbar(exp['data'][0], exp['data'][1]*(exp['data'][0]*1e3)**2,
+                yerr=exp['error']*(exp['data'][0]*1e3)**2,
+                label=exp['label'], color=exp['color'],
+                #marker=exp['marker'], s=40, zorder=2)
+                markeredgewidth=0, capsize=0, elinewidth=2,
+                lw=0, markersize=7,
+                marker=exp['marker'], zorder=2)
+
 def plot_range(exp):
     x = np.linspace(exp['E_min'], exp['E_max'], 100)
     y = exp['data'][1]*(exp['E_0']/x)**(3.0-2.0)
@@ -83,11 +95,18 @@ if __name__ == "__main__":
     exp = {}
     exp['CASA-MIA'] = {'data':np.array([[140, 180, 310, 650, 1300],
                                         [3.4e-5 ,2.6e-5, 2.4e-5, 2.6e-5, 3.5e-5]]),
-                      'color':colors[1], 'marker':'D',
-                      'convert': True, 'label':'CASA-MIA'}
+                      #'color':colors[1], 'marker':'D',
+                      'color': 'lawngreen', 'marker': 'D',
+                      'convert': True, 'label': 'CASA-MIA'}
     exp['IC40'] = {'data':np.array([[3e3], [1.2e-3]]),
-                   'color':'cyan', 'marker':'H',
-                   'convert': True, 'label':'IC40'}
+                   #'color':'cyan', 'marker':'H',
+                   'color': colors[0], 'marker': 'H',
+                   'convert': True, 'label': 'IC-40 (1 year)'}
+    exp['ARGO-YBJ'] = {'data':np.array([[0.390, 0.750, 1.640],
+                                        [8.06e-12, 1.64e-12, 0.13e-12]]),
+                      'error':np.array([1.49e-12, 0.43e-12, 0.05e-12]),
+                      'color': 'magenta', 'marker': 'o',
+                      'convert': False, 'label': 'ARGO-YBJ'}
 
     if args.fermi_limit:
         value = 1.044e-9
@@ -95,42 +114,48 @@ if __name__ == "__main__":
         value = 4.20419751853e-09 #((3.42e-22)*(2*10**6)**2)/(0.2*np.pi)
 
     exp['IC86'] = {'data':np.array([[2e3], [value]]),
-                   'color':colors[0], 'marker':'p',
+                   #'color':colors[0], 'marker':'p',
+                   'color':colors[1], 'marker':'p',
                    'E_0':2e3, 'E_min':0.683e3, 'E_max': 2.73e3,
-                   'convert': False, 'label':'IceCube 5 years'}
+                   'convert': False, 'label':'IC-86 (5 years)'}
 
     for key in exp:
         if not args.fermi_limit:
             exp[key]['label'] += ' ($|$b$|$ $<$ 5$^{\circ}$)'
     
-        plot_limits(exp[key], key)
+        if key in ['ARGO-YBJ']:
+            plot_data(exp[key], key)
+        else:
+            plot_limits(exp[key], key)
 
     plot_range(exp['IC86'])
 
     # Model prediction for flux emission over our entire FOV
     models = {}
     models['v_l_unatt'] = {'name':'vernetto_unattenuated',
-                           'color':'none', 'edgecolor':'forestgreen', 'alpha':1.0,
-                           'label':'Vernetto \& Lipari\'17 (Unattenuated)',
+                           'color':'none', 'edgecolor':'black', 'alpha':1.0,
+                           'label':'Vernetto 2017 (Unatt.)',
                            'zorder':-1}
     models['v_l_att'] = {'name':'vernetto_attenuated',
-                         'color':colors[2], 'edgecolor':'none', 'alpha':0.7,
-                         'label':'Vernetto \& Lipari\'17 (Attenuated)',
+                         'color':'lightgrey', 'edgecolor':'none', 'alpha':1.0,
+                         'label':'Vernetto 2017 (Att.)',
                          'zorder':-2}
     for model in models:
         plot_flux_model(models[model])
     
-    ax.set_xlim([10, 5e4])
+    ax.set_xlim([0.1, 5e4])
     ax.set_ylim([1e-9, 5e-6])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$E_\gamma$ [TeV]')
-    ax.legend()
+    plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), borderaxespad=0, ncol=3,
+               frameon=True, loc='lower left', mode='expand')
 
     if args.fermi_limit:
         ax.set_ylabel(r'$E^2\Phi_{template}$ [GeV cm${}^{-2}$ s${}^{-1}$]')
         plt.savefig(fig_dir+'template/fermi_integrated_limit.pdf')
-        plt.savefig(fig_dir+'paper/fermi_integrated_limit.pdf')
+        #plt.savefig(fig_dir+'paper/fermi_integrated_limit.pdf', bbox_inches='tight')
+        plt.savefig(fig_dir+'paper/fermi_integrated_limit.eps', bbox_inches='tight')
     else:
         ax.set_ylabel(r'$E^2J_\gamma$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]')
         plt.savefig(fig_dir+'template/per_str_limit.pdf')

@@ -41,8 +41,8 @@ def get_fermi_pi0_map():
 def plot_IC_FOV(ax, config='86'):
     """ Plot the Icecube FOV for different configurations. """
     params = {'max_dec': {'86':np.arccos(0.8), '40': np.radians(30)},
-              'color': {'86':'crimson', '40': 'green'},
-              'y': {'86':11, '40': -56}}
+              'color': {'86':colors[1], '40': colors[0]},
+              'y': {'86':11, '40': -55.5}}
               
     dec, ra = np.meshgrid(np.linspace(0., params['max_dec'][config], 100) - np.pi/2.,
                           np.linspace(0., 2.0*np.pi, 1000))
@@ -57,15 +57,15 @@ def plot_IC_FOV(ax, config='86'):
             c=params['color'][config], lw=2, ls='--')
     ax.text(x=-50, y=params['y'][config],
             s='IC-{}'.format(config), color=params['color'][config],
-            fontsize=25, fontweight='bold')
+            fontsize=30, fontweight='bold')
 
 def plot_rectangular_FOV(ax, exp='cm'):
     """ Plot the FOV for other experiments. """
-    params = {'lon': {'cm': [50, 200], 'argo': [25, 100]},
-              'color': {'cm': 'mediumblue', 'argo': 'yellow'},
-              'x': {'cm': 150, 'argo': 75},
-              'y': {'cm': 7, 'argo': 7},
-              'label': {'cm': 'CASA-MIA', 'argo': 'ARGO-YBJ'}}
+    params = {'lon': {'cm': [50, 200], 'argo': [25, 100], '40': [285, 320]},
+              'color': {'cm':'lawngreen', 'argo': 'magenta', '40':colors[0]},
+              'x': {'cm': 150, 'argo': 75, '40':-50},
+              'y': {'cm': 7, 'argo': 7, '40':-55.5},
+              'label': {'cm': 'CASA-MIA', 'argo': 'ARGO-YBJ', '40':'IC-40'}}
 
     lon1 = move_gc_to_center(params['lon'][exp][0]*np.pi/180.)*180./np.pi
     lon2 = move_gc_to_center(params['lon'][exp][1]*np.pi/180.)*180./np.pi
@@ -90,12 +90,13 @@ def plot_rectangular_FOV(ax, exp='cm'):
                 c=params['color'][exp], ls='--')
     ax.text(x=params['x'][exp], y=params['y'][exp],
             s=params['label'][exp], color=params['color'][exp],
-            fontsize=25, fontweight='bold')
+            fontsize=30, fontweight='bold')
 
 if __name__ == "__main__":
 
     plt.style.use(plot_style)
     fig, ax = plt.subplots(figsize=(20,10))
+    colors = plt.rcParams['axes.color_cycle']
 
     im = ax.imshow(get_fermi_pi0_map(), extent=[180,-180,-90,90], origin='lower',
                    interpolation='none', cmap='Greys', norm=LogNorm())
@@ -111,6 +112,6 @@ if __name__ == "__main__":
     ax.set_ylim([-90, 90])
     ax.set_xlabel('Galactic Longitude [$^{\circ}$]', fontsize=30)
     ax.set_ylabel('Galactic Latitude [$^{\circ}$]', fontsize=30)
-    #ax.set_title(r'FermiLAT $\pi^0$ Decay Component Map', fontsize=30)
 
-    plt.savefig(fig_dir+'template/FOV_comparison.png')
+    plt.savefig(fig_dir+'template/FOV_comparison.pdf')
+    plt.savefig(fig_dir+'paper/FOV_comparison.pdf')
