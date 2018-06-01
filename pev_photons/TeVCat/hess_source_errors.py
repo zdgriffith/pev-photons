@@ -31,7 +31,7 @@ def error_profile(llh, ra, dec, fit, **kwargs):
     print("   - max %.2f (TS %.2f)" % (Max[p], Max['TS']))
     print("   - fit %.2f (-%.2f/+%.2f)" % (fit[p], dMin, dMax))
     print("   - completed in %.2f sec" % (time.time() - t0))
-    return [fit[p], Min[p], Max[p]]
+    return [fit[p], dMin, dMax]
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -64,5 +64,5 @@ if __name__ == "__main__":
         TS, xmin = ps_llh.fit_source(ra, dec, scramble=False)
         fit = dict({'TS':TS}, **xmin) 
         source_fits[sources['name'][i]]['gamma'] = error_profile(ps_llh, ra, dec, fit, gamma=np.arange(0.99, 4.01, 0.01))
-        source_fits[sources['name'][i]]['nsources'] = error_profile(ps_llh, ra, dec, fit, nsources=np.arange(1, 100, 0.1))
+        source_fits[sources['name'][i]]['nsources'] = error_profile(ps_llh, ra, dec, fit, nsources=np.arange(0, 100, 0.1))
     np.save(prefix+'/TeVCat/fit_uncertainties.npy', source_fits)
