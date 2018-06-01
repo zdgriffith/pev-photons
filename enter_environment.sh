@@ -27,6 +27,9 @@ then
 elif [ $# -gt 0 ] && [ $1 = "trunk_skylab" ]
 then
     source /data/user/zgriffith/pev_photons/resources/trunk_skylab/bin/activate
+elif [ $# -gt 0 ] && [ $1 = "el7_photon_env" ]
+then
+    source /data/user/zgriffith/pev_photons/resources/el7_photon_env/bin/activate
 else
     source /data/user/zgriffith/pev_photons/resources/photon_env/bin/activate
 fi
