@@ -13,23 +13,31 @@ import healpy as hp
 from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix
 
-def manual_scan(ps_llh, args):
-    """manually test for a point source at each pixen in the sky map"""
+def manual_scan(ps_llh, nside=args.nside, extension=args.extension):
+    """Manually test for a point source at each pixel in the sky map.
 
-    npix = hp.nside2npix(args.nside)
+    Parameters
+    ----------
+    nside: int
+        HEALPIX nside value for skymap.
+    extension: float
+        radius of source spatial extension in degrees.
+    """
+
+    npix = hp.nside2npix(nside)
     m = np.zeros(npix)
 
-    theta, ra = hp.pix2ang(args.nside, range(npix))
+    theta, ra = hp.pix2ang(nside, range(npix))
     dec = np.pi/2. - theta
     mask = np.less(np.sin(dec), -0.8)
 
     ts = np.zeros(npix, dtype=np.float)
     xmin = np.zeros_like(ts, dtype=[(p, np.float) for p in ps_llh.params])
-    if args.extension:
+    if extension:
         ts, xmin = ps_llh._scan(ra[mask], dec[mask],
                                 ts, xmin, mask,
-                                src_extension=np.radians(args.extension))
-        np.save(prefix+'/all_sky/ext/skymap_ext_%s.npy' % args.extension,
+                                src_extension=np.radians(extension))
+        np.save(prefix+'/all_sky/ext/skymap_ext_%s.npy' % extension,
                 ts)
     else:
         ts, xmin = ps_llh._scan(ra[mask], dec[mask], ts, xmin, mask)
@@ -85,4 +93,4 @@ if __name__ == "__main__":
                     break
             np.save(prefix+args.outFile, m)
         else:
-            manual_scan(ps_llh, args)
+            manual_scan(ps_llh, nside=args.nside, extension=args.extension)
