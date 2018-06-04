@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Initialization of multi-year LLH object.
-    ps_llh = load_dataset('point_source', args)
+    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
     inj= PointSourceInjector(args.index, E0=10**6,
                              sinDec_bandwidth=np.sin(np.radians(2)))

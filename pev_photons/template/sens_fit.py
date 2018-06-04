@@ -15,7 +15,8 @@ from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix, fig_dir
 
 def sensitivity(args):
-    template_llh = load_dataset('galactic_plane', args)
+    template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                alpha=args.alpha, template_name=args.name)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,

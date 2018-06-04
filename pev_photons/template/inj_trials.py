@@ -13,8 +13,8 @@ from skylab.sensitivity_utils import estimate_sensitivity
 from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix
 
-def fit_ts(args):
-    template_llh = load_dataset('galactic_plane', args)
+def fit_ts(template_llh, alpha=3.0, E0=2e6, job=0,
+           n_trials=100, n_inj=0, name='fermi_pi0'):
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,
@@ -53,4 +53,8 @@ if __name__ == "__main__":
                    help='job number')
     args = p.parse_args()
 
-    fit_ts(args)
+    template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                alpha=args.alpha, template_name=args.name)
+    fit_ts(template_llh, alpha=args.alpha, E0=args.E0,
+           job=args.job, n_trials=args.n_trials,
+           n_inj=args.n_inj, name=args.name)

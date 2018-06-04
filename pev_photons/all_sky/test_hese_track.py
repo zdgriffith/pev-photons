@@ -12,22 +12,17 @@ import pandas as pd
 from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix, resource_dir
 
-def bg_trials(ra, dec, args):
-    llh_args = {}
-    llh_args['capscramble'] = True
-    ps_llh = load_dataset('point_source', args, llh_args=llh_args)
+def bg_trials(ps_llh, ra, dec, n_trials=10):
+    ps_llh.capscramble = True
 
-    trials = ps_llh.do_trials(args.n_trials, src_ra=ra,
+    trials = ps_llh.do_trials(n_trials, src_ra=ra,
                               src_dec=dec)
 
     np.save(prefix+'all_sky/hese_track_trials.npy',
              trials['TS'])
 
 
-def test_source(ra, dec, args):
-    llh_args = {}
-    ps_llh = load_dataset('point_source', args, llh_args=llh_args)
-
+def test_source(ps_llh, ra, dec):
     source = np.empty((1,),
                       dtype=[('ra', np.float), ('dec', np.float),
                              ('TS', np.float), ('nsources', np.float),
@@ -64,7 +59,8 @@ if __name__ == "__main__":
     ra = np.radians(events['ra'].values[0])
     dec = np.radians(events['dec'].values[0])
 
+    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
     if args.n_trials is not None:
-        test_source(ra, dec, args)
+        test_source(ps_llh, ra, dec, n_trials=args.n_trials)
     else:
-        bg_trials(ra, dec, args)
+        bg_trials(ps_llh, ra, dec)

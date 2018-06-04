@@ -63,7 +63,7 @@ if __name__ == "__main__":
         ts_list = np.full(args.bg_trials, np.nan)
         for trial in range(args.bg_trials):
             args.seed = np.random.randint(0, 10**6)
-            ps_llh = load_dataset('point_source', args,
+            ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed,
                                   llh_args={'scramble':True})
             for i, scan in enumerate(ps_llh.all_sky_scan()):
                 if i > 0:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             np.save(prefix+'all_sky/scan_trials/job_%s.npy' % args.job, ts_list)
     else:
         # Load the dataset.
-        ps_llh = load_dataset('point_source', args)
+        ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
         # Set the logging output file.
         logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)

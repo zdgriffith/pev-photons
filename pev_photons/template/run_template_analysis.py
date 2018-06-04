@@ -45,9 +45,11 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.name == 'cascades':
-        template_llh = load_dataset('HESE', args)
+        template_llh = load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
+                                    alpha=args.alpha, template_name=args.name)
     else:
-        template_llh = load_dataset('galactic_plane', args)
+        template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                    alpha=args.alpha, template_name=args.name)
 
     if args.bg_trials:
         run_bg_trials(template_llh, args)

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', args)
+    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
     sources = np.load(resource_dir+'hess_sources.npz')
 

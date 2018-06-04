@@ -15,20 +15,23 @@ from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
-def load_dataset(name, args, llh_args={'scramble':False}, model_args={}, bias=1.00):
+def load_dataset(name, ncpu=1, seed=1, alpha=2.0, template_name=None,
+                 llh_args={'scramble':False}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
     Parameters
     ----------
-    name : string which describes the event selection used for the desired dataset
-           Allowed entries: "point_source", "galactic_plane"
+    name : string
+        Describes the event selection used for the desired dataset.
+        Allowed entries: "point_source", "galactic_plane", "HESE"
 
-    args : Namespace object with argparse arguments from the parent script.
-           Needs to include:
-               ncpu  : number of cores to use.
-               seed  : random number seed.
-               alpha : spectral index to fix to in the template likelihood
+    ncpu: int
+        The number of cores to use.
+    seed: int
+        The random number seed.
+    alpha: float
+        The spectral index to fix to in the template likelihood.
 
     Returns
     ----------
@@ -36,33 +39,30 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}, bias=1.
 
     """
 
-    if name in ['point_source', 'high_galactic_lat']:
+    if name in ['point_source']:
         dataset = 'GammaRays5yr_PointSrc'
     elif name in ['galactic_plane', 'HESE']:
         dataset = 'GammaRays5yr_GalPlane'
     else:
         raise(ValueError, 'Name must be one of "point_source", "HESE", "galactic_plane".')
 
-    llh_args['ncpu'] = args.ncpu
+    llh_args['ncpu'] = ncpu
 
     years = ['2011', '2012', '2013', '2014', '2015']
 
     if name == 'point_source':
-        llh = MultiPointSourceLLH(seed=args.seed, ncpu=args.ncpu)
+        llh = MultiPointSourceLLH(seed=seed, ncpu=ncpu)
         llh_args['mode'] = 'box'
         llh_args['delta_ang'] = np.radians(4.0)
     else:
-        llh = MultiTemplateLLH(seed=args.seed, ncpu=args.ncpu)
-        model_args['bounds'] = [args.alpha, args.alpha]
+        llh = MultiTemplateLLH(seed=seed, ncpu=ncpu)
+        model_args['bounds'] = [alpha, alpha]
         model_args['fix_index'] = True
 
     for i, year in enumerate(years): 
         season = 'IC86.'+year
         exp, mc, livetime = Datasets[dataset].season(season)
-        exp['logE'] = np.log10(bias*10**exp['logE'])
-        mc['logE'] = np.log10(bias*10**mc['logE'])
-        #energy_bins = Datasets[dataset].energy_bins(season)
-        energy_bins = np.log10(bias*10**Datasets[dataset].energy_bins(season))
+        energy_bins = Datasets[dataset].energy_bins(season)
         energy_range = [energy_bins[0], energy_bins[-1]]
         sinDec_bins = Datasets[dataset].sinDec_bins(season)
         sinDec_range = [sinDec_bins[0], sinDec_bins[-1]]
@@ -76,7 +76,7 @@ def load_dataset(name, args, llh_args={'scramble':False}, model_args={}, bias=1.
             llh_year = PointSourceLLH(exp, mc, livetime, llh_model, **llh_args)
         else:
             template = Template((prefix+'/template/'+year+
-                                 '/'+args.name+'_exp.npy'), reduced=True)
+                                 '/'+template_name+'_exp.npy'), reduced=True)
             llh_year = TemplateLLH(exp, mc, livetime, llh_model,
                                    template=template, **llh_args)
 

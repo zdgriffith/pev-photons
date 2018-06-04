@@ -39,9 +39,11 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.name == 'cascades':
-        template_llh = load_dataset('HESE', args)
+        template_llh = load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
+                                    alpha=args.alpha, template_name=args.name)
     else:
-        template_llh = load_dataset('galactic_plane', args)
+        template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                    alpha=args.alpha, template_name=args.name)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,

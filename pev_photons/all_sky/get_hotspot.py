@@ -58,6 +58,6 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    ps_llh = load_dataset('point_source', args)
+    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
     ra, dec = get_hotspot_direction()
     test_hotspot(ps_llh, ra, dec)
