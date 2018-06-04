@@ -13,6 +13,16 @@ from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix, resource_dir
 
 def bg_trials(ps_llh, ra, dec, n_trials=10):
+    """ Produce background TS trials for the HESE track event.
+    Parameters
+    ----------
+    ra: float
+        The right ascension value in radians.
+    dec: float
+        The declination value in radians.
+    n_trials: int
+        The number of trials to run.
+    """
     ps_llh.capscramble = True
 
     trials = ps_llh.do_trials(n_trials, src_ra=ra,
@@ -21,8 +31,15 @@ def bg_trials(ps_llh, ra, dec, n_trials=10):
     np.save(prefix+'all_sky/hese_track_trials.npy',
              trials['TS'])
 
-
 def test_source(ps_llh, ra, dec):
+    """ Fit for a source at the HESE track event location.
+    Parameters
+    ----------
+    ra: float
+        The right ascension value in radians.
+    dec: float
+        The declination value in radians.
+    """
     source = np.empty((1,),
                       dtype=[('ra', np.float), ('dec', np.float),
                              ('TS', np.float), ('nsources', np.float),
@@ -36,11 +53,7 @@ def test_source(ps_llh, ra, dec):
     source['nsources'] = fit[1]['nsources']
     source['gamma'] = fit[1]['gamma']
 
-    pairs = [source.dtype.names[i]+': %0.2f' % val for i, val in enumerate(source[0])]
-    for pair in pairs:
-        print(pair)
     np.save(prefix+'all_sky/hese_track.npy', source)
-
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
