@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; pev_photons 0.1 documentation</title>
+  <title>Set Up &mdash; pev_photons 0.1 documentation</title>
   
 
   
@@ -27,7 +27,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -56,7 +57,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -74,9 +75,12 @@
             
             
               <p class="caption"><span class="caption-text">Getting Started:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Set Up</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Set Up</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-the-environment">Accessing the Environment</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -116,18 +120,25 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Set Up</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/zdgriffith/pev_photons" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -139,19 +150,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="set-up">
+<h1>Set Up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="accessing-the-environment">
+<h2>Accessing the Environment<a class="headerlink" href="#accessing-the-environment" title="Permalink to this headline">¶</a></h2>
+<p>To make it easy to replicate my environment, I have created and stored a virtual environment which is accessible on the cobalts. The virtual environment was installed using the python from the py2-v2 CVMFS environment: <code class="docutils literal notranslate"><span class="pre">/cvmfs/icecube.opensciencegrid.org/py2-v2/RHEL_6_x86_64/bin/python</span></code>.</p>
+<p>Simply run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> enter_environment.sh
+</pre></div>
+</div>
+<p>in pev_photons to activate the environment. Note this redefines your python path, leaving the environment with <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> will reset the python path to what it was before entering the environment. This will also add pev_photons to your python path.</p>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
@@ -197,7 +208,6 @@
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -207,14 +217,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>
