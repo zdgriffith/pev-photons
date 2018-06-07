@@ -3,8 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-:github_url: https://github.com/zdgriffith/pev_photons
-
 Scripts for the 5-year Gamma-Ray Analysis
 =========================================
 

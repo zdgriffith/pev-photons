@@ -79,6 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Set Up</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#accessing-the-environment">Accessing the Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-the-file-paths">Setting the File Paths</a></li>
 </ul>
 </li>
 </ul>
@@ -152,14 +153,78 @@
             
   <div class="section" id="set-up">
 <h1>Set Up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h1>
+<p>Currently you must run these scripts on a cobalt testbed or a submitter node.</p>
 <div class="section" id="accessing-the-environment">
 <h2>Accessing the Environment<a class="headerlink" href="#accessing-the-environment" title="Permalink to this headline">¶</a></h2>
-<p>To make it easy to replicate my environment, I have created and stored a virtual environment which is accessible on the cobalts. The virtual environment was installed using the python from the py2-v2 CVMFS environment: <code class="docutils literal notranslate"><span class="pre">/cvmfs/icecube.opensciencegrid.org/py2-v2/RHEL_6_x86_64/bin/python</span></code>.</p>
+<p>To make it easy to reproduce the results, I have created a virtual environment which is accessible on the cobalts. The virtual environment was installed using the python from the py2-v2 CVMFS environment: <code class="docutils literal notranslate"><span class="pre">/cvmfs/icecube.opensciencegrid.org/py2-v2/RHEL_6_x86_64/bin/python</span></code>.</p>
 <p>Simply run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> enter_environment.sh
 </pre></div>
 </div>
-<p>in pev_photons to activate the environment. Note this redefines your python path, leaving the environment with <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> will reset the python path to what it was before entering the environment. This will also add pev_photons to your python path.</p>
+<p>in <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code> to activate the environment. Alternatively, if on an EL7 machine, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> enter_environment.sh el_7
+</pre></div>
+</div>
+<p>Note this redefines your python path, leaving the environment with <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> will reset the python path to what it was before entering the environment. This will also add <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code> to your python path.</p>
+<p>To following package versions are necessary:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="63%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Package</th>
+<th class="head">Version</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>astropy</td>
+<td>2.0.3</td>
+</tr>
+<tr class="row-odd"><td>basemap</td>
+<td>1.0.7</td>
+</tr>
+<tr class="row-even"><td>healpy</td>
+<td>1.8.6</td>
+</tr>
+<tr class="row-odd"><td>matplotlib</td>
+<td>1.4.3</td>
+</tr>
+<tr class="row-even"><td>numpy</td>
+<td>1.13.3</td>
+</tr>
+<tr class="row-odd"><td>pandas</td>
+<td>0.18.1</td>
+</tr>
+<tr class="row-even"><td>scikit-learn</td>
+<td>0.17.1</td>
+</tr>
+<tr class="row-odd"><td>scipy</td>
+<td>0.15.1</td>
+</tr>
+<tr class="row-even"><td>skylab</td>
+<td>2.0.2</td>
+</tr>
+</tbody>
+</table>
+<p>You can create your own virtual environment with these packages using <code class="docutils literal notranslate"><span class="pre">exact_environment.txt</span></code> in <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code>.  Within a freshly made virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r exact_environment.txt
+</pre></div>
+</div>
+<p>If you go this route, make sure <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code> is in your python path before proceeding.</p>
+</div>
+<div class="section" id="setting-the-file-paths">
+<h2>Setting the File Paths<a class="headerlink" href="#setting-the-file-paths" title="Permalink to this headline">¶</a></h2>
+<p>The file <code class="docutils literal notranslate"><span class="pre">pev_photons/utils/support.py</span></code> has two paths that should be changed to the location you want to store the files:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal notranslate"><span class="pre">prefix</span></code> defines the base directory where generated data files should be stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">fig_dir</span></code> defines the base directory where generated plots should be stored.</li>
+</ol>
+<p>Change these paths to your personal directories.  Then, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python pev_photons/make_directories.py
+</pre></div>
+</div>
+<p>This makes the directory and all the subdirectories necessary in both the plot and data file locations if they don’t already exist.</p>
 </div>
 </div>
 
