@@ -2,6 +2,10 @@
 
 The scripts used to produce the results of the PeV gamma-ray analysis
 
+## Documentation
+
+The documentation for pev_photons is at https://zdgriffith.github.io/pev_photons/
+
 ## Directories
 
 * all_sky

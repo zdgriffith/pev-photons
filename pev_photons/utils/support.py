@@ -15,15 +15,15 @@ prefix = '/data/user/zgriffith/pev_photons/'
 # Directory to store plots
 fig_dir = '/home/zgriffith/public_html/pev_photons/'
 
+# Directory for dag related files
+dag_dir = '/scratch/zgriffith/'
+
 ########################################################################
 ########################################################################
 
 # Directory where files are kept that are only accessed,
 # not written to.
 resource_dir = '/data/user/zgriffith/pev_photons/resources/'
-
-# Directory for dag related files
-dag_dir = '/scratch/zgriffith/'
 
 # The matplotlib plotting stylesheet.
 plot_style = resource_dir+'gamma_rays_5yr.mplstyle'

@@ -1,7 +1,5 @@
 .. _setup:
 
-:github_url: https://github.com/zdgriffith/pev_photons
-
 ******
 Set Up
 ******
@@ -28,7 +26,7 @@ in ``pev_photons`` to activate the environment. Alternatively, if on an EL7 mach
 
 Note this redefines your python path, leaving the environment with ``deactivate`` will reset the python path to what it was before entering the environment. This will also add ``pev_photons`` to your python path.
 
-To following package versions are necessary:
+The exact package versions used are listed here:
 
 ============  =======
 Package       Version     
@@ -52,14 +50,15 @@ You can create your own virtual environment with these packages using ``exact_en
 
 If you go this route, make sure ``pev_photons`` is in your python path before proceeding.
 
-----------------------
-Setting the File Paths 
-----------------------
+-------------------------
+Setting up the File Paths 
+-------------------------
 
-The file ``pev_photons/utils/support.py`` has two paths that should be changed to the location you want to store the files:
+The analysis scripts produce data files and plots which contain the results.  The file ``pev_photons/utils/support.py`` has paths that should be changed to the location you want to store these files:
 
-1.  ``prefix`` defines the base directory where generated data files should be stored.
-2.  ``fig_dir`` defines the base directory where generated plots should be stored.
+1.  ``prefix``:  the base directory where generated data files should be stored.
+2.  ``fig_dir``:  the base directory where generated plots should be stored.
+3.  ``dag_dir``:  the directory where dagman log files should be stored.
 
 Change these paths to your personal directories.  Then, run:
 
