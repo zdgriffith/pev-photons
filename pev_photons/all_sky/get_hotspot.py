@@ -10,8 +10,9 @@ import healpy as hp
 
 from pev_photons.utils.load_datasets import load_dataset
 from pev_photons.utils.support import prefix
+from pev_photons.TeVCat.hess_source_errors import error_profile
 
-def test_hotspot(ps_llh, ra, dec):
+def test_hotspot(ps_llh, ra, dec, errors=False):
     """ fit for a point source at the location of the all-sky-scan hotspot """
 
     hotspot = np.empty((1,),
@@ -19,13 +20,20 @@ def test_hotspot(ps_llh, ra, dec):
                               ('TS', np.float), ('nsources', np.float),
                               ('gamma', np.float)])
 
-    fit = ps_llh.fit_source(ra, dec, scramble = False)
+    TS, xmin = ps_llh.fit_source(ra, dec, scramble = False)
+    fit = dict({'TS':TS}, **xmin) 
 
     hotspot['ra'] = np.degrees(ra)
     hotspot['dec'] = np.degrees(dec)
-    hotspot['TS'] = fit[0]
-    hotspot['nsources'] = fit[1]['nsources']
-    hotspot['gamma'] = fit[1]['gamma']
+    hotspot['TS'] = TS
+    hotspot['nsources'] = xmin['nsources']
+    hotspot['gamma'] = xmin['gamma']
+
+    if errors:
+        n_errors = error_profile(ps_llh, ra, dec, fit,
+                                 nsources=np.arange(0, 100, 0.1))
+        gamma_errors = error_profile(ps_llh, ra, dec, fit,
+                                     gamma=np.arange(0.99, 4.01, 0.01))
 
     pairs = [hotspot.dtype.names[i]+': %0.2f' % val for i, val in enumerate(hotspot[0])]
     for pair in pairs:
@@ -60,4 +68,4 @@ if __name__ == "__main__":
 
     ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
     ra, dec = get_hotspot_direction()
-    test_hotspot(ps_llh, ra, dec)
+    test_hotspot(ps_llh, ra, dec, errors=True)
