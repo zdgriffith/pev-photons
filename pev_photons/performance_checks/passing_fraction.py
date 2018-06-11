@@ -84,7 +84,7 @@ def passing_fraction(args, sel='ps', suffix=''):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-            description='Create an all sky TS map',
+            description='Plot the passing fraction of data and gamma rays.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--years', type=str, nargs='+', default=['all'],
                    help=('Year(s) to plot.  If "all", '
