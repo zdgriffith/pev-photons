@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import healpy as hp
 
@@ -275,8 +276,10 @@ if __name__ == "__main__":
     ax.yaxis.set_ticks(yts)
     ax.set_xlabel('l [$^\circ$]')
     ax.set_ylabel('b [$^\circ$]')
-    ax.text(-30.5, -4.75, 'IceCube Preliminary', color='r', fontsize=14, zorder=5)
     plt.gca().invert_yaxis()
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="2%", pad=0.05)
+    fig.colorbar(imgp, cax=cax, label='-log$_{10}$p')
     plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.pdf')
     plt.savefig(fig_dir+'paper/hess_sources.pdf')
     plt.close()
