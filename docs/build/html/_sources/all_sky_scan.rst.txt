@@ -1,0 +1,17 @@
+.. _all_sky_scan:
+
+**************
+All-Sky Search
+**************
+
+The following scripts are within the ``pev_photons/all_sky`` directory.
+
+------------
+All-Sky Scan
+------------
+
+.. code-block:: bash
+
+    python all_sky_scan.py --ncpu *desired_ncpu*
+
+This produces the file ``skymap.npy``, which is a healpy map of the test statistic for a point source at each pixel in the field of view.

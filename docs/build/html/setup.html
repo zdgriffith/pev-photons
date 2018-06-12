@@ -26,8 +26,10 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="All-Sky Search" href="all_sky_search.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 
   
@@ -74,14 +76,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Set Up</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#accessing-the-environment">Accessing the Environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#setting-the-file-paths">Setting the File Paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-the-file-paths">Setting up the File Paths</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="all_sky_search.html">All-Sky Search</a></li>
 </ul>
 
             
@@ -121,8 +127,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -135,10 +139,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            
-              <!-- User defined GitHub URL -->
-              <a href="https://github.com/zdgriffith/pev_photons" class="fa fa-github"> Edit on GitHub</a>
-            
+            <a href="_sources/setup.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -152,7 +153,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="set-up">
-<h1>Set Up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h1>
+<span id="setup"></span><h1>Set Up<a class="headerlink" href="#set-up" title="Permalink to this headline">¶</a></h1>
 <p>Currently you must run these scripts on a cobalt testbed or a submitter node.</p>
 <div class="section" id="accessing-the-environment">
 <h2>Accessing the Environment<a class="headerlink" href="#accessing-the-environment" title="Permalink to this headline">¶</a></h2>
@@ -166,7 +167,7 @@
 </pre></div>
 </div>
 <p>Note this redefines your python path, leaving the environment with <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> will reset the python path to what it was before entering the environment. This will also add <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code> to your python path.</p>
-<p>To following package versions are necessary:</p>
+<p>The exact package versions used are listed here:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="63%" />
@@ -213,12 +214,13 @@
 </div>
 <p>If you go this route, make sure <code class="docutils literal notranslate"><span class="pre">pev_photons</span></code> is in your python path before proceeding.</p>
 </div>
-<div class="section" id="setting-the-file-paths">
-<h2>Setting the File Paths<a class="headerlink" href="#setting-the-file-paths" title="Permalink to this headline">¶</a></h2>
-<p>The file <code class="docutils literal notranslate"><span class="pre">pev_photons/utils/support.py</span></code> has two paths that should be changed to the location you want to store the files:</p>
+<div class="section" id="setting-up-the-file-paths">
+<h2>Setting up the File Paths<a class="headerlink" href="#setting-up-the-file-paths" title="Permalink to this headline">¶</a></h2>
+<p>The analysis scripts produce data files and plots which contain the results.  The file <code class="docutils literal notranslate"><span class="pre">pev_photons/utils/support.py</span></code> has paths that should be changed to the location you want to store these files:</p>
 <ol class="arabic simple">
-<li><code class="docutils literal notranslate"><span class="pre">prefix</span></code> defines the base directory where generated data files should be stored.</li>
-<li><code class="docutils literal notranslate"><span class="pre">fig_dir</span></code> defines the base directory where generated plots should be stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">prefix</span></code>:  the base directory where generated data files should be stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">fig_dir</span></code>:  the base directory where generated plots should be stored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">dag_dir</span></code>:  the directory where dagman log files should be stored.</li>
 </ol>
 <p>Change these paths to your personal directories.  Then, run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python pev_photons/make_directories.py

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; pev_photons 0.1 documentation</title>
+  <title>All-Sky Search &mdash; pev_photons 0.1 documentation</title>
   
 
   
@@ -26,9 +26,8 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -57,7 +56,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -74,17 +73,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Set Up</a></li>
-</ul>
-<p class="caption"><span class="caption-text">User Guide</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="all_sky_search.html">All-Sky Search</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hess_source_search.html">H.E.S.S. Source Search</a></li>
-<li class="toctree-l1"><a class="reference internal" href="galactic_plane.html">Galactic Plane</a></li>
-<li class="toctree-l1"><a class="reference internal" href="performance_checks.html">Performance Checks</a></li>
 </ul>
 
             
@@ -130,12 +122,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>All-Sky Search</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/all_sky_scan.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -147,19 +141,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="all-sky-search">
+<span id="all-sky-scan"></span><h1>All-Sky Search<a class="headerlink" href="#all-sky-search" title="Permalink to this headline">¶</a></h1>
+<p>The following scripts are within the <code class="docutils literal notranslate"><span class="pre">pev_photons/all_sky</span></code> directory.</p>
+<div class="section" id="id1">
+<h2>All-Sky Scan<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python all_sky_scan.py --ncpu *desired_ncpu*
+</pre></div>
+</div>
+<p>This produces the file <code class="docutils literal notranslate"><span class="pre">skymap.npy</span></code>, which is a healpy map of the test statistic for a point source at each pixel in the field of view.</p>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
@@ -205,7 +198,6 @@
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -215,14 +207,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>
