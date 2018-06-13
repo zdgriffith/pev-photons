@@ -43,7 +43,7 @@ Finally, to plot the all-sky scan in a South Polar projection (figure 8 in the p
    :scale: 50 %
    :alt: all sky scan
 
-   **Figure 8**:  All-sky likelihood scan pre-trial p-values shown projected from the south pole in equatorial units.  The right ascension is labeled along the figure axes, with the interior text denoting declination bands.  The green circle highlights the hottest spot in the scan.  The Galactic plane region (:math:`<`5:math:`^{\circ}` in Galactic latitude) is also shown.
+   **Figure 8**:  All-sky likelihood scan pre-trial p-values shown projected from the south pole in equatorial units.  The right ascension is labeled along the figure axes, with the interior text denoting declination bands.  The green circle highlights the hottest spot in the scan.  The Galactic plane region (:math:`<5^{\circ}` in Galactic latitude) is also shown.
 
 -------
 Hotspot
@@ -118,7 +118,7 @@ This produces the left plot of figure 7 in the paper.
    :scale: 50 %
    :alt: point source sensitivity
 
-   **Figure 9**:  Sensitivity and discovery potential to E:math:`^{-2.0}` (solid) and E:math:`^{-2.7}` (dashed) sources at 1 PeV are shown in blue and red, respectively.  In purple are the extrapolations up to 1 PeV of H.E.S.S. sources in the analysis field of view under the scenario of no break in the best fit energy spectrum but including attenuation.  Error bars indicate the statistical uncertainty, while the systematic uncertainty is represented by the shaded boxes.
+   **Figure 9**:  Sensitivity and discovery potential to :math:`E^{-2.0}` (solid) and :math:`E^{-2.7}` (dashed) sources at 1 PeV are shown in blue and red, respectively.  In purple are the extrapolations up to 1 PeV of H.E.S.S. sources in the analysis field of view under the scenario of no break in the best fit energy spectrum but including attenuation.  Error bars indicate the statistical uncertainty, while the systematic uncertainty is represented by the shaded boxes.
 
 ^^^^^^^^^^^^
 Coarse Steps
