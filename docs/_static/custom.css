@@ -28,3 +28,18 @@
 .wy-side-nav-search input[type="text"] {
   border: 0px;
 }
+
+div.highlight {
+  background: #f8f8f8;
+}
+
+.rst-content div.figure p.caption {
+  font-style: normal;
+  border-style: solid;
+  border-color: #dfdfdf;
+  padding: 5px;
+}
+
+.wy-table thead, .rst-content table.docutils thead, .rst-content table.field-list thead {
+    background-color: #abb2c7;
+}
