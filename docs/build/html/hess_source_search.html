@@ -168,7 +168,82 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python hess_ts_to_pvalue.py
 </pre></div>
 </div>
-<p>Note that this requires the unique declination background trials produce in the <code class="docutils literal notranslate"><span class="pre">all_sky</span></code> section.  Add <code class="docutils literal notranslate"><span class="pre">--use_original_trials</span></code> to use the trials we generated instead.</p>
+<p>Note that this requires the unique declination background trials produce in the <code class="docutils literal notranslate"><span class="pre">all_sky</span></code> section.  Add <code class="docutils literal notranslate"><span class="pre">--use_original_trials</span></code> to use the trials we generated instead.  Finally, to calculate the sensitivity to each H.E.S.S. source at 1 PeV, given an unbroken power law with the best fit spectral index from H.E.S.S. data, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python hess_sensitivities.py --ncpu *desired_ncpu*
+</pre></div>
+</div>
+<p>Combining the information from this section should give you results consistent with the following table:</p>
+<table border="1" class="colwidths-auto docutils" id="id1">
+<caption><span class="caption-text">Individual H.E.S.S. Source Fit Results</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Source</th>
+<th class="head"><span class="math notranslate">\(\delta\)</span> [<span class="math notranslate">\(^{\circ}\)</span>]</th>
+<th class="head"><span class="math notranslate">\(\alpha\)</span> [<span class="math notranslate">\(^{\circ}\)</span>]</th>
+<th class="head">pre-trial p-value</th>
+<th class="head"><span class="math notranslate">\(n_s\)</span></th>
+<th class="head"><span class="math notranslate">\(\gamma\)</span></th>
+<th class="head">Sens. at 1 PeV (x <span class="math notranslate">\(10^{-20}\)</span>)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>HESS J1356-645</td>
+<td>209.00</td>
+<td>-64.50</td>
+<td>…</td>
+<td>0.0</td>
+<td>…</td>
+<td>3.72</td>
+</tr>
+<tr class="row-odd"><td>HESS J1507-622</td>
+<td>226.72</td>
+<td>-62.35</td>
+<td>0.29</td>
+<td>2.5</td>
+<td>1.3</td>
+<td>4.75</td>
+</tr>
+<tr class="row-even"><td>SNR G292.2-00.5</td>
+<td>169.75</td>
+<td>-61.40</td>
+<td>0.30</td>
+<td>10.0</td>
+<td>4.0</td>
+<td>8.97</td>
+</tr>
+<tr class="row-odd"><td>Kookaburra (Rabbit)</td>
+<td>214.52</td>
+<td>-60.98</td>
+<td>0.31</td>
+<td>3.7</td>
+<td>1.8</td>
+<td>4.96</td>
+</tr>
+<tr class="row-even"><td>HESS J1458-608</td>
+<td>224.54</td>
+<td>-60.87</td>
+<td>0.22</td>
+<td>9.1</td>
+<td>2.4</td>
+<td>1.88</td>
+</tr>
+<tr class="row-odd"><td>HESS J1427-608</td>
+<td>216.97</td>
+<td>-60.85</td>
+<td>0.07</td>
+<td>25.9</td>
+<td>3.2</td>
+<td>12.10</td>
+</tr>
+<tr class="row-even"><td>Kookaburra (PWN)</td>
+<td>215.04</td>
+<td>-60.76</td>
+<td>0.49</td>
+<td>1.8</td>
+<td>2.2</td>
+<td>4.31</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="stacking-test">
 <h2>Stacking Test<a class="headerlink" href="#stacking-test" title="Permalink to this headline">¶</a></h2>
@@ -177,8 +252,8 @@
 </pre></div>
 </div>
 <p>The results are stored in <code class="docutils literal notranslate"><span class="pre">{prefix}/TeVCat/stacking_fit_result.npy</span></code>.  It should match the following table:</p>
-<table border="1" class="colwidths-auto docutils" id="id1">
-<caption><span class="caption-text">H.E.S.S. Catalog Stacking Result</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<table border="1" class="colwidths-auto docutils" id="id2">
+<caption><span class="caption-text">H.E.S.S. Catalog Stacking Result</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Test Statistic</th>
 <th class="head">p-value</th>
