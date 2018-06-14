@@ -118,7 +118,7 @@ This produces the left plot of figure 7 in the paper.
    :scale: 50 %
    :alt: point source sensitivity
 
-   **Figure 9**:  Sensitivity and discovery potential to :math:`E^{-2.0}` (solid) and :math:`E^{-2.7}` (dashed) sources at 1 PeV are shown in blue and red, respectively.  In purple are the extrapolations up to 1 PeV of H.E.S.S. sources in the analysis field of view under the scenario of no break in the best fit energy spectrum but including attenuation.  Error bars indicate the statistical uncertainty, while the systematic uncertainty is represented by the shaded boxes.
+   **Figure 7 (left)**:  Sensitivity and discovery potential to :math:`E^{-2.0}` (solid) and :math:`E^{-2.7}` (dashed) sources at 1 PeV are shown in blue and red, respectively.  In purple are the extrapolations up to 1 PeV of H.E.S.S. sources in the analysis field of view under the scenario of no break in the best fit energy spectrum but including attenuation.  Error bars indicate the statistical uncertainty, while the systematic uncertainty is represented by the shaded boxes.
 
 ^^^^^^^^^^^^
 Coarse Steps
