@@ -66,3 +66,68 @@ This adds the p-value to the fit results file created earlier.  To skip generati
    * - 0.22
      - 0.276
      - 150.70
+
+-----------------------
+Sensitivity Calculation
+-----------------------
+
+To determine the sensitivity to the required level of precision (~1% uncertainty), we run signal injection trials on the cluster.  First, we determine a reasonable range of injection points with:
+
+.. code-block:: bash
+
+    python sensitivity_test.py
+
+Which runs 100 trials per injection point.  This step can be ommitted if you simply wish to compare final results.  Next, we run 10,000 trials at each injection points on the cluster.  **On submitter**, execute:
+
+.. code-block:: bash
+
+    python cluster_sens_trials.py
+
+Finally, perform a :math:`\chi^2` fit on the fraction of trials above 0 as a function of the number of injected events with:
+
+.. code-block:: bash
+
+    python sens_fit.py
+
+This yields the :math:`n_s` value which corresponds to a fraction of trials above 0 at 0.90 with 1% precision and calculates the corresponding flux.  The output (stored at ``{prefix}/template/fermi_pi0_sens.npy``, should match the following table:
+
+.. list-table:: Fermi Template Sensitivity Result
+   :widths: auto
+   :header-rows: 1
+
+   * - :math:`n_s` 
+     - :math:`n_s` error
+     - Flux [:math:`GeV^{−1}cm^{-2}s^{-1}`]
+     - Flux error
+   * - 491.2
+     - 2.3
+     - 2.63e-22
+     - 1.23e-24
+
+-----
+Plots
+-----
+
+To produce a plot with ARGO-YBJ, CASA-MIA, IC-40, and IC-86 fields-of-view overlaid on the Fermi :math:`\pi^0` skymap (figure 13(left) in the paper), run:
+
+.. code-block:: bash
+
+    python plot_fov.py
+
+.. figure:: _static/FOV_comparison.png
+   :scale: 50 %
+   :alt: Experimental FOV comparisons
+
+   **Figure 13 (left)**:  The respective field of views of CASA-MIA, ARGO-YBJ, IC-40, and this analysis overlaid on a map of the :math:`\pi^0` decay component of the Fermi-LAT galactic plane diffuse emission model.
+
+To produce the plot comparing upper limits on the normalization of the Fermi pi0 decay emission model (figure 13(right) in the paper), run:
+
+.. code-block:: bash
+
+    python plot_galactic_limit.py --fermi_limit
+
+.. figure:: _static/fermi_integrated_limit.png
+   :scale: 50 %
+   :alt: Fermi pi0 template flux limit
+
+   **Figure 13 (right)**:  The IceCube 90% confidence level upper limit on the flux from the :math:`\pi^0` decay component of the Fermi-LAT galactic plane diffuse emission model in our field of view as compared to results from ARGO-YBJ, CASA-MIA, and IC-40. Dotted lines show the E :math:`^{-3.0}` spectrum, used for obtaining IceCube upper limits, over the energy range containing 5% to 95% events in the final sample. Also shown are unattenuated and attenuated flux predictions from Vernetto 2017. 
