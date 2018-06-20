@@ -280,6 +280,6 @@ if __name__ == "__main__":
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     fig.colorbar(imgp, cax=cax, label='-log$_{10}$p')
-    plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.pdf')
+    plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.png')
     plt.savefig(fig_dir+'paper/hess_sources.pdf')
     plt.close()

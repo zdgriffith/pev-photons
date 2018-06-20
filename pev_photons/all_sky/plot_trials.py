@@ -66,6 +66,6 @@ if __name__ == "__main__":
     plt.xlim([0,50])
     plt.ylim([0.5,Ntrials])
     plt.tight_layout()
-    plt.savefig(fig_dir+'all_sky/all_sky_trials.pdf')
+    plt.savefig(fig_dir+'all_sky/all_sky_trials.png')
     plt.savefig(fig_dir+'paper/all_sky_trials.pdf')
     plt.close()

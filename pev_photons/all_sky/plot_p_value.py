@@ -29,10 +29,10 @@ if __name__ == "__main__":
 
     if args.extension:
         inFile = prefix + 'all_sky/ext/p_value_skymap_ext_%s.npy' % args.extension
-        outFile = 'all_sky_scan_ext_%s.pdf' % args.extension
+        outFile = 'all_sky_scan_ext_%s.png' % args.extension
     else:
         inFile = prefix + 'all_sky/p_value_skymap.npy'
-        outFile = 'all_sky_scan.pdf'
+        outFile = 'all_sky_scan.png'
 
     fig, ax = plt.subplots(figsize=(12,8))
 
@@ -64,7 +64,6 @@ if __name__ == "__main__":
                     edgecolor='g', facecolor='none')
 
     ax.legend()
-    skymap.plot_prelim()
     plt.savefig(fig_dir+'all_sky/'+outFile)
     if args.HESE:
         plt.savefig(fig_dir+'paper/hese_events.pdf')

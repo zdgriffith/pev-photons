@@ -126,7 +126,7 @@ if __name__ == "__main__":
     plt.xlabel('Energy [TeV]', fontweight='bold')
     plt.xscale('log')
     plt.yscale('log')
-    plt.savefig(fig_dir+'TeVCat/hess_source_%s.pdf' % args.index)
+    plt.savefig(fig_dir+'TeVCat/hess_source_%s.png' % args.index)
     if args.index==5:
         plt.savefig(fig_dir+'paper/hess_J1356.pdf')
     plt.close()

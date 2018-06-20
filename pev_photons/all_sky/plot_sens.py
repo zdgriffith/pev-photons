@@ -116,6 +116,6 @@ if __name__ == "__main__":
     plt.yscale('log')
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
-    plt.savefig(fig_dir+'all_sky/sensitivity.pdf', bbox_inches='tight')
+    plt.savefig(fig_dir+'all_sky/sensitivity.png', bbox_inches='tight')
     plt.savefig(fig_dir+'paper/sensitivity.pdf', bbox_inches='tight')
     plt.close()
