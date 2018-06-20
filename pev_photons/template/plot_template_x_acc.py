@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Plot a skymap projected with the South Pole at the center.
+# Plot a template PDF convolved with detector acceptance.
 ########################################################################
 
 import argparse
@@ -16,7 +16,7 @@ from pev_photons.utils.skymap import PolarSkyMap
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-                   description='Plot a skymap with a south polar projection.',
+                   description='Plot a template PDF convolved with detector acc.',
                    formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--name', type = str,
                    default='fermi_pi0',
@@ -53,7 +53,7 @@ if __name__ == "__main__":
                         **scatter_args)
     
     ax.legend()
-    plt.savefig(fig_dir+'template/'+args.name+'_x_acc.pdf',
+    plt.savefig(fig_dir+'template/'+args.name+'_x_acc.png',
                 bbox_inches='tight')
     if args.name == 'fermi_pi0':
         plt.savefig(fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
