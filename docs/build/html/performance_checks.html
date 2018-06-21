@@ -28,7 +28,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Galactic Plane" href="galactic_plane.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -80,8 +81,16 @@
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Set Up</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Guide</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="all_sky_search.html">All-Sky Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hess_source_search.html">H.E.S.S. Source Searches</a></li>
+<li class="toctree-l1"><a class="reference internal" href="galactic_plane.html">Galactic Plane</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Performance Checks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#effective-area">Effective Area</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#angular-resolution">Angular Resolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Angular Resolution</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -149,6 +158,39 @@
   <div class="section" id="performance-checks">
 <span id="id1"></span><h1>Performance Checks<a class="headerlink" href="#performance-checks" title="Permalink to this headline">¶</a></h1>
 <p>The following scripts reproduce the plots in the paper which related to reconstruction and event selection performance.  All scripts are within the <code class="docutils literal notranslate"><span class="pre">pev_photons/performance_checks</span></code> directory.</p>
+<div class="section" id="effective-area">
+<h2>Effective Area<a class="headerlink" href="#effective-area" title="Permalink to this headline">¶</a></h2>
+<p>The effective area to gamma rays a function of true energy for all dataset years is illustrated by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python eff_area_comp.py --sigmoid --noBins
+</pre></div>
+</div>
+<div class="figure" id="id3">
+<a class="reference internal image-reference" href="_images/eff_area_comp.png"><img alt="Effective Area to Gamma Rays" src="_images/eff_area_comp.png" style="width: 400.0px; height: 300.0px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 2</strong>:  IceTop’s effective area to gamma rays simulated with snow heights from each year of the data-taking period of the analysis. All cuts listed in Section ref{sec:qc} were applied. In 2011 a pre-scaling factor of three was applied for events where the shower triggered less than eight stations which produces the lower effective area relative to the amount of snow.</span></p>
+</div>
+</div>
+<div class="section" id="angular-resolution">
+<h2>Angular Resolution<a class="headerlink" href="#angular-resolution" title="Permalink to this headline">¶</a></h2>
+<p>To plot the angular resolution for gamma rays as a function of true energy for the 2011 and 2015 analysis years weighted to an <span class="math notranslate">\(E^{-2.0}\)</span> spectrum, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python ang_res.py
+</pre></div>
+</div>
+<div class="figure" id="id4">
+<a class="reference internal image-reference" href="_images/ang_res_years.png"><img alt="Angular Resolution to Gamma Rays" src="_images/ang_res_years.png" style="width: 400.0px; height: 300.0px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 3</strong>:  Angular resolution to gamma rays from simulation using detector response with snow heights from the first and last year of the data-taking period of the analysis.</span></p>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>Angular Resolution<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>To plot the fraction of quality-cut level events that survive the gamma-hadron separation cut, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python passing_fraction.py
+</pre></div>
+</div>
+<div class="figure" id="id5">
+<a class="reference internal image-reference" href="_static/passing_vs_energy.png"><img alt="Passing Fractions" src="_static/passing_vs_energy.png" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 6</strong>:  Fraction of events at the quality cut level which pass the gamma-hadron discrimination cut for gamma ray simulation and data as a function of energy.  Both the point source and Galactic plane component event selections are shown.</span></p>
+</div>
+</div>
 </div>
 
 
