@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import dashi
 from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
+@profile
 def final_sample(args, year, sel, level, label):
     f = {'level3':{}, 'level4':{}}
     if level == 'level3':
@@ -31,6 +32,7 @@ def final_sample(args, year, sel, level, label):
             f = np.load(resource_dir+'datasets/'+year+'_mc_'+sel+'.npy')
             return f['logE'], f['ow']
 
+@profile
 def passing_fraction(args, sel='ps', suffix=''):
     if 'all' in args.years:
         args.years = ['2011', '2012', '2013', '2014', '2015']
@@ -107,6 +109,6 @@ if __name__ == "__main__":
     plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/passing_vs_energy.pdf')
+    plt.savefig(fig_dir+'performance_checks/passing_vs_energy.png')
     plt.savefig(fig_dir+'paper/passing_vs_energy.pdf')
     plt.close()

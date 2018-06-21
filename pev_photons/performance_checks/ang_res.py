@@ -74,6 +74,6 @@ if __name__ == "__main__":
     l = plt.legend()
     plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/ang_res_years.pdf')
+    plt.savefig(fig_dir+'performance_checks/ang_res_years.png')
     plt.savefig(fig_dir+'paper/ang_res_years.pdf')
     plt.close()

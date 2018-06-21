@@ -148,6 +148,6 @@ if __name__ == "__main__":
                    ncol=5, fancybox=False)
     plot_setter(plt.gca(),l)
 
-    plt.savefig(fig_dir+'performance_checks/eff_area_comp.pdf')
+    plt.savefig(fig_dir+'performance_checks/eff_area_comp.png')
     plt.savefig(fig_dir+'paper/eff_area_comp.pdf')
     plt.close()

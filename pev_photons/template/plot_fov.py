@@ -113,5 +113,5 @@ if __name__ == "__main__":
     ax.set_xlabel('Galactic Longitude [$^{\circ}$]', fontsize=30)
     ax.set_ylabel('Galactic Latitude [$^{\circ}$]', fontsize=30)
 
-    plt.savefig(fig_dir+'template/FOV_comparison.pdf')
+    plt.savefig(fig_dir+'template/FOV_comparison.png')
     plt.savefig(fig_dir+'paper/FOV_comparison.pdf')

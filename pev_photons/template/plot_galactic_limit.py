@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     if args.fermi_limit:
         ax.set_ylabel(r'$E^2\Phi_{template}$ [GeV cm${}^{-2}$ s${}^{-1}$]')
-        plt.savefig(fig_dir+'template/fermi_integrated_limit.pdf')
+        plt.savefig(fig_dir+'template/fermi_integrated_limit.png')
         #plt.savefig(fig_dir+'paper/fermi_integrated_limit.pdf', bbox_inches='tight')
         plt.savefig(fig_dir+'paper/fermi_integrated_limit.eps', bbox_inches='tight')
     else:
