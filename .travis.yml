@@ -7,7 +7,7 @@ jobs:
     - env:
       - PYTHON=2.7
       - COVERAGE='false'
-      - DOCS='True'
+      - DOCS='true'
 
 script:
     - if [[ $DOCS == 'true' ]]; then source ci/build_docs.sh; fi
