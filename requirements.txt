@@ -5,3 +5,4 @@ scipy
 pandas
 healpy
 sphinx
+sphinx_rtd_theme
