@@ -115,7 +115,7 @@ To produce a plot with ARGO-YBJ, CASA-MIA, IC-40, and IC-86 fields-of-view overl
     python plot_fov.py
 
 .. figure:: _static/FOV_comparison.png
-   :scale: 50 %
+   :scale: 35 %
    :alt: Experimental FOV comparisons
 
    **Figure 13 (left)**:  The respective field of views of CASA-MIA, ARGO-YBJ, IC-40, and this analysis overlaid on a map of the :math:`\pi^0` decay component of the Fermi-LAT galactic plane diffuse emission model.
