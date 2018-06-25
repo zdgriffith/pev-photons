@@ -1,32 +1,12 @@
 # pev_photons
+[![Build Status](https://travis-ci.org/zdgriffith/pev_photons.svg?branch=master)](https://travis-ci.org/zdgriffith/pev_photons)
 
-The scripts used to produce the results of the PeV gamma-ray analysis
+This repository contains the scripts used to produce the results of the 5-year PeV gamma-ray analysis with IceTop and IceCube.
 
 ## Documentation
 
 The documentation for pev_photons is at https://zdgriffith.github.io/pev_photons/
 
-## Directories
+## Installation
 
-* all_sky
-    : Scripts related to the all-sky component of the analysis
-
-* TeVCat
-    : Scripts for analysis of TeVCat (HESS) sources with the 5-year gamma-ray dataset
-
-* template
-    : The scripts related to the template components of the gamma-ray analysis.
-
-* performance_checks
-    : Scripts testing the performance of reconstruction, event selection, etc.
-
-* event_selection
-    : Scripts used to create the event selection and produce files at the final cut level
-
-* utils
-    : support files
-
-## Scripts
-
-* make_directories.py
-    : Create all necessary directories in the specified file path, if necessary.
+See the [installation instructions](https://zdgriffith.github.io/pev_photons/installation.html) in the [documentation](https://zdgriffith.github.io/pev_photons/).
