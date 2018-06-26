@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # Plotting set up
     dashi.visual()
     plt.style.use(plot_style)
-    colors = plt.rcParams['axes.color_cycle']
+    colors = ['#250000', '#630000', '#a00000', '#dd2800', '#ff7a00', '#ffcd9a']
 
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
 
