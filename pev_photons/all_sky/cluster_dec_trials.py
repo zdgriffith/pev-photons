@@ -1,60 +1,69 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Submit a dagman to the cluster for calculating background trials
+# Submit a dag to the cluster for calculating background trials
 # for each declination value in a healpix map within the FOV.
 ########################################################################
 
 import argparse
 import os
 import sys
+from itertools import product
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
+
+def construct_dag(dag_maker, n_decs=342, test=False, nJobs=4, nTrials=25000):
+    """ Construct a dag for point source LLH background trials.
+
+    Parameters
+    ----------
+    n_decs : int
+        The number of unique declination values.  342 for an n_side of 512.
+    test : bool
+        Denotes whether this is a test on a non-submitter node.
+    nJobs : int
+        The number of jobs to run for a single declination value.
+    nTrials : int
+        The number of trials to run per job.
+
+    Returns
+    -------
+    ex : str
+        a bash executable to pass to os.system()
+    """
+    script = os.path.join(os.getcwd(), 'one_dec_ts.py')
+    dag_file = os.path.join(dag_maker.temp_dir, dag_maker.name+'.dag')
+    with open(dag_file, 'w+') as dag:
+        for i, (dec, job) in enumerate(product(range(n_decs), range(nJobs))):
+            arg = ' --job {} --dec_i {}'.format(job, dec)
+            arg += ' --n_trials {} '.format(nTrials)
+
+            if test:
+                return ' '.join(['python', cmd, arg])
+            else:
+                dag_maker.write(dag=dag, index=i, arg=script+arg,
+                                submit_file=resource_dir+'basic.submit',
+                                prefix=prefix) 
+    return 'condor_submit_dag -f {}'.format(dag_file)
 
 if __name__ == "__main__":
-
     p = argparse.ArgumentParser(description='Submit trials to the cluster.',
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
-                   help='Option for running test off cluster.')
-    p.add_argument('--maxjobs', type=str, default='1200',
-                   help='Max jobs running on the cluster.')
+                   help='Option for running off the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
     p.add_argument('--nJobs', type=int, default=4,
-                   help='The number of jobs to submit at each point.')
+                   help='The number of jobs to submit at each declination.')
     p.add_argument('--nTrials', type=int, default=25000,
-                   help='The number of trials run per job.')
+                   help='The number of trials to run per job.')
     args = p.parse_args()
 
-    script = os.getcwd() + '/one_dec_ts.py'
+    dag_maker = DagMaker(name='ps_dec_trials', temp_dir=dag_dir)
+    if args.rm_old:
+        dag_maker.remove_old(prefix=prefix)
 
-    if args.test:
-        cmd = 'python '+script 
-    else:
-        dag_name = prefix+'dagman/ps_dec_trials.dag'
-        ex       = ('condor_submit_dag -f -maxjobs '
-                    + args.maxjobs + ' ' + dag_name)
-
-        if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
-            os.system('rm '+dag_name[:-3]+'*')
-
-        dag = open(dag_name, "w+")
-    
-    job_num = 0 
-    unique_decs = 342 # For Nside = 512
-    for dec_i in range(unique_decs):
-        for job in range(args.nJobs):
-            arg  = ' --job %s --dec_i %s' % (job, dec_i)
-            arg += ' --n_trials %s ' % (args.nTrials)
-            if args.test:
-                ex  = ' '.join([cmd, arg])
-            else:
-                #arg = script+arg
-                dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'basic.submit\n')
-                dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
-            job_num += 1
+    ex = construct_dag(dag_maker, test=args.test, nJobs=args.nJobs,
+                       nTrials=args.nTrials)
     os.system(ex)
