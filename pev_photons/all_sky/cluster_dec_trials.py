@@ -18,6 +18,8 @@ def construct_dag(dag_maker, n_decs=342, test=False, nJobs=4, nTrials=25000):
 
     Parameters
     ----------
+    dag_maker : DagMaker instance
+        Class instance that contains info for creating dag files.
     n_decs : int
         The number of unique declination values.  342 for an n_side of 512.
     test : bool

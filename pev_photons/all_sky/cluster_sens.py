@@ -8,8 +8,43 @@
 import argparse
 import os
 import sys
+from itertools import product
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
+
+def construct_dag(dag_maker, test=False):
+    """ Construct a dag for point source sensitivity.
+
+    Parameters
+    ----------
+    dag_maker : DagMaker instance
+        Class instance that contains info for creating dag files.
+    test : bool
+        Denotes whether this is a test on a non-submitter node.
+
+    Returns
+    -------
+    ex : str
+        a bash executable to pass to os.system()
+    """
+    script = os.path.join(os.getcwd(), 'sens_on_cluster.py')
+    dag_file = os.path.join(dag_maker.temp_dir, dag_maker.name+'.dag')
+    indices = [2.0,2.7]
+    dec_bounds = [-85, -53.4]
+    decs = range(int((dec_bounds[1] - dec_bounds[0])*10))
+    with open(dag_file, 'w+') as dag:
+        for i, (dec, index) in enumerate(product(decs, indices)):
+            arg  = ' --dec %s' % dec
+            arg += ' --index %s' % index
+
+            if test:
+                return ' '.join(['python', cmd, arg])
+            else:
+                dag_maker.write(dag=dag, index=i, arg=script+arg,
+                                submit_file=resource_dir+'basic.submit',
+                                prefix=prefix) 
+    return 'condor_submit_dag -f {}'.format(dag_file)
 
 if __name__ == "__main__":
 
@@ -17,46 +52,14 @@ if __name__ == "__main__":
                           formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
                    help='Option for running test off cluster')
-    p.add_argument('--maxjobs', type=str, default='1200',
-                   help='Max jobs running on the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
     args = p.parse_args()
 
-    script = os.getcwd() + '/sens_on_cluster.py'
+    dag_maker = DagMaker(name='ps_sensitivity', temp_dir=dag_dir)
+    if args.rm_old:
+        dag_maker.remove_old(prefix=prefix)
 
-    if args.test:
-        cmd = 'python '+script 
-    else:
-        dag_name = prefix+'dagman/ps_sens.dag'
-        ex = ('condor_submit_dag -f -maxjobs ' + args.maxjobs
-              + ' ' + dag_name)
-
-        if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
-            os.system('rm '+dag_name[:-3]+'*')
-
-        dag = open(dag_name, "w+")
-
-    #dec_0 = -85
-    #dec_1 = -53.4
-    dec_0 = -70
-    dec_1 = -69
-
-    job_num = 0
-    for index in [2.0,2.7]:
-        for i in range(int((dec_1-dec_0)*10)):
-            dec = dec_0+i/10.
-            arg  = ' --dec %s' % dec
-            arg += ' --index %s' % index
-            arg += ' --index %s' % index
-            if args.test:
-                ex  = ' '.join([cmd, arg])
-            else:
-                dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'basic.submit\n')
-                dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
-            job_num += 1
-
+    ex = construct_dag(dag_maker, test=args.test, nJobs=args.nJobs,
+                       nTrials=args.nTrials)
     os.system(ex)
