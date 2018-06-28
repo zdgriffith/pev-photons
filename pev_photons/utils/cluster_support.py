@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import random
 from itertools import product
 
 class DagMaker():
@@ -54,7 +55,7 @@ class DagMaker():
                                                               self.name))
 
     def submit(self, script, test=None, static_args=None,
-               iters=None, submit_file=None, prefix=None):
+               iters=None, submit_file=None, prefix=None, random_seed=False):
         """ Construct a dag file and submit to the cluster.
 
         Parameters
@@ -72,6 +73,8 @@ class DagMaker():
             the .submit file for the dag to use.
         prefix : str
             The directory where output files are stored.
+        random_seed : bool
+            If True, generate a seed for the "--seed" argument.
 
         Returns
         -------
@@ -90,6 +93,9 @@ class DagMaker():
             for i, indices in enumerate(product(*iters.values())):
                 arg = args + ' '.join('--{} {}'.format(iters.keys()[j], val)
                                       for j, val in enumerate(indices))
+                if random_seed:
+                    arg += ' --seed {} '.format(random.randint(0, 10**8))
+                    
                 if test:
                     return ' '.join(['python', script, arg])
                 else:

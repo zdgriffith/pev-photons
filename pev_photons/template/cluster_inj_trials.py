@@ -4,12 +4,11 @@
 ## Submit a dagman to the cluster for template sensitivity trials
 ########################################################################
 
-import os
-import sys
-import random
 import argparse
+import os
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
 
 if __name__ == "__main__":
 
@@ -17,6 +16,8 @@ if __name__ == "__main__":
                    formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
                    help='Option for running test off cluster.')
+    p.add_argument('--rm_old', action='store_true', default=False,
+                   help='Remove old dag files?')
     p.add_argument('--nJobs', type=int, default=50,
                    help='The number of jobs to submit.')
     p.add_argument('--nTrials', type=int, default=200,
@@ -25,45 +26,25 @@ if __name__ == "__main__":
                    help='Spectral index of signal.')
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='Name of the template.')
-    p.add_argument('--maxjobs', type=str, default='1200',
-                   help='Max jobs running on the cluster.')
-    p.add_argument('--rm_old', action='store_true', default=False,
-                   help='Remove old dag files?')
     args = p.parse_args()
 
-    script = os.getcwd() + '/inj_trials.py'
-
-    if args.test:
-        cmd = 'python '+script 
-    else:
-        dag_name = prefix+'dagman/'+args.name+'_sens_trials.dag'
-        ex       = ('condor_submit_dag -f -maxjobs '
-                    + args.maxjobs + ' ' + dag_name)
-
-        if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
-            os.system('rm '+dag_name[:-3]+'*')
-
-        dag = open(dag_name, "w+")
-    
     # Range, intervals of injected events best found through a course
     # run on sensitivity_test.py first. 
     inj_list = {'fermi_pi0':[20., 98., 176., 254., 332., 410.,
                              488., 566., 644., 722., 800.],
                 'ingelman':range(0,601,50),
                 'cascades':range(0,501,50)}
-    job_num = 0 
-    for n_inj in inj_list[args.name]:
-        for job in range(args.nJobs):
-            arg  = ' --job %s --n_inj %s' % (job_num, n_inj)
-            arg += ' --alpha %s --seed %s ' % (args.alpha, random.randint(0,10**8))
-            arg += ' --n_trials %s --name %s' % (args.nTrials, args.name)
-            if args.test:
-                ex  = ' '.join([cmd, arg])
-            else:
-                dag.write('JOB ' + str(job_num) + ' ' + resource_dir+'extra_memory.submit\n')
-                dag.write('VARS ' + str(job_num) + ' script=\"' + script + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' ARGS=\"' + arg + '\"\n')
-                dag.write('VARS ' + str(job_num) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
-            job_num += 1
+
+    dag_maker = DagMaker(name=args.name+'sens_trials', temp_dir=dag_dir)
+    if args.rm_old:
+        dag_maker.remove_old(prefix=prefix)
+
+    static_args = {'n_trials': args.nTrials, 'name': args.name,
+                   'alpha': args.alpha}
+    iters = {'job': range(args.nJobs), 'n_inj': inj_list[args.name]}
+    ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'inj_trials.py'),
+                          static_args=static_args, iters=iters,
+                          submit_file=os.path.join(resource_dir,
+                                                   'extra_memory.submit'),
+                          test=args.test, prefix=prefix, random_seed=True)
     os.system(ex)

@@ -4,12 +4,11 @@
 ## Submit a dagman to the cluster for template background trials.
 ########################################################################
 
-import os
-import sys
-import random
 import argparse
+import os
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
 
 if __name__ == "__main__":
 
@@ -23,42 +22,22 @@ if __name__ == "__main__":
                    help='The number of trials run per job.')
     p.add_argument('--name', type=str, default='fermi_pi0',
                    help='Name of the template.')
-    p.add_argument('--maxjobs', type=str, default='1200',
-                   help='Max jobs running on the cluster.')
     p.add_argument("--alpha", type=float, default=3.0,
                     help="Power law index")
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
-    p.add_argument('--rescue', action='store_true', default=False,
-                   help='Option for submitting the rescue file.')
     args = p.parse_args()
 
-    script = os.getcwd() + '/run_template_analysis.py'
+    dag_maker = DagMaker(name=args.name+'_bg_trials', temp_dir=dag_dir)
+    if args.rm_old:
+        dag_maker.remove_old(prefix=prefix)
 
-    if args.test:
-        cmd = 'python '+script 
-    else:
-        dag_name = prefix+'dagman/'+args.name+'_bg_trials.dag'
-        ex       = ('condor_submit_dag -f -maxjobs '
-                    + args.maxjobs + ' ' + dag_name)
-
-        if args.rm_old:
-            print('Deleting '+dag_name[:-3]+' files...')
-            os.system('rm '+dag_name[:-3]+'*')
-
-        dag = open(dag_name, "w+")
-    
-    for job in range(args.nJobs):
-        arg  = ' --job %s ' % job
-        arg += ' --alpha %s ' % args.alpha
-        arg += ' --seed %s ' % random.randint(0,10**8)
-        arg += ' --bg_trials %s --name %s' % (args.nTrials, args.name)
-        if args.test:
-            ex  = ' '.join([cmd, arg])
-        else:
-            dag.write('JOB ' + str(job) + ' ' + resource_dir+'extra_memory.submit\n')
-            dag.write('VARS ' + str(job) + ' script=\"' + script + '\"\n')
-            dag.write('VARS ' + str(job) + ' ARGS=\"' + arg + '\"\n')
-            dag.write('VARS ' + str(job) + ' log_dir=\"' + prefix+'dagman/logs/' + '\"\n')
-
+    static_args = {'bg_trials': args.nTrials, 'name': args.name,
+                   'alpha': args.alpha}
+    iters = {'job': range(args.nJobs)}
+    ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'run_template_analysis.py'),
+                          static_args=static_args, iters=iters,
+                          submit_file=os.path.join(resource_dir,
+                                                   'extra_memory.submit'),
+                          test=args.test, prefix=prefix, random_seed=True)
     os.system(ex)
