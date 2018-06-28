@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+from itertools import product
 
 class DagMaker():
     """ Class for executing DagMan related tasks
@@ -51,3 +52,48 @@ class DagMaker():
                                                             self.name))
         dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(index, prefix,
                                                               self.name))
+
+    def submit(self, script, test=None, static_args=None,
+               iters=None, submit_file=None, prefix=None):
+        """ Construct a dag file and submit to the cluster.
+
+        Parameters
+        ----------
+        script : str
+            The name of the script to execute.
+        test : bool
+            Denotes whether to run a test job on a non-submitter node.
+        static_args : dict, optional
+            argument name and value pairs which do not change for each job.
+        iters : dict
+            argument names and lists of values pairs
+            which have one for each jobs submitted.
+        submit_file: str
+            the .submit file for the dag to use.
+        prefix : str
+            The directory where output files are stored.
+
+        Returns
+        -------
+        ex : str
+            a bash executable to pass to os.system()
+        """
+        
+        if static_args is not None:
+            args = ' '.join('--{} {}'.format(key, static_args[key])
+                                             for key in static_args.keys())
+            args = ' {} '.format(args)
+        else:
+            args = ' '
+        dag_file = os.path.join(self.temp_dir, self.name+'.dag')
+        with open(dag_file, 'w+') as dag:
+            for i, indices in enumerate(product(*iters.values())):
+                arg = args + ' '.join('--{} {}'.format(iters.keys()[j], val)
+                                      for j, val in enumerate(indices))
+                if test:
+                    return ' '.join(['python', script, arg])
+                else:
+                    self.write(dag=dag, index=i, arg=script+arg,
+                               submit_file=submit_file,
+                               prefix=prefix) 
+        return 'condor_submit_dag -f {}'.format(dag_file)
