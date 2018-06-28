@@ -32,7 +32,7 @@ if __name__ == "__main__":
         dag_maker.remove_old(prefix=prefix)
 
     static_args = {'n_trials': args.nTrials}
-    iters = {'nJobs': range(args.nJobs), 'dec_i': range(args.n_decs)}
+    iters = {'job': range(args.nJobs), 'dec_i': range(args.n_decs)}
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'one_dec_ts.py'),
                           static_args=static_args, iters=iters,
                           submit_file=os.path.join(resource_dir, 'basic.submit'),
