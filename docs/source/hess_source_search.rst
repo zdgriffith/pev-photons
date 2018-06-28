@@ -162,9 +162,15 @@ Run the stacked likelihood test for all H.E.S.S. source combined by executing:
 
 .. code-block:: bash
 
-    python all_sky_scan.py --ncpu *desired_ncpu*
+    python stacking_test.py
 
-The results are stored in ``{prefix}/TeVCat/stacking_fit_result.npy``.  It should match the following table:
+The results are stored in ``{prefix}/TeVCat/stacking_fit_result.npy``. To generate background trials use:
+
+.. code-block:: bash
+
+    python stacking_test.py --bg_trials 100000 --ncpu *desired_ncpu*
+
+The results should match the following table:
 
 .. list-table:: H.E.S.S. Catalog Stacking Result
    :widths: auto
