@@ -7,59 +7,34 @@
 
 import argparse
 import os
-import sys
-from itertools import product
 
 from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
 
 if __name__ == "__main__":
 
-    p = argparse.ArgumentParser(description='Runs sensitivity evaluation on cluster',
+    p = argparse.ArgumentParser(description='Sensitivity evaluation on the cluster.',
                           formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--test', action='store_true', default=False,
-                   help='Option for running test off cluster')
-    p.add_argument('--maxjobs', type=str, default='1200',
-                   help='Max jobs running on the cluster.')
+                   help='Option for running a test job off the cluster.')
     p.add_argument('--rm_old', action='store_true', default=False,
                    help='Remove old dag files?')
     p.add_argument("--systematic", help='Systematic to test.')
     p.add_argument("--year", help='Data year.')
     args = p.parse_args()
 
-    script = os.getcwd() + '/sens_on_cluster.py'
+    dag_maker = DagMaker(name='ps_sensitivity', temp_dir=dag_dir)
+    if args.rm_old:
+        dag_maker.remove_old(prefix=prefix)
 
-    if args.test:
-        cmd = 'python '+script 
-        dag_name = ''
-    else:
-        dag_name = 'ps_sens_{}_{}'.format(args.systematic, args.year)
+    indices = [2.0] # each of the spectral indices to submit
+    dec_bounds = [-85, -53.4] # the range in declination to test
+    static_args = {'systematic': args.systematic, 'year': args.year}
+    iters = {'index': indices,
+             'dec': range(int((dec_bounds[1] - dec_bounds[0])*10))}
 
-        if args.rm_old:
-            print('Deleting '+dag_name+' files...')
-            os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
-            os.system('rm '+os.path.join(prefix, 'dagman', dag_name)+'*')
-        dag_file = os.path.join(dag_dir, dag_name+'.dag')
-        dag = open(dag_file, "w+")
-
-    indices = [2.0]#, 2.7]
-    dec_0 = -85
-    dec_1 = -53.4
-    decs = [dec_0 + i/10. for i in range(int((dec_1-dec_0)*10))]
-
-    for job, (index, dec) in enumerate(product(indices, decs)):
-        arg =  '{} '.format(script)
-        arg += '--dec {} --index {} --systematic {}'.format(dec, index, args.systematic)
-        arg += ' --year {}'.format(args.year)
-        if args.test:
-            ex  = ' '.join([cmd, arg])
-            os.system(ex)
-        else:
-            dag.write('JOB {} {}/basic.submit\n'.format(job, resource_dir))
-            #dag.write('VARS {} script=\"{}\"\n'.format(job, script))
-            dag.write('VARS {} ARGS=\"{}\"\n'.format(job, arg))
-            dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(job, dag_dir, dag_name))
-            dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(job, prefix, dag_name))
-
-    if not args.test:
-        ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_file)
-        os.system(ex)
+    ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'sens_on_cluster.py'),
+                          submit_file=os.path.join(resource_dir, 'basic.submit'),
+                          static_args=static_args,
+                          iters=iters, test=args.test, prefix=prefix)
+    os.system(ex)
