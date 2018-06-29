@@ -18,6 +18,9 @@ class DagMaker():
         self.name = name
         self.temp_dir = temp_dir
 
+    def __repr__(self):
+        return ('{}(name={})'.format(self.__class__.__name__, self.name))
+
     def remove_old(self, prefix=None):
         """ Remove dag related files from previous submission.
 

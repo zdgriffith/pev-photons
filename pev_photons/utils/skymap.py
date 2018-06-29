@@ -37,6 +37,9 @@ class PolarSkyMap(object):
         self.basemap = Basemap(projection='spstere',
                                boundinglat=-50, lon_0=0)
 
+    def __repr__(self):
+        return ('{}(projection={})'.format(self.__class__.__name__,
+                                             self.basemap.projection))
 
     def plot_grid(self):
         """ Plot grid lines. """
@@ -128,4 +131,5 @@ class PolarSkyMap(object):
         for i, ra in enumerate(events['ra']):
             self.basemap.tissot(ra, events['dec'].values[i], events['err'].values[i],
                                 40, edgecolor='k', facecolor='none',
+                                alpha=0.3,
                                 linewidth=2, zorder=4)
