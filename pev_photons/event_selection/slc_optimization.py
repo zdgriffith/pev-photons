@@ -44,7 +44,7 @@ def slc_plot(f, cos_zen):
 
     plt.xlabel('t$_{pulse}$ - t$_{trigger}$ ($\mu s$)')
     plt.ylabel('Vertical DOM Number')
-    plt.colorbar(label='Hits')
+    plt.colorbar(label='Number of Hit DOMs')
     plt.tight_layout()
 
     plt.savefig(fig_dir+'event_selection/slcs_cosZen_%.2f.png' % zen_min)
