@@ -1,26 +1,24 @@
 #!/usr/bin/env python
+
+########################################################################
+# Level3 processing of IceTop data.
+# https://wiki.icecube.wisc.edu/index.php/IceTop_Level3_file_structure
+########################################################################
+
+import sys
+import os.path
+import argparse
+import re
+import glob
+
 from icecube import icetray
-import re, glob
-
-def get_detector_from_filename(input_file):
-    m = re.search("Level[^_]+_(IC[^_]+)_", input_file)
-    if not m:
-        raise ValueError("cannot parse %s for detector config" % input_file)
-    return m.group(1)
-
+from pev_photons.utils.support import prefix
 
 def get_run_from_filename(input_file):
     result = None
-    m = re.search("Run([0-9]+)", input_file)
+    m = re.search('Run([0-9]+)', input_file)
     if not m:
-        raise ValueError("cannot parse %s for Run number" % input_file)
-    return int(m.group(1))
-
-def get_dataset_from_filename(input_file):
-    result = None
-    m = re.search("icetop.00([0-9]+).", input_file) # Works for IC79 MC 
-    if not m:
-        raise ValueError("cannot parse %s for dataset" % input_file)
+        raise ValueError('cannot parse %s for Run number' % input_file)
     return int(m.group(1))
 
 def main(args, outputLevel=2):
@@ -29,19 +27,20 @@ def main(args, outputLevel=2):
     from icecube.icetop_Level3_scripts import icetop_globals
 
     icetray.I3Logger.global_logger.set_level(icetray.I3LogLevel.LOG_ERROR)
-    icetray.I3Logger.global_logger.set_level_for_unit("MakeQualityCuts",icetray.I3LogLevel.LOG_INFO)
+    icetray.I3Logger.global_logger.set_level_for_unit('MakeQualityCuts',icetray.I3LogLevel.LOG_INFO)
     
     if not args.L3_gcdfile:
+        pre = '/data/ana/CosmicRay/IceTop_level3/'
         if args.isMC:
-            gcdfile=["/data/ana/CosmicRay/IceTop_level3/sim/%s/GCD/Level3_%i_GCD.i3.gz"%(args.detector, args.dataset)]
+            gcdfile = [pre+'sim/%s/GCD/Level3_%i_GCD.i3.gz' % (args.detector, args.dataset)]
         else:
-            gcdfile=glob.glob("/data/ana/CosmicRay/IceTop_level3/exp/%s/GCD/Level3_%s_data_Run00%i_????_GCD.i3.gz"%(args.detector, args.detector, args.run))
+            gcdfile = glob.glob(pre+'exp/%s/GCD/Level3_%s_data_Run00%i_????_GCD.i3.gz' % (args.detector, args.detector, args.run))
     else:
         gcdfile = [args.L3_gcdfile]
         
     # Instantiate a tray
     tray = I3Tray()
-    tray.AddModule( 'I3Reader', 'Reader', FilenameList = gcdfile + args.inputFiles)
+    tray.AddModule('I3Reader', 'Reader', FilenameList=gcdfile + args.input_files)
 
     from icecube.frame_object_diff.segments import uncompress
     
@@ -49,15 +48,15 @@ def main(args, outputLevel=2):
     # If the L2 gcd file is provided (probably in the case when running on your own cluster and when you copied the diff and L2 GCDs there), 
     # then you use this, but you check first whether the filename makes sense (is the same as the base_filename used for compression). 
     def CheckL2GCD(frame):
-        geodiff=frame["I3GeometryDiff"]
+        geodiff=frame['I3GeometryDiff']
         if args.L2_gcdfile:
             L2_GCD = args.L2_gcdfile
             if os.path.basename(L2_GCD) != os.path.basename(geodiff.base_filename):
-                icetray.logging.log_fatal("The provided L2 GCD seems not suited to use for uncompressing the L3 GCD. It needs to have the same filename as the L2 GCD used to create the diff.")
+                icetray.logging.log_fatal('The provided L2 GCD seems not suited to use for uncompressing the L3 GCD. It needs to have the same filename as the L2 GCD used to create the diff.')
         else:
             L2_GCD = geodiff.base_filename
         if not os.path.exists(L2_GCD):
-            icetray.logging.log_fatal("L2 GCD file %s not found" % L2_GCD)
+            icetray.logging.log_fatal('L2 GCD file %s not found' % L2_GCD)
 
     tray.AddModule(CheckL2GCD,'CheckL2CD',
                    Streams=[icetray.I3Frame.Geometry])
@@ -65,34 +64,21 @@ def main(args, outputLevel=2):
     tray.Add(uncompress,
              base_filename=args.L2_gcdfile) # works correctly if L2_gcdfile is None
         
-    tray.AddSegment(icetop_Level3_scripts.segments.level3_IceTop, "level3_IceTop",
+    tray.AddSegment(icetop_Level3_scripts.segments.level3_IceTop, 'level3_IceTop',
                     detector=args.detector,
-                    do_select = args.select,
+                    do_select=args.select,
                     isMC=args.isMC,
                     add_jitter=args.add_jitter,
-                    snowLambda=args.snowLambda
+                    snowLambda=snow_lambda
                     )
     
     if args.do_inice:
-        itpulses='IceTopHLCSeedRTPulses'
-            
-        if args.spe_corr:
-            def fix_spe(frame,pulses):
-                if pulses in frame: # Although InIcePulses should always be there                                                                                                                            
-                    corr = dataclasses.I3RecoPulseSeriesMapApplySPECorrection(pulses,"I3Calibration")
-                    corrpulses = corr.apply(frame)
-                    frame.Delete(pulses)
-                    frame[pulses] = corrpulses
-                return True
-
-            tray.AddModule(fix_spe, "fixspe",pulses=icetop_globals.names["Level3"]["InIcePulses"],Streams=[icetray.I3Frame.DAQ, icetray.I3Frame.Physics])
-
-        tray.AddSegment(icetop_Level3_scripts.segments.level3_Coinc,"level3_Coinc",
+        tray.AddSegment(icetop_Level3_scripts.segments.level3_Coinc, 'level3_Coinc',
                         Detector=args.detector,
                         isMC=args.isMC,
                         do_select=args.select,
                         IceTopTrack='Laputop',
-                        IceTopPulses=itpulses,
+                        IceTopPulses='IceTopHLCSeedRTPulses',
                         )
 
     if args.waveforms:
@@ -101,7 +87,7 @@ def main(args, outputLevel=2):
                        pulses=icetop_globals.icetop_hlc_pulses,
                        If = lambda frame: icetop_globals.icetop_hlc_pulses in frame and count_stations(dataclasses.I3RecoPulseSeriesMap.from_frame(frame, icetop_globals.icetop_hlc_pulses)) >= 5)
         tray.AddSegment(icetop_Level3_scripts.segments.ExtractWaveforms, 'IceTop',
-                       If= lambda frame: "IceTopWaveformWeight" in frame and frame["IceTopWaveformWeight"].value!=0)    
+                       If= lambda frame: 'IceTopWaveformWeight' in frame and frame['IceTopWaveformWeight'].value!=0)    
                   
     ## Which keys to keep:
     wanted_general=['I3EventHeader',
@@ -172,22 +158,22 @@ def main(args, outputLevel=2):
         wanted_inice_pulses=[icetop_globals.inice_pulses,
                              icetop_globals.inice_coinc_pulses,
                              icetop_globals.inice_clean_coinc_pulses,
-                             icetop_globals.inice_clean_coinc_pulses+"TimeRange",
-                             icetop_globals.inice_clean_coinc_pulses+"_Balloon",
+                             icetop_globals.inice_clean_coinc_pulses+'TimeRange',
+                             icetop_globals.inice_clean_coinc_pulses+'_Balloon',
                              'InIceDSTPulses',
                              'I3SuperDST',
-                             "SaturationWindows",
-                             "CalibrationErrata",
+                             'SaturationWindows',
+                             'CalibrationErrata',
                              'SRT'+icetop_globals.inice_coinc_pulses,
                              'NCh_'+icetop_globals.inice_clean_coinc_pulses]
 
-        wanted_inice_reco=["Millipede",
-                           "MillipedeFitParams",
-                           "Millipede_dEdX",
-                           "Stoch_Reco",
-                           "Stoch_Reco2",
-                           "I3MuonEnergyLaputopCascadeParams",
-                           "I3MuonEnergyLaputopParams"
+        wanted_inice_reco=['Millipede',
+                           'MillipedeFitParams',
+                           'Millipede_dEdX',
+                           'Stoch_Reco',
+                           'Stoch_Reco2',
+                           'I3MuonEnergyLaputopCascadeParams',
+                           'I3MuonEnergyLaputopParams'
                            ]
    
         wanted_inice_cuts=['IT73AnalysisInIceQualityCuts']
@@ -211,29 +197,29 @@ def main(args, outputLevel=2):
                            'CoincMuonReco_MPEFitDirectHitsC'
                            ]
 
-        wanted=wanted+wanted_inice_pulses+wanted_inice_reco+wanted_inice_cuts+ wanted_inice_muon
+        wanted = wanted + wanted_inice_pulses + wanted_inice_reco + wanted_inice_cuts + wanted_inice_muon
 
-    tray.AddModule("Keep", 'DropObjects',
-                   Keys = wanted
+    tray.AddModule('Keep', 'DropObjects',
+                   Keys=wanted
                    )
     
-    if args.output.replace('.bz2', '').replace('.gz','')[-3:] == '.i3':
-        tray.AddModule("I3Writer", "i3-writer",
-                       Filename = args.output,
-                       DropOrphanStreams = [ icetray.I3Frame.DAQ ],
-                       streams = [icetray.I3Frame.DAQ, icetray.I3Frame.Physics],
+    if output.replace('.bz2', '').replace('.gz','')[-3:] == '.i3':
+        tray.AddModule('I3Writer', 'i3-writer',
+                       Filename=output,
+                       DropOrphanStreams=[icetray.I3Frame.DAQ],
+                       streams=[icetray.I3Frame.DAQ, icetray.I3Frame.Physics],
                        )
     else:
-        raise Exception('I do not know how to handle files with extension %s'%args.output.replace('.bz2', '').replace('.gz','')[-3:])
+        raise Exception('I do not know how to handle files with extension %s' % output.replace('.bz2', '').replace('.gz','')[-3:])
 
     if args.livetime or args.histos:
         from icecube.production_histograms import ProductionHistogramModule
         
         if args.histos:
-            tray.AddSegment(icetop_Level3_scripts.segments.MakeHistograms, "makeHistos", OutputFilename=args.histos, isMC=args.isMC)
+            tray.AddSegment(icetop_Level3_scripts.segments.MakeHistograms, 'makeHistos', OutputFilename=args.histos, isMC=args.isMC)
 
         if not args.isMC and args.livetime:
-            tray.Add(ProductionHistogramModule, "LivetimeHistogram",
+            tray.Add(ProductionHistogramModule, 'LivetimeHistogram',
                      Histograms = [icetop_Level3_scripts.histograms.Livetime],
                      OutputFilename = args.livetime
                      )
@@ -246,119 +232,51 @@ def main(args, outputLevel=2):
     else:
         tray.Execute(args.n)
 
-    if args.print_usage:
-        tray.PrintUsage(fraction=1.0)
     tray.Finish()
     
 
 if __name__ == "__main__":
-    import sys
-    import os.path
-    from argparse import ArgumentParser
-    parser = ArgumentParser(usage='%s [arguments] -o <filename>.i3[.bz2|.gz] {N}'%os.path.basename(sys.argv[0]))
-    parser.add_argument("-o", "--output", action="store", type=str, dest="output", help="Output file name", metavar="BASENAME")
-    parser.add_argument("-n", action="store", type=int, dest="n", help="number of frames to process")
-    parser.add_argument("-d", "--det", dest="detector",
-                      help="Detector configuration name, eg: IC79, IC86.2011, IC86.2012. Auto-detected if filename has standard formatting.")
-    parser.add_argument("--waveforms", action="store_true", dest="waveforms", help="Extract waveforms (only if more than 5 stations in HLC VEM pulses)")
-    parser.add_argument("--select", action="store_true", dest="select", help="Apply selection (containment, max. signal and min. stations). Default is to calculate variables but not filter", default=False)
-    parser.add_argument("--print-usage", action="store_true", dest="print_usage", help="Print CPU time usage at the end")
-    parser.add_argument("--debug", action="store_const", dest="log_level", help="Trace log-level", const=1, metavar="N", default=2)
-    parser.add_argument("--trace", action="store_const", dest="log_level", help="Trace log-level", const=0, metavar="N", default=2)
-    parser.add_argument('--L3-gcdfile', dest='L3_gcdfile', help='Manually specify the L3 (diff) GCD file to be used. When you run in Madison, this is not needed.')
-    parser.add_argument('--L2-gcdfile', dest='L2_gcdfile', help='Manually specify the L2 GCD file to be used. When you run in Madison with the standard L3 GCD diff, this is not needed.')
-    parser.add_argument("-m","--isMC", action="store_true",dest="isMC", help= "Is this data or MC?")
-    parser.add_argument("--dataset",dest="dataset", type=int,help= "Dataset number for MC. Needed when using default GCD, to look for it..")
-    parser.add_argument("--run",dest="run", type=int,help= "Runnumber, needed for data. Needed when using default GCD, to look for it..")
-    parser.add_argument("--add-jitter",action="store_true",dest="add_jitter",help="Do we add extra jitter on the IT pulses?")
-    parser.add_argument("--do-inice", action="store_true",dest="do_inice",help= "Also do in-ice reco?")
-    parser.add_argument("--histos", action="store", type=str, dest="histos", help="Histograms file name. Needs to be pickle file", metavar="BASENAME")
-    parser.add_argument("--livetime", action="store", type=str, dest="livetime", help="Livetime file name, only needed for data. Needs to be pickle file", metavar="BASENAME")
-    parser.add_argument("--spe-corr",action="store_true",dest="spe_corr",help="Should we do the SPE correction Level3?")
-    parser.add_argument("--snow-lambda", action="store", type=float, dest="snowLambda", help="Attenuation factor for snow. If not defined, use the one defined for every year.")
-    parser.add_argument('inputFiles',help="Input file(s)",type=str,nargs="*")
 
-    (args) = parser.parse_args()
-    ok=True
+    p = argparse.ArgumentParser(usage='%s [arguments] -o <filename>.i3[.bz2|.gz] {N}' % os.path.basename(sys.argv[0]))
+    p.add_argument('--input_files', help='Input file(s)', nargs='*')
+    p.add_argument('-n', type=int, help='Number of frames to process.')
+    p.add_argument('--detector',
+                   help='Detector configuration name, eg: IC79, IC86.2011.')
+    p.add_argument('--waveforms', action='store_true',
+                   help='Extract waveforms (only if more than 5 stations in HLC VEM pulses)')
+    p.add_argument('--select', action='store_true', default=False,
+                   help=('Apply selection (containment, max. signal and min. stations).'
+                         'Default is to calculate variables but not filter'))
+    p.add_argument('--L2_gcdfile', help='The L2 GCD file to be used.')
+    p.add_argument('--L3_gcdfile', help='The L3 (diff) GCD file to be used.')
+    p.add_argument('--isMC', action='store_true', help= 'Is this data or MC?')
+    p.add_argument('--dataset', type=int, help= 'Dataset number for MC.')
+    p.add_argument('--run', type=int, help= 'Run number, needed for data.')
+    p.add_argument('--add_jitter', action='store_true',
+                   help='Do we add extra jitter on the IT pulses?')
+    p.add_argument('--do_inice', action='store_true',
+                   help= 'Also do in-ice reco?')
+    p.add_argument('--histos', help='Histograms file name. Needs to be a pickle file.')
+    p.add_argument('--livetime', action='store',
+                   help='Livetime file name, only needed for data. Needs to be a pickle file.')
+
+    (args) = p.parse_args()
     
     icetray.I3Logger.global_logger.set_level(icetray.I3LogLevel.LOG_INFO)
 
-    if not len(args.inputFiles)>0:
-        icetray.logging.log_error("No input files found!")
-        ok=False
-    else:
-        # try to supply some args by parsing the input filename
-        if args.detector is None:
-            args.detector = get_detector_from_filename(args.inputFiles[0])
-            icetray.logging.log_info("Auto-detected detector %s" % args.detector)
-        if not args.isMC:  # Filename is only really needed for data...
-            if args.run is None:
-                args.run = get_run_from_filename(args.inputFiles[0])
-                icetray.logging.log_info("Auto-detected run %i" % args.run)
+    outDir = prefix+'datasets/level3/%s/' % args.dataset
+    start = re.split('\.', args.input_files[0])[-3][-6:]
+    end = re.split('\.', args.input_files[-1])[-3][-6:]
+    output = '%s/%s_part%s-%s.i3.gz' % (outDir, args.dataset, start, end)
 
+    SnowFactor = {'IC79': 2.1, 'IC86.2011':2.25,
+                  'IC86.2012':2.25, 'IC86.2013':2.3,
+                  'IC86.2014':2.3, 'IC86.2015':2.3}
+    snow_lambda = SnowFactor[args.detector]
 
-    if not args.L3_gcdfile:
-        icetray.logging.log_info("Using the default L3 GCD.")
-        if args.isMC:
-            if not args.dataset:
-                args.dataset=get_dataset_from_filename(args.inputFiles[0])
-                icetray.logging.log_info("Auto-detected dataset %i" %args.dataset)
-            
-            else:
-                if not os.path.exists("/data/ana/CosmicRay/IceTop_level3/sim/%s/GCD/Level3_%i_GCD.i3.gz"%(args.detector, args.dataset)):
-                    icetray.logging.log_error("The default L3 GCD file is not found.")
-                    ok=False
-        else:
-            if not args.run:
-                icetray.logging.log_error("When using the default L3 GCD for data, you need to specify the run number such that we can look for the correct GCD!")
-                ok=False
-            else:
-                if not os.path.exists(glob.glob("/data/ana/CosmicRay/IceTop_level3/exp/%s/GCD/Level3_%s_data_Run00%i_????_GCD.i3.gz"%(args.detector, args.detector, args.run))[0]):
-                    icetray.logging.log_error("Default L3 file not found.")
-                    ok=False
-    else:
-        icetray.logging.log_info("Using a user specified L3 GCD file.")
-        if not os.path.exists(args.L3_gcdfile):
-            icetray.logging.log_error(" L3 GCD file not found")
-            ok=False
+    if not args.isMC:  # Filename is only really needed for data...
+        if args.run is None:
+            args.run = get_run_from_filename(args.input_files[0])
+            icetray.logging.log_info('Auto-detected run %i' % args.run)
 
-    if not args.L2_gcdfile:
-        icetray.logging.log_info("Using the default L2 GCD.")
-    else:
-        icetray.logging.log_info("Using a user specified L2 GCD file. This should be the same as the one where the diff is create against! If no error is showing up, this is fine!")
-        if not os.path.exists(args.L2_gcdfile):
-            icetray.logging.log_error(" L2 GCD file not found.")
-            ok=False
-
-    if not args.output:
-        icetray.logging.log_error("Output file not specified!")
-        ok=False
-    else:
-        if len(os.path.dirname(args.output))>0 and not os.path.isdir(os.path.dirname(args.output)):
-            icetray.logging.log_error("Output directory not found.")
-            ok=False
-
-    if not args.isMC:
-        if args.livetime:
-            icetray.logging.log_info("Storing the livetime histo in %s."%args.livetime)
-            if len(os.path.dirname(args.livetime))>0 and not os.path.isdir(os.path.dirname(args.livetime)):
-                icetray.logging.log_error("Directory to store livetime pickle file not found.")
-                ok=False
-            if not args.livetime[-7:]==".pickle":
-                icetray.logging.log_error("livetime parameter needs to be a .pickle file.")
-                ok=False
-
-    if args.histos:
-        icetray.logging.log_info("Storing the histos in %s."%args.histos)
-        if len(os.path.dirname(args.histos))>0 and not os.path.isdir(os.path.dirname(args.histos)):
-            icetray.logging.log_error("Directory to store histos pickle file not found.")
-            ok=False
-        if not args.histos[-7:]==".pickle":
-            icetray.logging.log_error("histos parameter needs to be a .pickle file.")
-            ok=False
-
-    if not ok:
-        parser.print_help()
-    
-    else:
-        main(args, outputLevel=args.log_level)
+    main(args, output=output, snow_lambda=snow_lambda)

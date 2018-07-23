@@ -57,7 +57,7 @@ class DagMaker():
         dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(index, prefix,
                                                               self.name))
 
-    def submit(self, script, test=None, static_args=None,
+    def submit(self, script, test=None, static_args=None, bool_args=None,
                iters=None, submit_file=None, prefix=None, random_seed=False):
         """ Construct a dag file and submit to the cluster.
 
@@ -69,6 +69,8 @@ class DagMaker():
             Denotes whether to run a test job on a non-submitter node.
         static_args : dict, optional
             argument name and value pairs which do not change for each job.
+        static_args : list, optional
+            argument names which are boolean flags for the job.
         iters : dict
             argument names and lists of values pairs
             which have one for each jobs submitted.
@@ -85,12 +87,15 @@ class DagMaker():
             a bash executable to pass to os.system()
         """
         
+        args = ' '
         if static_args is not None:
             args = ' '.join('--{} {}'.format(key, static_args[key])
-                                             for key in static_args.keys())
+                            for key in static_args.keys())
             args = ' {} '.format(args)
-        else:
-            args = ' '
+
+        if bool_args is not None:
+            args = args + ' '.join(name for name in bool_args)
+
         dag_file = os.path.join(self.temp_dir, self.name+'.dag')
         with open(dag_file, 'w+') as dag:
             for i, indices in enumerate(product(*iters.values())):
