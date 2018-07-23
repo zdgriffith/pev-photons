@@ -69,7 +69,7 @@ class DagMaker():
             Denotes whether to run a test job on a non-submitter node.
         static_args : dict, optional
             argument name and value pairs which do not change for each job.
-        static_args : list, optional
+        bool_args : list, optional
             argument names which are boolean flags for the job.
         iters : dict
             argument names and lists of values pairs
