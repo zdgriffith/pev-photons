@@ -39,8 +39,8 @@ def write_job(script, batches, gcd_file, year,
     """
     for i, batch in enumerate(batches):
         out = '{}/{}_{}.hdf5'.format(out_dir, out_name, i)
-        arg = '{} -g {} --year {} -o {}'.format(' '.join(batch), gcd_file,
-                                                year, out)
+        arg = '{} --gcdfile {} --year {} -output {}'.format(' '.join(batch), gcd_file,
+                                                            year, out)
         if isMC:
             arg += ' --isMC'
         if systematics:

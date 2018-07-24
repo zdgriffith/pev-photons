@@ -236,8 +236,7 @@ def main(args, outputLevel=2):
     
 
 if __name__ == "__main__":
-
-    p = argparse.ArgumentParser(usage='%s [arguments] -o <filename>.i3[.bz2|.gz] {N}' % os.path.basename(sys.argv[0]))
+    p = argparse.ArgumentParser()
     p.add_argument('--input_files', help='Input file(s)', nargs='*')
     p.add_argument('-n', type=int, help='Number of frames to process.')
     p.add_argument('--detector',
@@ -259,8 +258,7 @@ if __name__ == "__main__":
     p.add_argument('--histos', help='Histograms file name. Needs to be a pickle file.')
     p.add_argument('--livetime', action='store',
                    help='Livetime file name, only needed for data. Needs to be a pickle file.')
-
-    (args) = p.parse_args()
+    args = p.parse_args()
     
     icetray.I3Logger.global_logger.set_level(icetray.I3LogLevel.LOG_INFO)
 

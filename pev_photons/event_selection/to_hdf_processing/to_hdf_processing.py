@@ -4,13 +4,13 @@
 # Run analysis-level processing on I3 Files, store as HDF Files
 ########################################################################
 
+import argparse
 import os
-import copy
 import sys
-from optparse import OptionParser
+import copy
 import numpy as np
-from sklearn.externals import joblib
 
+from sklearn.externals import joblib
 from I3Tray import I3Tray
 from icecube import icetray, dataio, dataclasses, phys_services, toprec
 from icecube import coinc_twc, static_twc, SeededRTCleaning
@@ -26,6 +26,8 @@ from pev_photons.event_selection.run_laputop import run_laputop
 from pev_photons.utils.support import resource_dir
 
 def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
+    """ Determine which keys get stored in the HDF file. """
+
     # Keep these no matter what.
     keys = ['I3EventHeader', 'charges', 'IceTopLLHRatio']
 
@@ -84,7 +86,7 @@ def reco_quality_cuts(frame, reco='Laputop'):
     """ Calculate quality cuts using the given reconstruction """
     quality_cuts = dataclasses.I3MapStringBool()
 
-    quality_cuts['fit_status'] = (frame[reco].fit_status_string == "OK")
+    quality_cuts['fit_status'] = (frame[reco].fit_status_string == 'OK')
     quality_cuts['containment_cut'] = (frame[reco+'_FractionContainment'] < 1.0)
 
     laputop = frame[reco]
@@ -153,7 +155,7 @@ def laputop_energy(frame, reco='Laputop'):
     else:
         mixed_energy= np.nan
 
-    frame.Put(reco+"_E" , dataclasses.I3Double(10**mixed_energy))
+    frame.Put(reco+'_E' , dataclasses.I3Double(10**mixed_energy))
 
 
 def shift_s125(frame, shift=0.03):
@@ -264,11 +266,11 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
         tray.AddModule(reco_quality_cuts, 'quality_cuts_'+reco, reco=reco)
         tray.AddModule(laputop_energy, 'reco_energy_'+reco, reco=reco)
         tray.AddModule(IceTop_LLH_Ratio, 'IceTop_LLH_ratio_'+reco)(
-                       ("Track", reco), ("Output", reco+'_IceTopLLHRatio'),
-                       ("TwoDPDFPickleYear", year),
-                       ("GeometryHDF5", resource_dir+'/geometry.h5'),
-                       ("checkQuality", True),
-                       ("highEbins", True))
+                       ('Track', reco), ('Output', reco+'_IceTopLLHRatio'),
+                       ('TwoDPDFPickleYear', year),
+                       ('GeometryHDF5', resource_dir+'/geometry.h5'),
+                       ('checkQuality', True),
+                       ('highEbins', True))
         tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
                        random_forests=rf, reco=reco)
         if isMC:
@@ -292,24 +294,22 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
     tray.Finish()
 
 if __name__ == "__main__":
-    parser = OptionParser(usage='%s [args] -o <filename>.i3[.bz2|.gz] {i3 file list}'%os.path.basename(sys.argv[0]))
-    parser.add_option('-g', '--gcdfile', help='The GCD file to be used.')
-    parser.add_option("-o", "--output", action="store", type="string",
-                      help="Output file name", metavar="BASENAME")
-    parser.add_option("--year", help="dataset year")
-    parser.add_option('--isMC', action='store_true', default=False,
+    p = argparse.ArgumentParser()
+    p.add_argument('--input_files', help='Input file(s)', nargs='*')
+    p.add_argument('--output', help='Output file name')
+    p.add_argument('--gcdfile', help='The GCD file to be used.')
+    p.add_argument('--year', help='dataset year')
+    p.add_argument('--isMC', action='store_true', default=False,
                    help='Is this a Monte Carlo dataset?')
-    parser.add_option('--run_migrad', action='store_true', default=False,
+    p.add_argument('--run_migrad', action='store_true', default=False,
                    help='Run Laputop with MIGRAD?')
-    parser.add_option('--systematics', action='store_true', default=False,
+    p.add_argument('--systematics', action='store_true', default=False,
                    help='Process with systematic reconstructions?')
-    parser.add_option('--store_extra', action='store_true', default=False,
+    p.add_argument('--store_extra', action='store_true', default=False,
                    help='Store additional keys in HDF files?')
+    args = p.parse_args()
 
-    (args, event_files) = parser.parse_args()
-
-    in_files = [args.gcdfile] + event_files
-
+    in_files = [args.gcdfile] + args.input_files
     main(in_files, out_file=args.output, year=args.year, isMC=args.isMC,
          systematics=args.systematics, run_migrad=args.run_migrad,
          store_extra=args.store_extra)
