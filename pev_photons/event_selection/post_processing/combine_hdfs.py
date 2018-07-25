@@ -51,7 +51,12 @@ def extract_dataframe(input_file, isMC, systematics=None):
 
         # Quality cuts independent of reconstruction.
         for cut in cut_keys:
-            series_dict[cut] = store['Laputop_quality_cuts'][cut]
+            series_dict[cut] = store['IT73AnalysisIceTopQualityCuts'][cut]
+
+        llh_keys = ['LLH_Ratio', 'LLH_Gamma_q_r', 'LLH_Gamma_q_t', 'LLH_Gamma_t_r',
+                    'LLH_Hadron_q_r', 'LLH_Hadron_q_t', 'LLH_Hadron_t_r']
+        for key in llh_keys:
+            series_dict[key] = store['Laputop_IceTopLLHRatio'][key]
 
         recos = ['Laputop']
         if systematics:
