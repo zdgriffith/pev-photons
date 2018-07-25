@@ -20,7 +20,7 @@ class llh_ratio_test(object):
 
     def load_geometry(self,geofile=os.getcwd()+'/geometry.h5'):
         """ From a geometry file, loads geometry of the detector"""
-        geometry = tables.openFile(geofile)
+        geometry = tables.open_file(geofile)
         self.geo_doms=[]
         self.geo_X = []
         self.geo_Y = []
@@ -109,7 +109,7 @@ class llh_ratio_test(object):
     def load_hdf_file(self,file,llh_calculated=False,skip_non_llh=False,skylab=False,isMC=False):
         """ Load all necessary variables from a hdf file. """
        
-        self.f=tables.openFile(file)
+        self.f=tables.open_file(file)
 
         self.events={}
         self.hist={}
