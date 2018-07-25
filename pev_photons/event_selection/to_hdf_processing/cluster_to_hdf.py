@@ -11,8 +11,9 @@ startTime = datetime.now()
 from pev_photons.utils.support import prefix, resource_dir, dag_dir
 
 def write_job(script, batches, gcd_file, year,
-              out_dir, out_name, dag_name,
-              isMC=False, test=False, systematics=False, job=0):
+              out_dir, out_name, dag_name, isMC=False,
+              test=False, systematics=False, training=False,
+              store_extra=False, job=0):
     """Submit a dag file for Monte Carlo.
 
     Parameters
@@ -35,16 +36,24 @@ def write_job(script, batches, gcd_file, year,
         to the cluster.
     systematics : boolean
         Flag for running systematic processing on the events.
+    training : boolean
+        Flag for processing training data for the classifiers.
+    store_extra : boolean
+        Flag for storing extra dataframe keys.
 
     """
     for i, batch in enumerate(batches):
         out = '{}/{}_{}.hdf5'.format(out_dir, out_name, i)
-        arg = '{} --gcdfile {} --year {} -output {}'.format(' '.join(batch), gcd_file,
-                                                            year, out)
+        arg = '--input_files {} --gcdfile {}'.format(' '.join(batch), gcd_file)
+        arg += ' --year {} --output {}'.format(year, out)
         if isMC:
             arg += ' --isMC'
         if systematics:
             arg += ' --systematics'
+        if training:
+            arg += ' --training'
+        if store_extra:
+            arg += ' --store_extra'
 
         if test:
             cmd = 'python '+script
@@ -126,6 +135,10 @@ if __name__ == "__main__":
                    help='Remove old dag files?')
     p.add_argument('--systematics', action='store_true', default=False,
                    help='Process with systematic reconstructions?')
+    p.add_argument('--training', action='store_true', default=False,
+                   help='Process datasets for training classifiers?')
+    p.add_argument('--store_extra', action='store_true', default=False,
+                   help='Store extra dataframe keys?')
     args = p.parse_args()
 
     script = os.path.join(os.getcwd(), 'to_hdf_processing.py')
@@ -143,6 +156,7 @@ if __name__ == "__main__":
         if args.rm_old:
             print('Deleting '+dag_name+' files...')
             os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
+            os.system('rm '+os.path.join(prefix, 'dagman', dag_name)+'*')
         dag_file = os.path.join(dag_dir, dag_name+'.dag')
         dag = open(dag_file, "w+")
 
@@ -159,11 +173,14 @@ if __name__ == "__main__":
         batches = [files[i:i+args.n] for i in range(0, len(files), args.n)]
         if args.systematics:
             out_dir = prefix+'datasets/systematics/%s/' % args.MC_dataset
+        elif args.training:
+            out_dir = prefix+'datasets/training/%s/' % args.MC_dataset
         else:
             out_dir = prefix+'datasets/%s/' % args.MC_dataset
         write_job(script, batches, gcd_file, args.year, out_dir,
                   out_name=args.MC_dataset, dag_name=dag_name,
-                  isMC=isMC, test=args.test, systematics=args.systematics)
+                  isMC=isMC, test=args.test, systematics=args.systematics,
+                  store_extra=args.store_extra)
     else:
         files, gcd_files = get_data_files(args.year, systematics=args.systematics)
         run_batches = get_data_batches(files, args.n)
@@ -175,7 +192,8 @@ if __name__ == "__main__":
             gcd_file = gcd_files[run]
             job = write_job(script, batches, gcd_file, args.year, out_dir,
                             out_name=run, dag_name=dag_name, test=args.test,
-                            systematics=args.systematics, job=job)
+                            systematics=args.systematics,
+                            store_extra=args.store_extra, job=job)
 
     if not args.test:
         ex = 'condor_submit_dag -f -maxjobs {} {}'.format(args.maxjobs, dag_file)

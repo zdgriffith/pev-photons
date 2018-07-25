@@ -34,7 +34,8 @@ def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     # Reconstruction related keys.
     reco_keys = ['', 'Params', '_FractionContainment',
                  '_inice_FractionContainment', '_E',
-                 '_opening_angle', '_quality_cuts', '_passing']
+                 '_IceTopLLHRatio', '_opening_angle',
+                 '_quality_cuts', '_passing']
     for reco in recos:
         keys += [reco+key for key in reco_keys]
         for alpha in [2.0, 2.7, 3.0]:
@@ -226,21 +227,23 @@ def cut_events(frame, recos=[], threshold=0.7):
 
 
 def main(in_files, out_file, year, isMC=False, systematics=False,
-         run_migrad=False, store_extra=False):
+         run_migrad=False, store_extra=False, training=False):
     
     tray = I3Tray()
     tray.AddModule('I3Reader', 'Reader', FilenameList=in_files)
     tray.AddSegment(uncompress, 'uncompress')
 
-    tray.AddModule(base_quality_cuts, 'base_quality_cuts')
+    if not training or not isMC:
+        tray.AddModule(base_quality_cuts, 'base_quality_cuts')
 
     tray.AddSegment(icecube_cleaning, 'icecube_cleaning')
     tray.AddModule(calculate_inice_charge, 'icecube_charge')
 
-    rf = {}
-    for alpha in ['2.0', '2.7', '3.0']:
-        rf['alpha_'+alpha] = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_'+alpha+'.pkl')
-        rf['alpha_'+alpha].verbose = 0
+    if not training:
+        rf = {}
+        for alpha in ['2.0', '2.7', '3.0']:
+            rf['alpha_'+alpha] = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_'+alpha+'.pkl')
+            rf['alpha_'+alpha].verbose = 0
 
     recos = ['Laputop']
     if run_migrad:
@@ -307,9 +310,11 @@ if __name__ == "__main__":
                    help='Process with systematic reconstructions?')
     p.add_argument('--store_extra', action='store_true', default=False,
                    help='Store additional keys in HDF files?')
+    p.add_argument('--training', action='store_true', default=False,
+                   help='Process training data?')
     args = p.parse_args()
 
     in_files = [args.gcdfile] + args.input_files
     main(in_files, out_file=args.output, year=args.year, isMC=args.isMC,
          systematics=args.systematics, run_migrad=args.run_migrad,
-         store_extra=args.store_extra)
+         store_extra=args.store_extra, training=args.training)
