@@ -273,8 +273,9 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
                        ('GeometryHDF5', resource_dir+'/geometry.h5'),
                        ('checkQuality', True),
                        ('highEbins', True))
-        tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
-                       random_forests=rf, reco=reco)
+        if not training:
+            tray.AddModule(apply_random_forest, 'apply_random_forest_'+reco,
+                           random_forests=rf, reco=reco)
         if isMC:
             tray.AddModule(opening_angle, 'opening_angle_'+reco, reco=reco)
 
