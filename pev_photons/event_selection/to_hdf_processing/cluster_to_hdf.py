@@ -104,17 +104,21 @@ def get_data_batches(files, batch_length):
     return run_batches
 
 
-def get_data_files(year, systematics=False):
+def get_data_files(year, systematics=False, training=False):
     files = []
     if systematics:
         run_files = prefix+'resources/run_files/{}_systematic_run_files.txt'.format(year)
-    else:
-        run_files = prefix+'resources/run_files/{}_good_run_files.txt'.format(year)
+    elif training:
+        run_files = prefix+'resources/run_files/{}_burn_run_files.txt'.format(year)
     with open(run_files) as f:
         for fname in f:
             files.append(fname[:-1])
-    with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
-        gcd_files = json.load(f)
+    if training:
+        with open(prefix+'resources/run_files/{}_burn_gcd_files.json'.format(year)) as f:
+            gcd_files = json.load(f)
+    else:
+        with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
+            gcd_files = json.load(f)
     return files, gcd_files
 
 
@@ -180,12 +184,15 @@ if __name__ == "__main__":
         write_job(script, batches, gcd_file, args.year, out_dir,
                   out_name=args.MC_dataset, dag_name=dag_name,
                   isMC=isMC, test=args.test, systematics=args.systematics,
-                  store_extra=args.store_extra)
+                  training=args.training, store_extra=args.store_extra)
     else:
-        files, gcd_files = get_data_files(args.year, systematics=args.systematics)
+        files, gcd_files = get_data_files(args.year, systematics=args.systematics,
+                                          training=args.training)
         run_batches = get_data_batches(files, args.n)
         if args.systematics:
             out_dir = prefix+'/datasets/systematics/data/'+args.year
+        elif args.training:
+            out_dir = prefix+'datasets/training/data/'+args.year
         else:
             out_dir = prefix+'/datasets/data/'+args.year
         for i, (run, batches) in enumerate(run_batches.iteritems()):
@@ -193,6 +200,7 @@ if __name__ == "__main__":
             job = write_job(script, batches, gcd_file, args.year, out_dir,
                             out_name=run, dag_name=dag_name, test=args.test,
                             systematics=args.systematics,
+                            training=args.training,
                             store_extra=args.store_extra, job=job)
 
     if not args.test:

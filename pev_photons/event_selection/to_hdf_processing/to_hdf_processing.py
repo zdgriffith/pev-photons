@@ -233,8 +233,7 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
     tray.AddModule('I3Reader', 'Reader', FilenameList=in_files)
     tray.AddSegment(uncompress, 'uncompress')
 
-    if not training or not isMC:
-        tray.AddModule(base_quality_cuts, 'base_quality_cuts')
+    tray.AddModule(base_quality_cuts, 'base_quality_cuts')
 
     tray.AddSegment(icecube_cleaning, 'icecube_cleaning')
     tray.AddModule(calculate_inice_charge, 'icecube_charge')
