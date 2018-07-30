@@ -4,7 +4,7 @@
 H.E.S.S. Source Searches
 ************************
 
-Gamma-ray point sources observed by `H.E.S.S. <https://www.mpi-hd.mpg.de/hfm/HESS/>`_ at TeV energies are candidate targets for this analysis.  The scripts used to test for correlation with these sources are within the ``pev_photons/TeVCat`` directory.
+Gamma-ray point sources observed by `H.E.S.S. <https://www.mpi-hd.mpg.de/hfm/HESS/>`_ at TeV energies are candidate targets for this analysis.  The scripts used to test for correlation with these sources are within the ``pev-photons/TeVCat`` directory.
 
 -----------------------
 Individual Source Tests

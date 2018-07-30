@@ -1,4 +1,4 @@
-.. pev_photons documentation master file, created by
+.. pev-photons documentation master file, created by
    sphinx-quickstart on Tue Jun  5 14:06:44 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.

@@ -4,7 +4,7 @@
 All-Sky Search
 **************
 
-The following scripts reproduce the section of the analysis which searches the entire sky for point sources of gamma rays.  All scripts are within the ``pev_photons/all_sky`` directory.
+The following scripts reproduce the section of the analysis which searches the entire sky for point sources of gamma rays.  All scripts are within the ``pev-photons/all_sky`` directory.
 
 ------------
 All-Sky Scan

@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'pev_photons'
+project = u'pev-photons'
 copyright = u'2018, Zachary Griffith'
 author = u'Zachary Griffith'
 
@@ -113,7 +113,7 @@ def setup(app):
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pev_photonsdoc'
+htmlhelp_basename = 'pev-photonsdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -140,7 +140,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pev_photons.tex', u'pev\\_photons Documentation',
+    (master_doc, 'pev-photons.tex', u'pev\\-photons Documentation',
      u'Zachary Griffith', 'manual'),
 ]
 
@@ -150,7 +150,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pev_photons', u'pev_photons Documentation',
+    (master_doc, 'pev-photons', u'pev-photons Documentation',
      [author], 1)
 ]
 
@@ -161,8 +161,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pev_photons', u'pev_photons Documentation',
-     author, 'pev_photons', 'One line description of project.',
+    (master_doc, 'pev-photons', u'pev-photons Documentation',
+     author, 'pev-photons', 'One line description of project.',
      'Miscellaneous'),
 ]
 

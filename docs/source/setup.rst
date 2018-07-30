@@ -18,13 +18,13 @@ Simply run
 
     source enter_environment.sh
 
-in ``pev_photons`` to activate the environment. Alternatively, if on an EL7 machine, use:
+in ``pev-photons`` to activate the environment. Alternatively, if on an EL7 machine, use:
 
 .. code-block:: bash
 
     source enter_environment.sh el_7
 
-Note this redefines your python path, leaving the environment with ``deactivate`` will reset the python path to what it was before entering the environment. This will also add ``pev_photons`` to your python path.
+Note this redefines your python path, leaving the environment with ``deactivate`` will reset the python path to what it was before entering the environment. This will also add ``pev-photons`` to your python path.
 
 The exact package versions used are listed here:
 
@@ -42,19 +42,19 @@ scipy         0.15.1
 skylab        2.0.2
 ============  =======
 
-You can create your own virtual environment with these packages using ``exact_environment.txt`` in ``pev_photons``.  Within a freshly made virtual environment:
+You can create your own virtual environment with these packages using ``exact_environment.txt`` in ``pev-photons``.  Within a freshly made virtual environment:
 
 .. code-block:: bash
 
     pip install -r exact_environment.txt
 
-If you go this route, make sure ``pev_photons`` is in your python path before proceeding.
+If you go this route, make sure ``pev-photons`` is in your python path before proceeding.
 
 -------------------------
 Setting up the File Paths 
 -------------------------
 
-The analysis scripts produce data files and plots which contain the results.  The file ``pev_photons/utils/support.py`` has paths that should be changed to the location you want to store these files:
+The analysis scripts produce data files and plots which contain the results.  The file ``pev-photons/utils/support.py`` has paths that should be changed to the location you want to store these files:
 
 1.  ``prefix``:  the base directory where generated data files should be stored.
 2.  ``fig_dir``:  the base directory where generated plots should be stored.
@@ -64,6 +64,6 @@ Change these paths to your personal directories.  Then, run:
 
 .. code-block:: bash
 
-    python pev_photons/make_directories.py
+    python pev-photons/make_directories.py
 
 This makes the directory and all the subdirectories necessary in both the plot and data file locations if they don't already exist.
