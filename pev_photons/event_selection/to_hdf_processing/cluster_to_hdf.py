@@ -164,6 +164,13 @@ if __name__ == "__main__":
         dag_file = os.path.join(dag_dir, dag_name+'.dag')
         dag = open(dag_file, "w+")
 
+    if args.systematics:
+        ext = 'systematics'
+    elif:
+        ext = 'training'
+    else:
+        ext = ''
+
     job = 0
     if isMC:
         if args.MC_dataset in next(os.walk(prefix+'datasets/level3/'))[1]:
@@ -175,12 +182,7 @@ if __name__ == "__main__":
             gcd_file = os.path.join(path, 'GCD/Level3_{}_GCD.i3.gz'.format(args.dataset))
 
         batches = [files[i:i+args.n] for i in range(0, len(files), args.n)]
-        if args.systematics:
-            out_dir = prefix+'datasets/systematics/%s/' % args.MC_dataset
-        elif args.training:
-            out_dir = prefix+'datasets/training/%s/' % args.MC_dataset
-        else:
-            out_dir = prefix+'datasets/%s/' % args.MC_dataset
+        out_dir = prefix+'datasets/{}/post_processing/{}/{}/'.format(ext, args.year, args.MC_dataset)
         write_job(script, batches, gcd_file, args.year, out_dir,
                   out_name=args.MC_dataset, dag_name=dag_name,
                   isMC=isMC, test=args.test, systematics=args.systematics,
@@ -189,12 +191,7 @@ if __name__ == "__main__":
         files, gcd_files = get_data_files(args.year, systematics=args.systematics,
                                           training=args.training)
         run_batches = get_data_batches(files, args.n)
-        if args.systematics:
-            out_dir = prefix+'/datasets/systematics/data/'+args.year
-        elif args.training:
-            out_dir = prefix+'datasets/training/data/'+args.year
-        else:
-            out_dir = prefix+'/datasets/data/'+args.year
+        out_dir = prefix+'datasets/{}/post_processing/{}/data/'.format(ext, args.year)
         for i, (run, batches) in enumerate(run_batches.iteritems()):
             gcd_file = gcd_files[run]
             job = write_job(script, batches, gcd_file, args.year, out_dir,
