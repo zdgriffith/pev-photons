@@ -283,8 +283,9 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
         tray.AddModule(calculate_containment, 'True_containment',
                        particle='MCPrimary')
     else:
-        tray.AddModule(cut_events, 'cut_events',
-                       recos=recos)
+        if not training:
+            tray.AddModule(cut_events, 'cut_events',
+                           recos=recos)
 
     # Write events to an HDF file
     keys = select_keys(isMC=isMC, store_extra=store_extra, recos=recos)
