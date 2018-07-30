@@ -4,15 +4,41 @@
 # Combine HDF files of a dataset into a single Pandas dataframe.
 ########################################################################
 
+import os
 import argparse
-import glob
 import numpy as np
 import pandas as pd
+from glob import glob
 
 from pev_photons.utils.support import prefix
 from pev_photons.event_selection.post_processing.pandas_writer import get_weights
 
-def extract_dataframe(input_file, isMC, systematics=None):
+def set_to_names(dataset):
+    """ Return the file names corresponding to a given dataset. """
+    if dataset is not None:
+        if dataset in ['12533', '12612', '12613', '12614', '12622']:
+            return dataset, 'gammas'
+    else:
+        return 'data', 'data'
+
+def extract_dataframe(input_file, MC_dataset=None, processing=''):
+    """ Given an HDF file, converts the desired fields
+        to a Pandas dataframe.
+    Parameters
+    ----------
+    input_file : str
+        The name of the HDF file to be converted.
+    MC_dataset : str
+        The dataset number if MC, "None" if data.
+    processing : str, optional
+        The type of file processing. Optional categories
+        are "systematics" and "training".
+
+    Returns
+    -------
+    df : Pandas dataframe
+    """
+   
     with pd.HDFStore(input_file, mode='r') as store:
         series_size = store.get_storer('NStation').nrows
         # Dictionary of key: pd.Series pairs to get converted to pd.DataFrame
@@ -24,7 +50,8 @@ def extract_dataframe(input_file, isMC, systematics=None):
         lap_keys = ['zenith', 'azimuth']
         lap_cut_keys = []
         lap_param_keys = ['s125']
-        if args.complete:
+
+        if processing == 'training':
             value_keys += ['IceTopMaxSignal', 'StationDensity']
             mc_keys += ['x', 'y', 'type']
             cut_keys += ['IceTopMaxSignalAbove6', 'IceTopMaxSignalInside',
@@ -43,11 +70,11 @@ def extract_dataframe(input_file, isMC, systematics=None):
         for key in value_keys:
             series_dict[key] = store[key]['value']
 
-        if isMC:
+        if MC_dataset:
             for key in mc_keys:
                 series_dict['MC_{}'.format(key)] = store['MCPrimary'][key]
-
-        series_dict['weights'] = get_weights(args.dataset, series_dict['MC_energy'], series_dict['NStation'])
+            series_dict['weights'] = get_weights(MC_dataset, series_dict['MC_energy'],
+                                                 series_dict['NStation'])
 
         # Quality cuts independent of reconstruction.
         for cut in cut_keys:
@@ -59,7 +86,7 @@ def extract_dataframe(input_file, isMC, systematics=None):
             series_dict[key] = store['Laputop_IceTopLLHRatio'][key]
 
         recos = ['Laputop']
-        if systematics:
+        if processing == 'systematics':
             recos.extend(['LaputopLambdaUp', 'LaputopLambdaDown',
                           'LaputopS125Up', 'LaputopS125Down'])
         for i, reco in enumerate(recos):
@@ -73,45 +100,41 @@ def extract_dataframe(input_file, isMC, systematics=None):
             for cut in lap_cut_keys:
                 series_dict[reco+'_'+cut] = store[reco+'_quality_cuts'][cut]
             
-            series_dict[reco+'_opening_angle'] = store[reco+'_opening_angle']['value']
+
             series_dict[reco+'_log10_s125'] = np.log10(series_dict[reco+'_s125'])
             series_dict[reco+'_energy'] = store[reco+'_E']['value']
+            series_dict[reco+'_FractionContainment'] = store[reco+'_FractionContainment']['value']
 
-            if args.complete:
-                series_dict[reco+'_FractionContainment'] = store[reco+'_FractionContainment']['value']
+            if MC_dataset:
+                series_dict[reco+'_opening_angle'] = store[reco+'_opening_angle']['value']
                 series_dict[reco+'_core_diff'] = np.sqrt((series_dict[reco+'_x'] - series_dict['MC_x'])**2 +
                                                          (series_dict[reco+'_y'] - series_dict['MC_y'])**2)
-
     df = pd.DataFrame(series_dict)
 
     return df
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-            description='Rewrite HDF files for analysis purposes',
+            description='Convert processed events to a Pandas dataframe.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--dataset', help='Set to run over')
-    p.add_argument('--isMC', action="store_true", default=False,
-                   help='Is this simulation?')
-    p.add_argument('--complete', action="store_true", default=False,
-                   help='Keep much more information.')
-    p.add_argument('--training', action="store_true", default=False,
-                   help='Training datasets?')
-    p.add_argument('--systematics', action="store_true", default=False,
-                   help='Include systematics?')
+    p.add_argument('--year', help='Detector year.')
+    p.add_argument('--MC_dataset', default=None,
+                   help='If simulation, the dataset to run over.')
+    p.add_argument('--processing', choices=['', 'training', 'systematics'],
+                   default='', help=('Processing category.'
+                                     'Default is for the standard analysis.'))
     args = p.parse_args()
 
-    if args.training:
-        file_list = glob.glob(prefix+'/datasets/training/'+args.dataset+'/*.hdf5')
-        outFile = prefix+'/datasets/training/'+args.dataset+'.hdf5'
-    else:
-        file_list = glob.glob(prefix+'/datasets/'+args.dataset+'/*.hdf5')
-        outFile = prefix+'/datasets/'+args.dataset+'.hdf5'
+    set_name, file_name = set_to_names(args.MC_dataset)
 
-    with pd.HDFStore(outFile, mode='w') as output_store:
+    pre = os.path.join(prefix, 'datasets', args.processing)
+    file_list = glob('{}/post_processing/{}/{}/*.hdf5'.format(pre, args.year, set_name))
+    out_file = '{}/pd_dataframes/{}/{}.hdf5'.format(pre, args.year, file_name)
+
+    with pd.HDFStore(out_file, mode='w') as output_store:
         for i, input_file in enumerate(file_list):
             print(i)
-            df = extract_dataframe(input_file, args.isMC,
-                                   systematics=args.systematics)
+            df = extract_dataframe(input_file, args.MC_dataset,
+                                   processing=args.processing)
             output_store.append('dataframe', df, format='table',
                                 data_columns=True, min_itemsize=30)
