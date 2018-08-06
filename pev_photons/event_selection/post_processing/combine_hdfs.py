@@ -72,8 +72,8 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
 
         if MC_dataset:
             for key in mc_keys:
-                series_dict['MC_{}'.format(key)] = store['MCPrimary'][key]
-            series_dict['weights'] = get_weights(MC_dataset, series_dict['MC_energy'],
+                series_dict['true_{}'.format(key)] = store['MCPrimary'][key]
+            series_dict['weights'] = get_weights(MC_dataset, series_dict['true_energy'],
                                                  series_dict['NStation'])
 
         # Quality cuts independent of reconstruction.
@@ -107,8 +107,8 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
 
             if MC_dataset:
                 series_dict[reco+'_opening_angle'] = store[reco+'_opening_angle']['value']
-                series_dict[reco+'_core_diff'] = np.sqrt((series_dict[reco+'_x'] - series_dict['MC_x'])**2 +
-                                                         (series_dict[reco+'_y'] - series_dict['MC_y'])**2)
+                series_dict[reco+'_core_diff'] = np.sqrt((series_dict[reco+'_x'] - series_dict['true_x'])**2 +
+                                                         (series_dict[reco+'_y'] - series_dict['true_y'])**2)
     df = pd.DataFrame(series_dict)
 
     return df
@@ -118,6 +118,8 @@ if __name__ == "__main__":
             description='Convert processed events to a Pandas dataframe.',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--year', help='Detector year.')
+    p.add_argument('--dask', action='store_true', default=False,
+                   help='Use Dask to parellelize the processing?')
     p.add_argument('--MC_dataset', default=None,
                    help='If simulation, the dataset to run over.')
     p.add_argument('--processing', choices=['', 'training', 'systematics'],
@@ -131,10 +133,25 @@ if __name__ == "__main__":
     file_list = glob('{}/post_processing/{}/{}/*.hdf5'.format(pre, args.year, set_name))
     out_file = '{}/pd_dataframes/{}/{}.hdf5'.format(pre, args.year, file_name)
 
-    with pd.HDFStore(out_file, mode='w') as output_store:
-        for i, input_file in enumerate(file_list):
-            print(i)
-            df = extract_dataframe(input_file, args.MC_dataset,
-                                   processing=args.processing)
+    if args.dask:
+        from dask.diagnostics import ProgressBar
+        from dask import delayed
+        import dask.dataframe as dd
+        import dask.multiprocessing
+        with ProgressBar():
+            delayed_dfs = [delayed(extract_dataframe(input_file, args.MC_dataset,
+                                                     processing=args.processing))
+                           for input_file in file_list]
+            df = dd.from_delayed(delayed_dfs).compute(num_workers=10)
+        with pd.HDFStore(out_file, mode='w') as output_store:
             output_store.append('dataframe', df, format='table',
                                 data_columns=True, min_itemsize=30)
+
+    else:
+        with pd.HDFStore(out_file, mode='w') as output_store:
+            for i, input_file in enumerate(file_list):
+                print(i)
+                df = extract_dataframe(input_file, args.MC_dataset,
+                                       processing=args.processing)
+                output_store.append('dataframe', df, format='table',
+                                    data_columns=True, min_itemsize=30)
