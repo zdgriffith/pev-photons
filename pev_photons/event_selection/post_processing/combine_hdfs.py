@@ -85,6 +85,46 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
         for key in llh_keys:
             series_dict[key] = store['Laputop_IceTopLLHRatio'][key]
 
+        #---- Separation ----#
+        #---- IceTop ----#
+        llh_name = 'Laputop_IceTopLLHRatio'
+        series_dict['llh_ratio'] = store.select(llh_name).LLH_Ratio
+        series_dict['llh_ratio_q_r'] = store.select(llh_name).LLH_Gamma_q_r/store.select(llh_name).LLH_Hadron_q_r
+        series_dict['llh_ratio_q_t'] = store.select(llh_name).LLH_Gamma_q_t/store.select(llh_name).LLH_Hadron_q_t
+        series_dict['llh_ratio_t_r'] = store.select(llh_name).LLH_Gamma_t_r/store.select(llh_name).LLH_Hadron_t_r
+
+        #---- IceCube ----#
+        series_dict['twc_hlc_count'] = store.select('hlc_count_TWC').value
+        series_dict['twc_slc_count'] = store.select('slc_count_TWC').value
+        series_dict['twc_nchannel'] = store.select('nchannel_TWC').value
+        series_dict['twc_hlc_charge'] = store.select('hlc_charge_TWC').value
+        series_dict['twc_slc_charge'] = store.select('slc_charge_TWC').value
+
+        try:
+            series_dict['srt_hlc_count'] = store.select('all_hlcs_SRTCoincPulses').value
+            series_dict['srt_slc_count'] = store.select('all_slcs_SRTCoincPulses').value
+            series_dict['srt_nchannel'] = store.select('nchannel_SRTCoincPulses').value
+            series_dict['srt_hlc_charge'] = store.select('all_hlc_charge_SRTCoincPulses').value
+            series_dict['srt_slc_charge'] = store.select('all_slc_charge_SRTCoincPulses').value
+        except:
+            series_dict['srt_hlc_count'] = np.zeros(len(series_dict['twc_hlc_count']))
+            series_dict['srt_slc_count'] = np.zeros(len(series_dict['twc_hlc_count']))
+            series_dict['srt_nchannel'] = np.zeros(len(series_dict['twc_hlc_count']))
+            series_dict['srt_hlc_charge'] = np.zeros(len(series_dict['twc_hlc_count'])) 
+            series_dict['srt_slc_charge'] = np.zeros(len(series_dict['twc_hlc_count']))
+
+        tr = np.greater(series_dict['srt_hlc_count'], 0)
+        series_dict['counts'] = (tr*series_dict['srt_hlc_count']
+                                 + tr*series_dict['srt_slc_count']
+                                 + np.invert(tr)*series_dict['twc_hlc_count']
+                                 + np.invert(tr)*series_dict['twc_slc_count'])
+        series_dict['nchannel'] = (tr*series_dict['srt_nchannel']
+                                   + np.invert(tr)*series_dict['twc_nchannel'])
+        series_dict['charges'] = (tr*series_dict['srt_hlc_charge']
+                                  + tr*series_dict['srt_slc_charge']
+                                  + np.invert(tr)*series_dict['twc_hlc_charge']
+                                  + np.invert(tr)*series_dict['twc_slc_charge'])
+
         recos = ['Laputop']
         if processing == 'systematics':
             recos.extend(['LaputopLambdaUp', 'LaputopLambdaDown',
