@@ -7,8 +7,8 @@
 import numpy as np
 
 import matplotlib.pyplot as plt
-from pev_photons.utils.support import prefix
-from pev_photons.utils.support import fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import prefix
+from pev-photons.utils.support import fig_dir, plot_setter, plot_style
 
 def index_x_events():
     alpha_fits = np.load(prefix+'all_sky/alpha_fit_test_-60.npy')

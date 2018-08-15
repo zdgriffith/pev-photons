@@ -7,8 +7,8 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev-photons.utils.load_datasets import load_dataset
+from pev-photons.utils.support import prefix, resource_dir
 
 def run_bg_trials(ps_llh, sources, args):
     """Run background trials for the H.E.S.S. stacking analysis"""

@@ -8,8 +8,8 @@ import argparse
 import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.utils.load_datasets import load_systematic_dataset
-from pev_photons.utils.support import prefix
+from pev-photons.utils.load_datasets import load_systematic_dataset
+from pev-photons.utils.support import prefix
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

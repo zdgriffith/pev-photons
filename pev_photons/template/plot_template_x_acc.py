@@ -11,8 +11,8 @@ from matplotlib.colors import LogNorm
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, plot_style, fig_dir, plasma_map
-from pev_photons.utils.skymap import PolarSkyMap
+from pev-photons.utils.support import prefix, plot_style, fig_dir, plasma_map
+from pev-photons.utils.skymap import PolarSkyMap
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

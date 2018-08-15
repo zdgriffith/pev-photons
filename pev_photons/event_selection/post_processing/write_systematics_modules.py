@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from pev_photons.utils.support import prefix
+from pev-photons.utils.support import prefix
 
 def sigma(y):
     values, base = np.histogram(y, bins = np.arange(0,20,0.01), weights = np.divide(np.ones(len(y)), float(len(y))))

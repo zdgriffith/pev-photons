@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 startTime = datetime.now()
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev-photons.utils.support import prefix, resource_dir, dag_dir
 
 def write_job(script, batches, gcd_file, year,
               out_dir, out_name, dag_name, isMC=False,

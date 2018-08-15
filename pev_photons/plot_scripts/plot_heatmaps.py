@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def load_pkl(tfile):
     f=open(tfile)

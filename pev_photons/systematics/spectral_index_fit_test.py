@@ -9,8 +9,8 @@ import numpy as np
 import logging
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev-photons.utils.load_datasets import load_dataset
+from pev-photons.utils.support import prefix
 
 def gammaray_check(ps_llh):
 

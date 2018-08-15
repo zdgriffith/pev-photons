@@ -6,7 +6,7 @@ import json
 import re
 import numpy as np
 
-from pev_photons.utils.support import prefix
+from pev-photons.utils.support import prefix
 
 def clean_files(runFile, fileList):
     """Remove runs marked as bad from the file list."""

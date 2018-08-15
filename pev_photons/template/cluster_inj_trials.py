@@ -7,8 +7,8 @@
 import argparse
 import os
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev-photons.utils.support import prefix, resource_dir, dag_dir
+from pev-photons.utils.cluster_support import DagMaker
 
 if __name__ == "__main__":
 

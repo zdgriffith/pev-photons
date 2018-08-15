@@ -7,8 +7,8 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev-photons.utils.load_datasets import load_dataset
+from pev-photons.utils.support import prefix
 
 def run_bg_trials(template_llh, args):
     """ Run background trials for the Fermi-LAT template analysis """

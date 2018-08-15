@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
 
 if __name__ == "__main__":
 

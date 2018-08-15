@@ -13,7 +13,7 @@ from skylab.llh_models import EnergyLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.utils.support import prefix
+from pev-photons.utils.support import prefix
 
 logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)

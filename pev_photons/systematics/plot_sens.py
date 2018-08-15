@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 from glob import glob
 
-from pev_photons.utils.support import prefix, resource_dir
-from pev_photons.utils.support import fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import prefix, resource_dir
+from pev-photons.utils.support import fig_dir, plot_setter, plot_style
 
 def plot_sens(label, color):
     arrs = []

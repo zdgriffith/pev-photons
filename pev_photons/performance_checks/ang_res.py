@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def find_nearest(array,value):
     """ Returns the nearest bin value. """

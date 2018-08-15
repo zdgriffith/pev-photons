@@ -10,7 +10,7 @@ from mpl_toolkits.basemap import Basemap
 import healpy as hp
 import pandas as pd
 
-from pev_photons.utils.support import resource_dir
+from pev-photons.utils.support import resource_dir
 
 class PolarSkyMap(object):
     """ Class for plotting sky maps using Basemap projected from the Pole.

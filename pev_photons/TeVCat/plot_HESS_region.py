@@ -14,8 +14,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, resource_dir
-from pev_photons.utils.support import fig_dir, ps_map, plot_style
+from pev-photons.utils.support import prefix, resource_dir
+from pev-photons.utils.support import fig_dir, ps_map, plot_style
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 

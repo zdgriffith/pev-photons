@@ -12,7 +12,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import dashi
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev-photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 @profile
 def final_sample(args, year, sel, level, label):

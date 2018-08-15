@@ -11,7 +11,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-from pev_photons.utils.support import prefix
+from pev-photons.utils.support import prefix
 
 def check_testing(x, y, E, events):
     a = np.any((np.isclose(events['primary_x'].values[:,np.newaxis],x)

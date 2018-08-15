@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=pev_photons
+set SPHINXPROJ=pev-photons
 
 if "%1" == "" goto help
 
