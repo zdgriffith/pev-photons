@@ -52,7 +52,7 @@ def make_fig_dirs():
     
 
 if __name__ == "__main__":
-    if (    prefix == '/data/user/zgriffith/pev-photons/'
+    if (    prefix == '/data/user/zgriffith/pev_photons/'
         or fig_dir == '/home/zgriffith/public_html/pev-photons/'
         or dag_dir == '/scratch/zgriffith/'
        ):
