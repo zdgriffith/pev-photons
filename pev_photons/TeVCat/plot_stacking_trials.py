@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 
-from pev-photons.utils.support import prefix, fig_dir, plot_setter, plot_style
+from pev_photons.utils.support import prefix, fig_dir, plot_setter, plot_style
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     stack_true = np.load(prefix+'TeVCat/stacking_fit_result.npy')['TS']
     if args.use_original_trials:
-        bg_trials = np.load('/data/user/zgriffith/pev-photons/TeVCat/stacking_trials.npy')
+        bg_trials = np.load('/data/user/zgriffith/pev_photons/TeVCat/stacking_trials.npy')
     else:
         bg_trials = np.load(prefix+'TeVCat/stacking_trials.npy')
     n_trials = len(bg_trials)

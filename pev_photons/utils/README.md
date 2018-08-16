@@ -1,4 +1,4 @@
-# pev-photons
+# pev_photons
 
 Support Scripts.
 

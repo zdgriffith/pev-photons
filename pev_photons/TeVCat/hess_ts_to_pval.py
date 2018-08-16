@@ -11,7 +11,7 @@ from glob import glob
 
 import healpy as hp
 
-from pev-photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     for dec_i in range(n_decs):
         print('{}/{}'.format(dec_i, n_decs))
         if args.use_original_trials:
-            f_list = glob('/data/user/zgriffith/pev-photons/all_sky/dec_trials/dec_%s_job_*' % dec_i)
+            f_list = glob('/data/user/zgriffith/pev_photons/all_sky/dec_trials/dec_%s_job_*' % dec_i)
         else:
             f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
         trials = []

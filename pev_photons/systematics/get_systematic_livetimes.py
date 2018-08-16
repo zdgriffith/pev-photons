@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from pev-photons.utils.support import resource_dir
+from pev_photons.utils.support import resource_dir
 
 if __name__ == "__main__":
 

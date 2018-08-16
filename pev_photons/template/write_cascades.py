@@ -8,7 +8,7 @@ import numpy as np
 import healpy as hp
 import pandas as pd
 
-from pev-photons.utils.support import prefix, resource_dir
+from pev_photons.utils.support import prefix, resource_dir
 
 if __name__ == "__main__":
 

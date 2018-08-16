@@ -8,8 +8,8 @@ import argparse
 import os
 import glob
 
-from pev-photons.utils.support import prefix, resource_dir, dag_dir
-from pev-photons.utils.cluster_support import DagMaker
+from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons.utils.cluster_support import DagMaker
 
 def getL2GCD(config):
     """ Retrieve the Level 2 GCD filename for simulation

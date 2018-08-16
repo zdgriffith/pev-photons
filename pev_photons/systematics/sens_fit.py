@@ -11,8 +11,8 @@ import argparse as argparse
 from skylab.sensitivity_utils import fit
 from skylab.template_injector import TemplateInjector
 
-from pev-photons.utils.load_datasets import load_systematic_dataset
-from pev-photons.utils.support import prefix, fig_dir
+from pev_photons.utils.load_datasets import load_systematic_dataset
+from pev_photons.utils.support import prefix, fig_dir
 
 def sensitivity(args):
     exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.name, ncpu=args.ncpu,

@@ -10,8 +10,8 @@ import numpy as np
 from skylab.template_injector import TemplateInjector
 from skylab.sensitivity_utils import estimate_sensitivity
 
-from pev-photons.utils.load_datasets import load_systematic_dataset
-from pev-photons.utils.support import prefix
+from pev_photons.utils.load_datasets import load_systematic_dataset
+from pev_photons.utils.support import prefix
 
 def fit_ts(args):
     exp, mc, livetime, template_llh, template = load_systematic_dataset('galactic_plane', args.systematic, ncpu=args.ncpu,

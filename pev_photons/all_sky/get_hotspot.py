@@ -8,9 +8,9 @@ import argparse
 import numpy as np
 import healpy as hp
 
-from pev-photons.utils.load_datasets import load_dataset
-from pev-photons.utils.support import prefix
-from pev-photons.TeVCat.hess_source_errors import error_profile
+from pev_photons.utils.load_datasets import load_dataset
+from pev_photons.utils.support import prefix
+from pev_photons.TeVCat.hess_source_errors import error_profile
 
 def test_hotspot(ps_llh, ra, dec, errors=False):
     """ fit for a point source at the location of the all-sky-scan hotspot """

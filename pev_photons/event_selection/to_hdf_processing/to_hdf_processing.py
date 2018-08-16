@@ -20,10 +20,10 @@ from icecube.recclasses import I3LaputopParams, LaputopParameter
 from icecube.icetop_Level3_scripts.functions import count_stations 
 from icecube.frame_object_diff.segments import uncompress
 
-from pev-photons.event_selection.llh_ratio_scripts.llh_ratio_i3_module import IceTop_LLH_Ratio
-from pev-photons.event_selection.icecube_cleaning import icecube_cleaning
-from pev-photons.event_selection.run_laputop import run_laputop
-from pev-photons.utils.support import resource_dir
+from pev_photons.event_selection.llh_ratio_scripts.llh_ratio_i3_module import IceTop_LLH_Ratio
+from pev_photons.event_selection.icecube_cleaning import icecube_cleaning
+from pev_photons.event_selection.run_laputop import run_laputop
+from pev_photons.utils.support import resource_dir
 
 def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     """ Determine which keys get stored in the HDF file. """

@@ -7,7 +7,7 @@
 import pandas as pd
 import numpy as np
 
-from pev-photons.utils.support import prefix
+from pev_photons.utils.support import prefix
 
 def write_files(year):
     """ write training and testing files for an MC year """

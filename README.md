@@ -5,7 +5,7 @@ This repository contains the scripts used to produce the results of the 5-year P
 
 ## Documentation
 
-The documentation for pev-photons is at https://zdgriffith.github.io/pev-photons/
+The documentation for pev_photons is at https://zdgriffith.github.io/pev-photons/
 
 ## Installation
 

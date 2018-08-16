@@ -53,7 +53,7 @@ if __name__ == "__main__":
             description='Write exp and mc datasets using random forests',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev-photons/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--cut_val', dest='cut_val', type = float,
                    default = 0.7, help = 'cut value for random forests')

@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from pev-photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
 
 def plot_s125(true_E, log_S125, label, E_bins=np.arange(5.7,8.0,0.1)):
     bin_medians, bin_edges, n = stats.binned_statistic(true_E, log_S125,

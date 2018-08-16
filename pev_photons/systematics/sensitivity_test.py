@@ -10,8 +10,8 @@ import numpy as np
 from skylab.sensitivity_utils import estimate_sensitivity, sensitivity_flux
 from skylab.template_injector import TemplateInjector
 
-from pev-photons.utils.load_datasets import load_systematic_dataset
-from pev-photons.utils.support import fig_dir
+from pev_photons.utils.load_datasets import load_systematic_dataset
+from pev_photons.utils.support import fig_dir
 
 def mu2flux(inj, args):
 

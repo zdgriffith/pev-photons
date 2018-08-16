@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import dashi
-from pev-photons.utils.support import fig_dir, resource_dir
-from pev-photons.utils.support import plot_setter, plot_style, plasma_map
+from pev_photons.utils.support import fig_dir, resource_dir
+from pev_photons.utils.support import plot_setter, plot_style, plasma_map
 
 def rhombus(width, depth, cos_zen, color):
     """plot a rhombus"""

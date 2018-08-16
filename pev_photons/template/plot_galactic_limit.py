@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import interpolate
 
-from pev-photons.utils.support import plot_style, fig_dir, resource_dir
+from pev_photons.utils.support import plot_style, fig_dir, resource_dir
 
 def convert_limit(data):
     g = np.array([[1.66, 1.58, 1.63, 1.67, 1.63], np.full(5, 1.4)])

@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
 
-from pev-photons.utils.support import prefix
+from pev_photons.utils.support import prefix
 
 def prediction(f, selection, year, cut_val):
     hard_trainer = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_2.0.pkl')

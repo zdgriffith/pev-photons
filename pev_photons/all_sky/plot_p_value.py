@@ -8,8 +8,8 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pev-photons.utils.support import prefix, plot_style, fig_dir, ps_map
-from pev-photons.utils.skymap import PolarSkyMap
+from pev_photons.utils.support import prefix, plot_style, fig_dir, ps_map
+from pev_photons.utils.skymap import PolarSkyMap
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(

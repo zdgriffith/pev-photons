@@ -18,7 +18,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.coordinates import Angle as astropyAngle
 
-from pev-photons.utils.support import prefix, resource_dir, fig_dir, plot_style
+from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_style
 
 def move_gc_to_center(lon):
     l_t=astropyAngle(lon*u.radian)

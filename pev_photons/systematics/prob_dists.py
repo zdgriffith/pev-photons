@@ -12,7 +12,7 @@ from scipy import stats
 
 from sklearn.externals import joblib
 
-from pev-photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_setter, plot_style
 
 def prediction(f, year):
     hard_trainer = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_2.0.pkl')

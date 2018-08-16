@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from glob import glob
 
-from pev-photons.utils.support import prefix, plot_style, fig_dir, plot_setter
+from pev_photons.utils.support import prefix, plot_style, fig_dir, plot_setter
 
 def plot_trials(args, bg_trials, n_trials, true_TS):
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     #Load in scrambled trials
     if args.use_original_trials:
-        job_list = glob('/data/user/zgriffith/pev-photons/template/trials/'+args.name+'/*.npy') 
+        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*.npy') 
     else:
         job_list = glob(prefix+'/template/trials/'+args.name+'/*.npy') 
     bg_trials = []

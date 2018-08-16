@@ -10,10 +10,10 @@
 # Change these directories to your personal storage locations. 
 
 # Directory to store data files that are created from the package scripts.
-prefix = '/data/user/zgriffith/pev-photons/'
+prefix = '/data/user/zgriffith/pev_photons/'
 
 # Directory to store plots
-fig_dir = '/home/zgriffith/public_html/pev-photons/'
+fig_dir = '/home/zgriffith/public_html/pev_photons/'
 
 # Directory for dag related files
 dag_dir = '/scratch/zgriffith/'
@@ -23,7 +23,7 @@ dag_dir = '/scratch/zgriffith/'
 
 # Directory where files are kept that are only accessed,
 # not written to.
-resource_dir = '/data/user/zgriffith/pev-photons/resources/'
+resource_dir = '/data/user/zgriffith/pev_photons/resources/'
 
 # The matplotlib plotting stylesheet.
 plot_style = resource_dir+'gamma_rays_5yr.mplstyle'

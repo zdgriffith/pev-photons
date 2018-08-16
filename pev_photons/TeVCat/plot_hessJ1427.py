@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import interpolate
 
-from pev-photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
+from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
 from gamma_ray_survival import absorption_spline
 
 def plot_hgps_data(source, color, label):

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
 
-from pev-photons.utils.support import prefix, resource_dir, fig_dir, plot_style
+from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_style
 
 def survival_vs_energy():
     surv = np.loadtxt(resource_dir+'gamma_survival_vs_energy.txt')

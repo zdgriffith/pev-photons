@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pev-photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
+from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
 from sklearn.externals import joblib
 
 def plot_fraction(level3, level4, label):
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             description='Write exp and mc datasets using random forests',
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--prefix', dest='prefix', type = str,
-                   default = '/data/user/zgriffith/pev-photons/',
+                   default = '/data/user/zgriffith/pev_photons/',
                    help    = 'base directory for file storing')
     p.add_argument('--cut_val', dest='cut_val', type = float,
                    default = 0.7, help = 'cut value for random forests')

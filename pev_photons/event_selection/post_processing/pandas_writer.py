@@ -183,7 +183,7 @@ if __name__ == "__main__":
             help='Is this simulation')
     args = p.parse_args()
     
-    file_list = glob.glob('/data/user/zgriffith/pev-photons/datasets/'+args.dataset+'/*.hdf5')
-    outFile = '/data/user/zgriffith/pev-photons/datasets/'+args.dataset+'.hdf5'
+    file_list = glob.glob('/data/user/zgriffith/pev_photons/datasets/'+args.dataset+'/*.hdf5')
+    outFile = '/data/user/zgriffith/pev_photons/datasets/'+args.dataset+'.hdf5'
 
     rewrite(file_list, outFile, args.dataset, args.isMC)

@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 from glob import glob
 
-from pev-photons.utils.support import prefix
-from pev-photons.event_selection.post_processing.pandas_writer import get_weights
+from pev_photons.utils.support import prefix
+from pev_photons.event_selection.post_processing.pandas_writer import get_weights
 
 def set_to_names(dataset):
     """ Return the file names corresponding to a given dataset. """

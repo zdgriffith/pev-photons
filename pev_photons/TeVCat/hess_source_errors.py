@@ -8,8 +8,8 @@ import time
 import argparse
 import numpy as np
 
-from pev-photons.utils.load_datasets import load_dataset
-from pev-photons.utils.support import prefix, resource_dir
+from pev_photons.utils.load_datasets import load_dataset
+from pev_photons.utils.support import prefix, resource_dir
 
 def error_profile(llh, ra, dec, fit, **kwargs):
 

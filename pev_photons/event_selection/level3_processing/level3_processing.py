@@ -12,7 +12,7 @@ import re
 import glob
 
 from icecube import icetray
-from pev-photons.utils.support import prefix
+from pev_photons.utils.support import prefix
 
 def get_run_from_filename(input_file):
     result = None

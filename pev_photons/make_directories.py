@@ -6,7 +6,7 @@
 
 import os
 
-from pev-photons.utils.support import prefix, fig_dir
+from pev_photons.utils.support import prefix, fig_dir
 
 def make_file_dirs():
     # All second level directories
@@ -52,8 +52,8 @@ def make_fig_dirs():
     
 
 if __name__ == "__main__":
-    if (    prefix == '/data/user/zgriffith/pev-photons/'
-        or fig_dir == '/home/zgriffith/public_html/pev-photons/'
+    if (    prefix == '/data/user/zgriffith/pev_photons/'
+        or fig_dir == '/home/zgriffith/public_html/pev_photons/'
         or dag_dir == '/scratch/zgriffith/'
        ):
         raise Exception('You need to change the storage directories in support.py first!')

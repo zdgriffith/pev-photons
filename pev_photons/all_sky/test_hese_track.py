@@ -9,8 +9,8 @@ import numpy as np
 import healpy as hp
 import pandas as pd
 
-from pev-photons.utils.load_datasets import load_dataset
-from pev-photons.utils.support import prefix, resource_dir
+from pev_photons.utils.load_datasets import load_dataset
+from pev_photons.utils.support import prefix, resource_dir
 
 def bg_trials(ps_llh, ra, dec, n_trials=10):
     """ Produce background TS trials for the HESE track event.

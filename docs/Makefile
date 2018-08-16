@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = pev-photons
+SPHINXPROJ    = pev_photons
 SOURCEDIR     = source
 BUILDDIR      = _build
 
