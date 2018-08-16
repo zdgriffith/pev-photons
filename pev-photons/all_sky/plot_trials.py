@@ -28,7 +28,7 @@ if __name__ == "__main__":
     hotspot = np.load(prefix+'all_sky/hotspot.npy')['TS'][0]
 
     if args.use_original_trials:
-        job_list = glob('/data/user/zgriffith/pev_photons/all_sky/all_sky_trials/full_*.npy')
+        job_list = glob('/data/user/zgriffith/pev-photons/all_sky/all_sky_trials/full_*.npy')
     else:
         job_list = glob(prefix+'all_sky/all_sky_trials/full_*.npy')
 
