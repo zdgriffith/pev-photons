@@ -10,14 +10,58 @@ import numpy as np
 import pandas as pd
 from glob import glob
 
-from pev_photons.utils.support import prefix
-from pev_photons.event_selection.post_processing.pandas_writer import get_weights
+from pev_photons.utils.support import prefix, resource_dir
+
+def get_weights(MC_dataset, energy, nstations):
+    """ Create the MC weights for the given dataset generation parameters """
+
+    def norm(emin, emax, eslope):
+        #Function from weighting project
+        if eslope < -1:
+            g = eslope+1
+            return (emax**g - emin**g)/g
+        else:
+            return np.log(emax/emin)
+
+    def int_area(E, theta_max):
+        #Integrated Area times Solid Angle
+        radius = (800 * np.greater_equal(E, 1e5)
+                  + 300 * np.greater_equal(E, 1e6)
+                  + 300 * np.greater_equal(E, 1e7))
+
+        return ((radius*100)**2)*(1-np.cos(np.radians(theta_max))**2)*np.pi**2
+    
+    events = np.load('/data/user/zgriffith/sim_files/'+MC_dataset+'_events.npy') 
+
+    def n_thrown(E):
+        # Number of thrown events in an Ebin, normed by the size of the Ebin
+        indices = np.floor(10 * np.log10(E)) - 50
+        if MC_dataset == '12622':
+            return 6e4/norm(1e6, 10**6.1, -1)
+        else:
+            return np.take(events, indices.astype('int'))/norm(1e6, 10**6.1, -1)
+
+    #Maximum Zenith Angle
+    if MC_dataset in ['7006', '7007']:
+        max_zen = 40.
+    elif MC_dataset in ['12360', '12362']:
+        max_zen = 65.
+    else:
+        max_zen = 45.
+
+    weights = int_area(energy,max_zen)*energy/n_thrown(energy)
+
+    if MC_dataset == '12622': 
+        prescale = 2. * (np.less(nstations, 8) & np.greater(nstations, 3)) + 1.
+        return weights/prescale
+    else:
+        return weights 
 
 def set_to_names(dataset):
     """ Return the file names corresponding to a given dataset. """
     if dataset is not None:
         if dataset in ['12533', '12612', '12613', '12614', '12622']:
-            return dataset, 'gammas'
+            return dataset, 'gamma_mc'
     else:
         return 'data', 'data'
 
@@ -75,6 +119,12 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
                 series_dict['true_{}'.format(key)] = store['MCPrimary'][key]
             series_dict['weights'] = get_weights(MC_dataset, series_dict['true_energy'],
                                                  series_dict['NStation'])
+
+        # Event ID info
+        series_dict['time'] = store.select('I3EventHeader').time_start_mjd
+        series_dict['run'] = store.select('I3EventHeader').Run
+        series_dict['event'] = store.select('I3EventHeader').Event
+        series_dict['subevent'] = store.select('I3EventHeader').SubEvent
 
         # Quality cuts independent of reconstruction.
         for cut in cut_keys:
@@ -144,14 +194,42 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
             series_dict[reco+'_log10_s125'] = np.log10(series_dict[reco+'_s125'])
             series_dict[reco+'_energy'] = store[reco+'_E']['value']
             series_dict[reco+'_FractionContainment'] = store[reco+'_FractionContainment']['value']
+            series_dict[reco+'_inice_FractionContainment'] = store[reco+'_inice_FractionContainment']['value']
 
             if MC_dataset:
                 series_dict[reco+'_opening_angle'] = store[reco+'_opening_angle']['value']
                 series_dict[reco+'_core_diff'] = np.sqrt((series_dict[reco+'_x'] - series_dict['true_x'])**2 +
                                                          (series_dict[reco+'_y'] - series_dict['true_y'])**2)
-    df = pd.DataFrame(series_dict)
 
-    return df
+    df = pd.DataFrame(series_dict)
+    return df.loc[np.isfinite(df['LLH_Ratio'].values)]
+
+def split_sample(df, processing, year):
+    """ Split the MC dataset into training/testing and validation samples.
+    Parameters
+    ----------
+    df : Pandas dataframe
+        dataframe containing MC events.
+    processing : str
+        type of event processing.  For training, 80% of events are retained.
+    year : str
+        Detector year used for MC simulation.
+
+    Returns
+    -------
+    Pandas dataframe containing only events
+    to store for the given processing.
+    """
+
+    event_path = resource_dir+'/validation_mc_events/{}'.format(year)
+    val_x = np.loadtxt(event_path+'_x.txt')
+    val_y = np.loadtxt(event_path+'_y.txt')
+    in_val = (np.in1d(df['true_x'].values, val_x)
+              & np.in1d(df['true_y'].values, val_y))
+    if processing == 'training':
+        return df[~in_val]
+    else:
+        return df[in_val]
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -171,27 +249,30 @@ if __name__ == "__main__":
 
     pre = os.path.join(prefix, 'datasets', args.processing)
     file_list = glob('{}/post_processing/{}/{}/*.hdf5'.format(pre, args.year, set_name))
-    out_file = '{}/pd_dataframes/{}/{}.hdf5'.format(pre, args.year, file_name)
+    out_file = '{}/dataframes/{}/{}.hdf5'.format(pre, args.year, file_name)
 
     if args.dask:
         from dask.diagnostics import ProgressBar
         from dask import delayed
         import dask.dataframe as dd
         import dask.multiprocessing
+
         with ProgressBar():
             delayed_dfs = [delayed(extract_dataframe(input_file, args.MC_dataset,
                                                      processing=args.processing))
                            for input_file in file_list]
             df = dd.from_delayed(delayed_dfs).compute(num_workers=10)
-        with pd.HDFStore(out_file, mode='w') as output_store:
-            output_store.append('dataframe', df, format='table',
-                                data_columns=True, min_itemsize=30)
-
     else:
-        with pd.HDFStore(out_file, mode='w') as output_store:
-            for i, input_file in enumerate(file_list):
-                print(i)
-                df = extract_dataframe(input_file, args.MC_dataset,
-                                       processing=args.processing)
-                output_store.append('dataframe', df, format='table',
-                                    data_columns=True, min_itemsize=30)
+        frames = []
+        for i, input_file in enumerate(file_list):
+            frames.append(extract_dataframe(input_file, args.MC_dataset,
+                                            processing=args.processing))
+        df = pd.concat(frames)
+
+    if args.MC_dataset:
+        df = split_sample(df, args.processing, args.year)
+
+    with pd.HDFStore(out_file, mode='w') as output_store:
+        output_store.append('dataframe', df,
+                            format='table', data_columns=True,
+                            min_itemsize=30)
