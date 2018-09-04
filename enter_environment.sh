@@ -27,11 +27,11 @@ then
 elif [ $# -gt 0 ] && [ $1 = "trunk_skylab" ]
 then
     source /data/user/zgriffith/pev_photons/resources/venvs/trunk_skylab/bin/activate
-elif [ $# -gt 0 ] && [ $1 = "el7_photon_env" ]
+elif [ $# -gt 0 ] && [ $1 = "el6_photon_env" ]
 then
-    source /data/user/zgriffith/pev_photons/resources/venvs/el7_photon_env/bin/activate
-else
     source /data/user/zgriffith/pev_photons/resources/venvs/photon_env/bin/activate
+else
+    source /data/user/zgriffith/pev_photons/resources/venvs/el7_photon_env/bin/activate
 fi
 
 export PYTHONPATH=$PYTHONPATH:"$(pwd)"
