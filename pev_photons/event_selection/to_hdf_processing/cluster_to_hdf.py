@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     if args.systematics:
         ext = 'systematics'
-    elif:
+    elif args.training:
         ext = 'training'
     else:
         ext = ''

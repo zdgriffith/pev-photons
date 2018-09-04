@@ -10,7 +10,6 @@ import sys
 import copy
 import numpy as np
 
-from sklearn.externals import joblib
 from I3Tray import I3Tray
 from icecube import icetray, dataio, dataclasses, phys_services, toprec
 from icecube import coinc_twc, static_twc, SeededRTCleaning
@@ -65,8 +64,7 @@ def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
 def base_quality_cuts(frame):
     """ Calculate quality cuts """
     keys = ['IceTopMaxSignalAbove6', 'IceTopMaxSignalInside',
-            'IceTopNeighbourMaxSignalAbove4',
-            'IceTop_StandardFilter', 'StationDensity_passed']
+            'IceTop_StandardFilter']
     cuts = frame['IT73AnalysisIceTopQualityCuts']
     quality_cuts = dataclasses.I3MapStringBool()
     for key in keys:
@@ -239,6 +237,7 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
     tray.AddModule(calculate_inice_charge, 'icecube_charge')
 
     if not training:
+        from sklearn.externals import joblib
         rf = {}
         for alpha in ['2.0', '2.7', '3.0']:
             rf['alpha_'+alpha] = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_'+alpha+'.pkl')
