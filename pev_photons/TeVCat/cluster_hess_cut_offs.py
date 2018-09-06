@@ -29,6 +29,6 @@ if __name__ == "__main__":
 
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'hess_cut_off.py'),
                           iters=iters,
-                          submit_file=os.path.join(resource_dir, 'basic.submit'),
+                          submit_file=os.path.join(resource_dir, 'py2v3.submit'),
                           test=args.test, prefix=prefix)
     os.system(ex)
