@@ -41,8 +41,8 @@ if __name__ == "__main__":
     result = ps_llh.weighted_sensitivity([0.5], [0.9],
                                          inj=inj,
                                          eps=1.e-2,
-                                         n_bckg=1000,
-                                         n_iter=100,
+                                         n_bckg=10000,
+                                         n_iter=1000,
                                          src_ra=np.pi, src_dec=dec)
     sens = result[0]["flux"][0]
     np.save(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.source, args.Ecut), sens)
