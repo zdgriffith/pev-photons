@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    hess = np.load(prefix+'hgps_sources.npz')
+    hess = np.load(prefix+'resources/hgps_sources.npz')
     sens = list()
 
     for i, alpha in enumerate(hess['alpha']):
