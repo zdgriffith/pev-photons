@@ -10,15 +10,15 @@ import numpy as np
 
 from pev_photons.utils.support import resource_dir, prefix, fig_dir, plot_style
 
-def n_thrown(E, theta_min, theta_max):
-    events = np.load('/data/user/zgriffith/sim_files/12533_events.npy') 
-    # Number of thrown events in an Ebin, normed by the size of the Ebin
-    indices = np.floor(10 * np.log10(E)) - 50
-
-    full = np.cos(np.radians(0))**2 - np.cos(np.radians(45.))**2
-    frac = (np.cos(np.radians(theta_min))**2 - np.cos(np.radians(theta_max))**2)/full
-
-    return np.floor(frac*np.take(events, indices.astype('int')))
+def n_thrown(E, theta_min):
+    df = pd.read_hdf(prefix+'datasets/corsika/10042.hdf5')
+    vals, E_edges, zen_edges = np.histogram2d(np.log10(df['energy'].values), np.degrees(df['zenith'].values),
+                                              bins=(np.arange(5,8.1,0.1), np.arange(0,46,1)))
+    E_indices = np.floor(10 * np.log10(E)) - 50
+    n_bin = []
+    for i, E_i in enumerate(E_indices):
+        n_bin.append(vals[int(E_i)][int(theta_min[i])]*100)
+    return np.array(n_bin)
 
 def int_area(E, theta):
 
@@ -29,7 +29,7 @@ def int_area(E, theta):
     theta_min = np.floor(theta)
     theta_max = theta_min + 1
     solid_angle = 2*np.pi*(np.cos(np.radians(theta_min))**2 - np.cos(np.radians(theta_max))**2)
-    return (np.pi*radius**2)*solid_angle/n_thrown(E, theta_min, theta_max)
+    return (np.pi*radius**2)*solid_angle/n_thrown(E, theta_min)
 
 if __name__ == "__main__":
     plt.style.use(plot_style)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
         hist, x_e, y_e = np.histogram2d(np.degrees(gammas['true_zenith'].values),
                                         np.log10(gammas['true_energy'].values),
                                         bins=[np.arange(0, 46, 1), np.arange(5, 8.1, 0.1)],
-                                        weights=int_area(gammas['true_energy'], np.degrees(gammas['true_zenith'])))
+                                        weights=int_area(gammas['true_energy'].values, np.degrees(gammas['true_zenith'].values)))
         E_centers = (y_e[:-1]+y_e[1:])/2.
         bins = np.average(hist, axis=1, weights=np.sum(hist, axis=0)*(10**E_centers)**-2.7/np.sum((10**E_centers)**-2.7))
         left,right = x_e[:-1], x_e[1:]
