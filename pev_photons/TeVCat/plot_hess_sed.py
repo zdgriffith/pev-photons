@@ -60,13 +60,18 @@ def plot_fit(label, source, colors, args, index):
 
     for flux in [phi, phi_stat_high, phi_stat_low,
                  phi_sys_high, phi_sys_low]:
-            if args.Ecut is not None:
-                flux *= np.exp(-E/args.Ecut)
+            #if args.Ecut is not None:
+            #    flux *= np.exp(-E/args.Ecut)
             if not args.no_absorption:
                 flux *= absorption_spline(E)
 
     # The center line of the flux fit.
     plt.plot(E, phi, label=label, color=color, linestyle='-', zorder=index)
+
+    if args.Ecut is not None:
+        phi *= np.exp(-E/args.Ecut)
+        plt.plot(E, phi, label='{} TeV cut off'.format(args.Ecut),
+                 linestyle='-.', zorder=index)
 
     #The statistical uncertainty bound.
     plt.fill_between(E, phi_stat_low, phi_stat_high,
@@ -86,7 +91,7 @@ if __name__ == "__main__":
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--no_absorption', action='store_true', default=False,
                    help='If True, fluxes have no absorption.')
-    p.add_argument('--Ecut', type=float, default=None,
+    p.add_argument('--Ecut', type=int, default=None,
                    help='Option for an exponential cut-off.')
     p.add_argument('--index', type=int, default=5,
                    help='Index of the HESS source.')
@@ -112,10 +117,21 @@ if __name__ == "__main__":
 
     plt.plot(b, y0*b**(2 - gamma),
              color=colors[1],label="IceCube 5-year 90$\%$ upper limit")
-
     #Arrow
     plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
     plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
+
+    if args.Ecut:
+        flux_i = np.load(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.index, args.Ecut))
+        y0 = flux_i*1e9
+        y = y0*(x**(2-gamma))
+
+        plt.plot(b, y0*b**(2 - gamma),
+                 color=colors[1], ls='-.',
+                 label="IceCube UL ({} TeV cut off)".format(args.Ecut))
+        #Arrow
+        plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
+        plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
 
     plt.xlim([3*10**-1, 10**4])
     plt.ylim([10**-16, 10**-10])
@@ -126,7 +142,7 @@ if __name__ == "__main__":
     plt.xlabel('Energy [TeV]', fontweight='bold')
     plt.xscale('log')
     plt.yscale('log')
-    plt.savefig(fig_dir+'TeVCat/hess_source_%s.png' % args.index)
+    plt.savefig(fig_dir+'TeVCat/hess_source_%s.png' % args.index, dpi=300)
     if args.index==5:
         plt.savefig(fig_dir+'paper/hess_J1356.pdf')
     plt.close()
