@@ -61,12 +61,12 @@ def plot_hess_sources(args):
                     color=colors[3], marker='*', label='H.E.S.S. 90% limits')
 
 def plot_sens(args):
-    indices = [2.0,2.7]
+    indices = [2.0, 2.7]
     kind_labels = ['Sensitivity', 'Discovery Potential']
     linestyle = ['-', '--']
 
     if args.coarse:
-        dec_list = np.linspace(-84.,-54.,10)
+        dec_list = np.linspace(-84., -54., 10)
         kinds = ['sens', 'disc']
         for i, index in enumerate(indices):
             for j, kind in enumerate(kinds):
