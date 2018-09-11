@@ -28,8 +28,8 @@ if __name__ == "__main__":
     if args.rm_old:
         dag_maker.remove_old(prefix=prefix)
 
-    static_args = {'n_trials': args.nTrials}
-    iters = {'nJobs': range(args.nJobs)}
+    static_args = {'bg_trials': args.nTrials}
+    iters = {'job': range(args.nJobs)}
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'all_sky_scan.py'),
                           static_args=static_args, iters=iters,
                           submit_file=os.path.join(resource_dir, 'basic.submit'),
