@@ -64,5 +64,6 @@ if __name__ == "__main__":
     ax.set_ylabel('Acceptance (m$^2$sr)')
     ax.legend(loc='upper left')
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/acceptance.png')
+    plt.savefig(fig_dir+'performance_checks/acceptance.png', dpi=300)
+    plt.savefig(fig_dir+'paper/acceptance.pdf', bbox_inches='tight')
     plt.close()
