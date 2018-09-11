@@ -17,20 +17,27 @@
 
 # TO USE: Run "source enter_environment.sh" 
 
-eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
 
 # If you want matplotlib 2 but everything else the same,
 # enter "mpl_2" as a cl argument
 if [ $# -gt 0 ] && [ $1 = "mpl_2" ]
 then
+    eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
     source /data/user/zgriffith/pev_photons/resources/venvs/mpl_2_env/bin/activate
 elif [ $# -gt 0 ] && [ $1 = "trunk_skylab" ]
 then
+    eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
     source /data/user/zgriffith/pev_photons/resources/venvs/trunk_skylab/bin/activate
 elif [ $# -gt 0 ] && [ $1 = "el6_photon_env" ]
 then
+    eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
     source /data/user/zgriffith/pev_photons/resources/venvs/photon_env/bin/activate
+elif [ $# -gt 0 ] && [ $1 = "py2v3_env" ]
+then
+    eval `/cvmfs/icecube.opensciencegrid.org/py2-v3/setup.sh`
+    source /data/user/zgriffith/pev_photons/resources/venvs/py2v3_env/bin/activate
 else
+    eval `/cvmfs/icecube.opensciencegrid.org/py2-v2/setup.sh`
     source /data/user/zgriffith/pev_photons/resources/venvs/el7_photon_env/bin/activate
 fi
 
