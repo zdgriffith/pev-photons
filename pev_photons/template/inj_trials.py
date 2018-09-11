@@ -15,6 +15,8 @@ from pev_photons.utils.support import prefix
 
 def fit_ts(template_llh, alpha=3.0, E0=2e6, job=0,
            n_trials=100, n_inj=0, name='fermi_pi0'):
+    """ Calculate TS trials with an injected gamma-ray signal
+        conforming to the given template """
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,
