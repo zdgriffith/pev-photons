@@ -16,6 +16,7 @@ from matplotlib.ticker import MultipleLocator
 from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def load_pkl(tfile):
+    """ Load pickle files. containing PDFs of hit distributions. """
     f=open(tfile)
     h1=pkl.load(f)
     n1=pkl.load(f)
@@ -29,6 +30,7 @@ def load_pkl(tfile):
 def plot_2d_hist(hist, xedges, yedges, xlim, ylim,
                  xlabel='', ylabel='', title='', cmap='coolwarm',
                  vmin=1e-1, vmax=1e-5, same_plot=False, alpha=1.0):
+    """ Plot PDFs in relevant LLHRatio variables (time, distance, charge). """
     hist = hist.T
     hist = np.ma.masked_where(hist==0,hist)
 
@@ -42,6 +44,7 @@ def plot_2d_hist(hist, xedges, yedges, xlim, ylim,
 
 def get_events(s125_low=0.3, s125_high=0.4, zen_low=0.85, zen_high=0.9,
                h5file=None):
+    """ Extract PDF values for the hits from each event. """
 
     g = tables.open_file(h5file)
 
