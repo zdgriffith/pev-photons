@@ -11,7 +11,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
-import dashi
 from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
 
 def sigmoid_flat(energy, p0, p1, p2):
@@ -55,10 +54,9 @@ def effective_area(args, logE, year, w, color):
             weights[i] += np.pi*1.400**2
 
     bins = np.arange(5,8.1,args.Ebin_width)
-    E_hist = dashi.factory.hist1d(logE, bins,
-                                  weights=(w**-1)*weights)
-    error_hist = dashi.factory.hist1d(logE, bins,
-                                      weights=(w**-1)*weights**2)
+    E_hist, bin_edges = np.histogram(logE, bins, weights=(w**-1*weights))
+    error_hist, bin_edges = np.histogram(logE, bins, weights=(w**-1*weights**2))
+    bin_centers = (bin_edges[:-1]+bin_edges[1:])/2.
 
     if year == '2011':
         n_gen = 60000
@@ -66,12 +64,12 @@ def effective_area(args, logE, year, w, color):
         events = np.load(resource_dir+'datasets/level3/'+year+'_mc_total_events.npy')
         n_gen  = events[:].astype('float')
 
-    area = E_hist.bincontent/n_gen
-    error = np.sqrt(error_hist.bincontent)/n_gen
+    area = E_hist/n_gen
+    error = np.sqrt(error_hist)/n_gen
     
     #Plot bins unless told not to
     if not args.noBins:
-        line = ax0.errorbar(E_hist.bincenters, area,
+        line = ax0.errorbar(bin_centers, area,
                             xerr=args.Ebin_width/2., yerr=error,
                             capsize=0, capthick=2, lw=2, ms=0,
                             label=year, color=color, fmt='o', marker='o')
@@ -81,7 +79,7 @@ def effective_area(args, logE, year, w, color):
     fine_bins = np.arange(5.7,8.01,0.01)
     if args.sigmoid:
         x = 10**fine_bins
-        sigmoid = get_effective_area_fit(E_hist.bincenters, area,
+        sigmoid = get_effective_area_fit(bin_centers, area,
                                          error, args.Ebin_width,
                                          fit_func=sigmoid_flat,
                                          energy_points=x)
@@ -89,7 +87,7 @@ def effective_area(args, logE, year, w, color):
                         label=year)
         return sigmoid, fine_bins, line[0]
     else:
-        return area, E_hist.bincenters, line[0]
+        return area, bin_centers, line[0]
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -104,7 +102,6 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Plotting set up
-    dashi.visual()
     plt.style.use(plot_style)
     colors = ['#250000', '#630000', '#a00000', '#dd2800', '#ff7a00', '#ffcd9a']
 
@@ -149,5 +146,5 @@ if __name__ == "__main__":
     plot_setter(plt.gca(),l)
 
     plt.savefig(fig_dir+'performance_checks/eff_area_comp.png')
-    plt.savefig(fig_dir+'paper/eff_area_comp.pdf')
+    #plt.savefig(fig_dir+'paper/eff_area_comp.pdf')
     plt.close()
