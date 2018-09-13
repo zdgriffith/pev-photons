@@ -35,8 +35,8 @@ if __name__ == "__main__":
                                                             surv[1], k=2)
     ratio = spline(hess['distance'])
 
-    E = np.arange(1, 1000, 0.1)
-    Ecut = range(10, 1010, 10)
+    E = np.arange(1, 10000, 0.1)
+    Ecut = np.append(range(10, 1010, 10), range(1100, 10100, 100))
     for i, (j, k) in enumerate(product(range(row_n), range(col_n))):
         flux = hess['flux'][i]*(1e3)**(-hess['alpha'][i])
         flux *= np.exp(-1e3 / E)*1e-12
@@ -47,11 +47,8 @@ if __name__ == "__main__":
         for E_i in Ecut:
             flux_i = np.load(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(i, E_i))
             sens.append(flux_i*1e3)
-        ax[j, k].plot([0, 1e4],
-                      [1e3*hess_sens['sensitivity'][list(hess_sens['name']).index(hess['name'][i])]]*2,
-                      label='Sens. (Power Law)')
 
-        ax[j, k].plot(Ecut, sens, label='Sens. (Cut Off)')
+        ax[j, k].plot(Ecut, sens, label='Sensitivity')
 
         if j == (row_n-1):
             ax[j, k].set_xlabel('Energy Cut Off [TeV]', fontsize=14)
@@ -59,10 +56,10 @@ if __name__ == "__main__":
             ax[j, k].set_ylabel('Flux ', fontsize=14)
         ax[j, k].set_xscale('log')
         ax[j, k].set_yscale('log')
-        ax[j, k].set_xlim([50, 1000])
+        ax[j, k].set_xlim([50, 10000])
         ax[j, k].set_ylim([1e-22, 1e-15])
         if k == 0 and j == 0:
-            ax[j, k].legend(fontsize=12, loc='upper left')
+            ax[j, k].legend(fontsize=12, loc='upper right')
 
     plt.tight_layout()
     plt.savefig(fig_dir+'TeVCat/cut_offs.png', dpi=300)
