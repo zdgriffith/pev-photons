@@ -5,17 +5,19 @@ The scripts used to produce the all-sky-scan and related results.
 ## Producing the all sky scan
 
 * all_sky_scan.py
-    : perform an unbinned LLH test over each point of a grid in the sky, creating a TS map
+    : perform an unbinned LLH test over each point of a grid in the sky, creating a TS map.
 * dec_list.py
-    : create an array of unique declination values for a given Nside
+    : create an array of unique declination values for a given Nside.
 * one_dec_ts.py
     : calculate the TS for random trials at a given declination.
 * cluster_dec_trials.py
-    : submit one_dec_ts.py on the cluster 
-* ts_to_pvalue.py
-    : convert a TS map to a pre-trial p-value map using the TS ensembles produced by cluster_dec_trials.py
+    : submit one_dec_ts.py on the cluster.
+* ts_to_p_value.py
+    : convert a TS map to a pre-trial p-value map using the TS ensembles produced by cluster_dec_trials.py.
 * plot_p_value.py
-    : plot the pre-trial p-value map
+    : plot the pre-trial p-value map.
+* cluster_all_sky_trials.py
+    : submit all-sky trial jobs to the cluster.
 
 ## Hotspot
 
@@ -34,3 +36,6 @@ The scripts used to produce the all-sky-scan and related results.
     : Calculate sensitivity and discovery potential every 3 degrees.
 * plot_sens.py
     : Plot sensitivity and discovery potential as a function of declination with projected HESS fluxes.
+
+* test_hese_track.py
+    : Test for an excess at the location of the HESE track.
