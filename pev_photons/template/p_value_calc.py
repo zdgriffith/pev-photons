@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from glob import glob
 
-from pev_photons.utils.support import prefix, plot_style, fig_dir, plot_setter
+from pev_photons import utils
 
 def plot_trials(args, bg_trials, n_trials, true_TS):
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     #Plot the background trials scrambled in right ascension
@@ -48,7 +48,7 @@ def plot_trials(args, bg_trials, n_trials, true_TS):
 
     #Plot a legend with bold lines.
     l = plt.legend(loc=0, fontsize = 18, prop={'weight':'bold'})
-    plot_setter(plt.gca(), l)
+    utils.plot_setter(plt.gca(), l)
 
     plt.xlim([0,20])
     plt.ylim([0.5,n_trials])
@@ -56,7 +56,7 @@ def plot_trials(args, bg_trials, n_trials, true_TS):
     plt.xlabel('Test Statistic', fontweight = 'bold')
     plt.ylabel('Trials', fontweight = 'bold')
     plt.tight_layout()
-    plt.savefig(fig_dir+'template/'+args.name+'_bg_trials.pdf')
+    plt.savefig(utils.fig_dir+'template/'+args.name+'_bg_trials.pdf')
     plt.close()
 
 if __name__ == "__main__":
@@ -79,9 +79,9 @@ if __name__ == "__main__":
 
     #Load in scrambled trials
     if args.use_original_trials:
-        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*.npy') 
+        job_list = glob('/data/user/zgriffith/pev_photons/template/trials/'+args.name+'/*.npy')
     else:
-        job_list = glob(prefix+'/template/trials/'+args.name+'/*.npy') 
+        job_list = glob(utils.prefix+'/template/trials/'+args.name+'/*.npy')
     bg_trials = []
     for job in job_list:
         job_ts = np.load(job)
@@ -89,12 +89,12 @@ if __name__ == "__main__":
     n_trials = float(len(bg_trials))
 
     #Calculate true result p-value
-    fit_result = np.load(prefix+'/template/'+args.name+'_fit_result.npy')
+    fit_result = np.load(utils.prefix+'/template/'+args.name+'_fit_result.npy')
     true_TS  = fit_result['TS']
 
     p_value = np.sum(np.greater(bg_trials, fit_result['TS']))/n_trials
     print("p-value: %.4f" % p_value)
-    
+
     #Save to fit result
     if "p_value" not in fit_result.dtype.fields:
         fit_result = numpy.lib.recfunctions.append_fields(fit_result,
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                                                           data=[p_value],
                                                           dtypes=np.float,
                                                           usemask=False)
-        np.save(prefix+'/template/'+args.name+'_fit_result.npy',
+        np.save(utils.prefix+'/template/'+args.name+'_fit_result.npy',
                 fit_result)
 
     #Plot if desired

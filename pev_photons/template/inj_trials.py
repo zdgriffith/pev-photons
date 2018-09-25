@@ -10,8 +10,7 @@ import numpy as np
 from skylab.template_injector import TemplateInjector
 from skylab.sensitivity_utils import estimate_sensitivity
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def fit_ts(template_llh, alpha=3.0, E0=2e6, job=0,
            n_trials=100, n_inj=0, name='fermi_pi0'):
@@ -31,7 +30,7 @@ def fit_ts(template_llh, alpha=3.0, E0=2e6, job=0,
     n = trials['TS'][ trials['TS'] > 0].size
     ntot = trials['TS'].size
 
-    np.save(prefix+'template/sens_trials/'+args.name+'/'+args.name+'_job_'+str(args.job)+'.npy',
+    np.save(utils.prefix+'template/sens_trials/'+args.name+'/'+args.name+'_job_'+str(args.job)+'.npy',
             [args.n_inj, n, ntot])
 
 if __name__ == "__main__":

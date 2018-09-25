@@ -7,13 +7,12 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def run_bg_trials(template_llh, args):
     """ Run background trials for the Fermi-LAT template analysis """
     trials = template_llh.do_trials(args.bg_trials)
-    np.save(prefix+'template/trials/%s/%s_job_%s.npy' % (args.name, args.name, args.job),
+    np.save(utils.prefix+'template/trials/%s/%s_job_%s.npy' % (args.name, args.name, args.job),
             trials['TS'])
 
 def run_template_test(template_llh, args):
@@ -23,7 +22,7 @@ def run_template_test(template_llh, args):
     fit_arr = np.empty((1,), dtype=[('TS', np.float), ('nsources', np.float)])
     fit_arr['TS'][0] = out[0]
     fit_arr['nsources'][0] = out[1]['nsources']
-    np.save(prefix+'template/'+args.name+'_fit_result.npy', fit_arr)
+    np.save(utils.prefix+'template/'+args.name+'_fit_result.npy', fit_arr)
 
 if __name__ == "__main__":
 
@@ -45,11 +44,11 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.name == 'cascades':
-        template_llh = load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
-                                    alpha=args.alpha, template_name=args.name)
+        template_llh = utils.load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
+                                          alpha=args.alpha, template_name=args.name)
     else:
-        template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
-                                    alpha=args.alpha, template_name=args.name)
+        template_llh = utils.load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                          alpha=args.alpha, template_name=args.name)
 
     if args.bg_trials:
         run_bg_trials(template_llh, args)

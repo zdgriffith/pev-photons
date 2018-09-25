@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Test the sensitivity to a flux template. 
+# Test the sensitivity to a flux template.
 ########################################################################
 
 import argparse
@@ -10,8 +10,7 @@ import numpy as np
 from skylab.sensitivity_utils import estimate_sensitivity, sensitivity_flux
 from skylab.template_injector import TemplateInjector
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import fig_dir
+from pev_photons import utils
 
 def mu2flux(inj, args):
 
@@ -39,11 +38,11 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.name == 'cascades':
-        template_llh = load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
-                                    alpha=args.alpha, template_name=args.name)
+        template_llh = utils.load_dataset('HESE', ncpu=args.ncpu, seed=args.seed,
+                                          alpha=args.alpha, template_name=args.name)
     else:
-        template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
-                                    alpha=args.alpha, template_name=args.name)
+        template_llh = utils.load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                          alpha=args.alpha, template_name=args.name)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,
@@ -56,10 +55,10 @@ if __name__ == "__main__":
         mu2flux(inj, args)
 
     #Directory where plots will go
-    path = (fig_dir+'template/'+args.name+'/')
+    path = (utils.fig_dir+'template/'+args.name+'/')
 
     results = estimate_sensitivity(template_llh, inj,
-                                   nstep=11, 
-                                   ni_bounds=[0,args.n_max], 
-                                   nsample=100, 
+                                   nstep=11,
+                                   ni_bounds=[0,args.n_max],
+                                   nsample=100,
                                    path=path)

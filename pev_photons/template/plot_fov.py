@@ -18,7 +18,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.coordinates import Angle as astropyAngle
 
-from pev_photons.utils.support import prefix, resource_dir, fig_dir, plot_style
+from pev_photons import utils
 
 def move_gc_to_center(lon):
     l_t=astropyAngle(lon*u.radian)
@@ -26,7 +26,7 @@ def move_gc_to_center(lon):
     return l_t
 
 def get_fermi_pi0_map():
-    fermi = np.load(resource_dir+'fermi_pi0.npy')
+    fermi = np.load(utils.resource_dir+'fermi_pi0.npy')
 
     eq_map = hp.cartview(fermi, return_projected_map=True)
     plt.close()
@@ -43,7 +43,7 @@ def plot_IC_FOV(ax, config='86'):
     params = {'max_dec': {'86':np.arccos(0.8), '40': np.radians(30)},
               'color': {'86':colors[1], '40': colors[0]},
               'y': {'86':11, '40': -55.5}}
-              
+
     dec, ra = np.meshgrid(np.linspace(0., params['max_dec'][config], 100) - np.pi/2.,
                           np.linspace(0., 2.0*np.pi, 1000))
     dec = dec.flatten()
@@ -53,7 +53,7 @@ def plot_IC_FOV(ax, config='86'):
     lonFOV = np.degrees(move_gc_to_center(c.galactic.l.radian))
     points = np.array([ [lonFOV[i], latFOV[i]] for i in range(len(lonFOV))])
     hull = ConvexHull(points)
-    ax.plot(points[hull.vertices,0], points[hull.vertices,1], 
+    ax.plot(points[hull.vertices,0], points[hull.vertices,1],
             c=params['color'][config], lw=2, ls='--')
     ax.text(x=-50, y=params['y'][config],
             s='IC-{}'.format(config), color=params['color'][config],
@@ -94,7 +94,7 @@ def plot_rectangular_FOV(ax, exp='cm'):
 
 if __name__ == "__main__":
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     fig, ax = plt.subplots(figsize=(20,10))
     colors = plt.rcParams['axes.color_cycle']
 
@@ -113,5 +113,5 @@ if __name__ == "__main__":
     ax.set_xlabel('Galactic Longitude [$^{\circ}$]', fontsize=30)
     ax.set_ylabel('Galactic Latitude [$^{\circ}$]', fontsize=30)
 
-    plt.savefig(fig_dir+'template/FOV_comparison.png')
-    plt.savefig(fig_dir+'paper/FOV_comparison.pdf')
+    plt.savefig(utils.fig_dir+'template/FOV_comparison.png')
+    plt.savefig(utils.fig_dir+'paper/FOV_comparison.pdf')

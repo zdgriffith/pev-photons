@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import interpolate
 
-from pev_photons.utils.support import plot_style, fig_dir, resource_dir
+from pev_photons import utils
 
 def convert_limit(data):
     g = np.array([[1.66, 1.58, 1.63, 1.67, 1.63], np.full(5, 1.4)])
@@ -31,12 +31,12 @@ def plot_arrow(exp):
         ax.plot(np.full(2, x_i),
                 np.full(2, exp['data'][1][i])*[1,0.5],
                 color=exp['color'], zorder=2)
-                
+
     ax.scatter(exp['data'][0],exp['data'][1]*0.5,
                marker='v', color=exp['color'], s=40, zorder=2)
     ax.scatter(exp['data'][0],exp['data'][1], label=exp['label'],
                marker=exp['marker'], color=exp['color'], s=40, zorder=2)
-    
+
 def plot_limits(exp, key):
     if exp['convert']:
         exp['data'][1] *= convert_limit(exp['data'][0])
@@ -64,7 +64,7 @@ def plot_range(exp):
     ax.plot(x, y, ls='--', color=exp['color'], zorder=1)
 
 def plot_flux_model(model):
-    values = np.load(resource_dir+model['name']+'.npy')
+    values = np.load(utils.resource_dir+model['name']+'.npy')
 
     if args.fermi_limit:
         for key in ['low', 'high']:
@@ -86,11 +86,11 @@ if __name__ == "__main__":
                    help='If True, convert to angular integrated limit.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
     fig, ax = plt.subplots()
 
-    fermi_ratio = np.load(resource_dir+'fermi_ratio_dict.npz')
+    fermi_ratio = np.load(utils.resource_dir+'fermi_ratio_dict.npz')
 
     exp = {}
     exp['CASA-MIA'] = {'data':np.array([[140, 180, 310, 650, 1300],
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     for key in exp:
         if not args.fermi_limit:
             exp[key]['label'] += ' ($|$b$|$ $<$ 5$^{\circ}$)'
-    
+
         if key in ['ARGO-YBJ']:
             plot_data(exp[key], key)
         else:
@@ -142,7 +142,7 @@ if __name__ == "__main__":
                          'zorder':-2}
     for model in models:
         plot_flux_model(models[model])
-    
+
     ax.set_xlim([0.1, 5e4])
     ax.set_ylim([1e-9, 5e-6])
     ax.set_xscale('log')
@@ -153,10 +153,10 @@ if __name__ == "__main__":
 
     if args.fermi_limit:
         ax.set_ylabel(r'$E^2\Phi_{template}$ [GeV cm${}^{-2}$ s${}^{-1}$]')
-        plt.savefig(fig_dir+'template/fermi_integrated_limit.png')
-        #plt.savefig(fig_dir+'paper/fermi_integrated_limit.pdf', bbox_inches='tight')
-        plt.savefig(fig_dir+'paper/fermi_integrated_limit.eps', bbox_inches='tight')
+        plt.savefig(utils.fig_dir+'template/fermi_integrated_limit.png')
+        #plt.savefig(utils.fig_dir+'paper/fermi_integrated_limit.pdf', bbox_inches='tight')
+        plt.savefig(utils.fig_dir+'paper/fermi_integrated_limit.eps', bbox_inches='tight')
     else:
         ax.set_ylabel(r'$E^2J_\gamma$ [GeV cm$^{-2}$ s$^{-1}$ sr$^{-1}$]')
-        plt.savefig(fig_dir+'template/per_str_limit.pdf')
+        plt.savefig(utils.fig_dir+'template/per_str_limit.pdf')
     plt.close()

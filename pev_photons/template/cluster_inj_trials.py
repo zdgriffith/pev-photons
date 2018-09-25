@@ -7,8 +7,7 @@
 import argparse
 import os
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev_photons import utils
 
 if __name__ == "__main__":
 
@@ -29,22 +28,22 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Range, intervals of injected events best found through a course
-    # run on sensitivity_test.py first. 
+    # run on sensitivity_test.py first.
     inj_list = {'fermi_pi0':[20., 98., 176., 254., 332., 410.,
                              488., 566., 644., 722., 800.],
                 'ingelman':range(0,601,50),
                 'cascades':range(0,501,50)}
 
-    dag_maker = DagMaker(name=args.name+'sens_trials', temp_dir=dag_dir)
+    dag_maker = DagMaker(name=args.name+'sens_trials', temp_dir=utils.dag_dir)
     if args.rm_old:
-        dag_maker.remove_old(prefix=prefix)
+        dag_maker.remove_old(prefix=utils.prefix)
 
     static_args = {'n_trials': args.nTrials, 'name': args.name,
                    'alpha': args.alpha}
     iters = {'job': range(args.nJobs), 'n_inj': inj_list[args.name]}
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'inj_trials.py'),
                           static_args=static_args, iters=iters,
-                          submit_file=os.path.join(resource_dir,
+                          submit_file=os.path.join(utils.resource_dir,
                                                    'extra_memory.submit'),
-                          test=args.test, prefix=prefix, random_seed=True)
+                          test=args.test, prefix=utils.prefix, random_seed=True)
     os.system(ex)

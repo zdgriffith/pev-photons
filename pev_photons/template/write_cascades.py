@@ -8,7 +8,7 @@ import numpy as np
 import healpy as hp
 import pandas as pd
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
 
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     theta_gal, phi_gal = hp.Rotator(coord = ['G','C'], rot = [180,180])(dec, ra)
     pix = hp.ang2pix(nside, theta_gal, phi_gal)
     cascades = np.take(cascades, pix)
-    np.save(prefix+'resources/cascade_template.npy', cascades)
+    np.save(utils.prefix+'resources/cascade_template.npy', cascades)

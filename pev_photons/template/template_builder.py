@@ -12,7 +12,7 @@ import numpy as np
 
 from skylab.datasets import Datasets
 from skylab.template import Template
-from pev_photons.utils.support import prefix, resource_dir, fig_dir
+from pev_photons import utils
 
 def template_builder(args):
     """Build the template for a given year."""
@@ -30,9 +30,9 @@ def template_builder(args):
       ext = '_exp'
       weights = None
 
-    output = (prefix + '/template/' + args.year + '/' 
+    output = (prefix + '/template/' + args.year + '/'
               + args.inFile + ext)
-    fig_out = (fig_dir + '/template/' + args.year + '/' 
+    fig_out = (utils.fig_dir + '/template/' + args.year + '/'
                + args.inFile + ext)
 
     os.system('mkdir -p ' + output)
@@ -48,7 +48,7 @@ def template_builder(args):
 
     template = Template()
 
-    template.build(map_in=(resource_dir + args.inFile + '.npy'),
+    template.build(map_in=(utils.resource_dir + args.inFile + '.npy'),
                    nside_out=512,
                    mc=mc, exp=exp,
                    coords='galactic',

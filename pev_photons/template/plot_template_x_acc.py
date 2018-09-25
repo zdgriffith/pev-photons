@@ -11,8 +11,7 @@ from matplotlib.colors import LogNorm
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, plot_style, fig_dir, plasma_map
-from pev_photons.utils.skymap import PolarSkyMap
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -29,32 +28,32 @@ if __name__ == "__main__":
                    help='Year of analyis to build.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
 
     fig, ax = plt.subplots(figsize=(12,8))
 
-    skymap = PolarSkyMap(fig, ax)
- 
+    skymap = utils.PolarSkyMap(fig, ax)
+
     if not args.noGrid:
         skymap.plot_grid()
 
     if not args.noPlane:
         skymap.plot_galactic_plane()
 
-    filename = prefix+'/template/'+args.year+'/'+args.name+'_exp.npy'
+    filename = utils.prefix+'/template/'+args.year+'/'+args.name+'_exp.npy'
     hmap = np.load(filename)
     hmap = hp.ud_grade(hmap.item()['signal_x_acceptance_map'], nside_out=512)
     hmap = len(hmap)*hmap/np.sum(hmap[np.isfinite(hmap)])
-    scatter_args = {'cmap':plasma_map,
+    scatter_args = {'cmap':utils.plasma_map,
                     'norm':LogNorm(vmin=5*10**-2, vmax=np.max(hmap)),
                     's':2**3, 'lw':0, 'zorder':0, 'rasterized':True}
 
     skymap.plot_sky_map(hmap, coord='G', colorbar_label='-log$_{10}$p',
                         **scatter_args)
-    
+
     ax.legend()
-    plt.savefig(fig_dir+'template/'+args.name+'_x_acc.png',
+    plt.savefig(utils.fig_dir+'template/'+args.name+'_x_acc.png',
                 bbox_inches='tight')
     if args.name == 'fermi_pi0':
-        plt.savefig(fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
+        plt.savefig(utils.fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
     plt.close()

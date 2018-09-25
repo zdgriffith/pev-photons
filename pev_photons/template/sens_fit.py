@@ -11,12 +11,11 @@ import argparse as argparse
 from skylab.sensitivity_utils import fit
 from skylab.template_injector import TemplateInjector
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, fig_dir
+from pev_photons import utils
 
 def sensitivity(args):
-    template_llh = load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
-                                alpha=args.alpha, template_name=args.name)
+    template_llh = utils.load_dataset('galactic_plane', ncpu=args.ncpu, seed=args.seed,
+                                      alpha=args.alpha, template_name=args.name)
 
     inj = TemplateInjector(template=template_llh.template,
                            gamma=args.alpha,
@@ -25,7 +24,7 @@ def sensitivity(args):
                            seed=1)
     inj.fill(template_llh.exp, template_llh.mc, template_llh.livetime)
 
-    files = glob(prefix+'template/sens_trials/'+args.name+'/*.npy') 
+    files = glob(utils.prefix+'template/sens_trials/'+args.name+'/*.npy')
 
     inj_list = {'fermi_pi0':[20., 98., 176., 254., 332., 410.,
                              488., 566., 644., 722., 800.],
@@ -39,11 +38,11 @@ def sensitivity(args):
         index = inj_list[args.name].index(a[0])
         frac[index] += a[1]
         tot[index] += a[2]
-        
+
     ni, ni_err, images = fit(inj_list[args.name], frac, tot,
                              0.9, ylabel="fraction TS > 0.90",
                              npar = 2, par = None,
-                             image_base=fig_dir+'template/'+args.name+'_sens')
+                             image_base=utils.fig_dir+'template/'+args.name+'_sens')
     flux = inj.mu2flux(ni)
     flux_err = flux * ni_err / ni
 
@@ -59,7 +58,7 @@ def sensitivity(args):
     sens_result['ni_err'] = ni_err
     sens_result['flux'] = flux
     sens_result['flux_err'] = flux_err
-    np.save(prefix+'template/'+args.name+'_sens.npy', sens_result)
+    np.save(utils.prefix+'template/'+args.name+'_sens.npy', sens_result)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Perform a sensitivity calculation fit',
