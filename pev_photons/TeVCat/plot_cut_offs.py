@@ -12,7 +12,7 @@ from itertools import product
 import scipy
 from scipy import interpolate
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -20,16 +20,16 @@ if __name__ == "__main__":
             formatter_class=argparse.RawDescriptionHelpFormatter)
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     row_n = 5
     col_n = 3
     fig, ax = plt.subplots(row_n, col_n, sharex='col', figsize=(12, 9))
-    hess = np.load(resource_dir+'hgps_sources.npz')
-    hess_sens = np.load(prefix+'TeVCat/hess_sens.npz')
+    hess = np.load(utils.resource_dir+'hgps_sources.npz')
+    hess_sens = np.load(utils.prefix+'TeVCat/hess_sens.npz')
 
-    surv = np.loadtxt(resource_dir+'gamma_survival_vs_distance.txt')
+    surv = np.loadtxt(utils.resource_dir+'gamma_survival_vs_distance.txt')
     surv = surv.T
     spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
                                                             surv[1], k=2)
@@ -42,10 +42,10 @@ if __name__ == "__main__":
         flux *= np.exp(-1e3 / E)*1e-12
         flux *= ratio[i]
         ax[j, k].plot(E, flux, label='H.E.S.S. Extrap.')
-   
+
         sens = []
         for E_i in Ecut:
-            flux_i = np.load(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(i, E_i))
+            flux_i = np.load(utils.prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(i, E_i))
             sens.append(flux_i*1e3)
 
         ax[j, k].plot(Ecut, sens, label='Sensitivity')
@@ -62,5 +62,5 @@ if __name__ == "__main__":
             ax[j, k].legend(fontsize=12, loc='upper right')
 
     plt.tight_layout()
-    plt.savefig(fig_dir+'TeVCat/cut_offs.png', dpi=300)
+    plt.savefig(utils.fig_dir+'TeVCat/cut_offs.png', dpi=300)
     plt.close()

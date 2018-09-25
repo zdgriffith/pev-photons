@@ -7,8 +7,7 @@
 import argparse
 import os
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev_photons import utils
 
 if __name__ == "__main__":
 
@@ -21,14 +20,14 @@ if __name__ == "__main__":
                    help='Remove old dag files?')
     args = p.parse_args()
 
-    dag_maker = DagMaker(name='hess_cut_offs', temp_dir=dag_dir)
+    dag_maker = utils.DagMaker(name='hess_cut_offs', temp_dir=utils.dag_dir)
     if args.rm_old:
-        dag_maker.remove_old(prefix=prefix)
+        dag_maker.remove_old(prefix=utils.prefix)
 
     iters = {'source': range(15), 'Ecut':range(10, 1010, 10)}
 
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'hess_cut_off.py'),
                           iters=iters,
-                          submit_file=os.path.join(resource_dir, 'py2v3.submit'),
-                          test=args.test, prefix=prefix)
+                          submit_file=os.path.join(utils.resource_dir, 'py2v3.submit'),
+                          test=args.test, prefix=utils.prefix)
     os.system(ex)

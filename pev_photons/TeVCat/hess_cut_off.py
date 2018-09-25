@@ -2,7 +2,7 @@
 
 ########################################################################
 # Calculates the sensitivity to each HESS source's
-# declination and spectral index 
+# declination and spectral index
 ########################################################################
 
 import argparse
@@ -10,8 +10,7 @@ import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -28,9 +27,9 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    hess = np.load(prefix+'resources/hgps_sources.npz')
+    hess = np.load(utils.prefix+'resources/hgps_sources.npz')
     sens = list()
 
     dec = np.radians(hess['dec'][args.source])
@@ -45,4 +44,4 @@ if __name__ == "__main__":
                                          n_iter=1000,
                                          src_ra=np.pi, src_dec=dec)
     sens = result[0]["flux"][0]
-    np.save(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.source, args.Ecut), sens)
+    np.save(utils.prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.source, args.Ecut), sens)

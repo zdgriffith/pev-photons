@@ -2,7 +2,7 @@
 
 ########################################################################
 # Calculates the sensitivity to each HESS source's
-# declination and spectral index 
+# declination and spectral index
 ########################################################################
 
 import argparse
@@ -10,8 +10,7 @@ import numpy as np
 
 from skylab.ps_injector import PointSourceInjector
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -24,9 +23,9 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    hess = np.load(prefix+'resources/hgps_sources.npz')
+    hess = np.load(utils.prefix+'resources/hgps_sources.npz')
     sens = list()
 
     for i, alpha in enumerate(hess['alpha']):
@@ -50,4 +49,4 @@ if __name__ == "__main__":
     a['name'] = hess['name']
     a['sensitivity'] = sens
 
-    np.savez(prefix+'TeVCat/hess_sens.npz', **a)
+    np.savez(utils.prefix+'TeVCat/hess_sens.npz', **a)

@@ -14,8 +14,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, resource_dir
-from pev_photons.utils.support import fig_dir, ps_map, plot_style
+from pev_photons import utils
 
 def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
 
@@ -30,9 +29,9 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
         src['x'] = x
         src['y'] = y
         src['plot'] = plot
-    
+
     sources.sort(key=lambda x: x['x'])
-    
+
     nbottom = 0
     ntop = 0
     for src in sources:
@@ -41,7 +40,7 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                 nbottom += 1
             if src['position'] == 't':
                 ntop += 1
-    
+
     def GetFractionalX(i,ntot,position):
         xmin2 = xmin
         xmax2 = xmax
@@ -57,12 +56,12 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
             sys.exit('Error: "i >= ntot"')
         result = xmin2 + (i+0.5)*(xmax2-xmin2)/(ntot)
         return result
-    
+
     ibottom = 0
     #itop = 0
     #itop = [3,0,2,1,4,5,6,7,8,9,10,11,12]
     itop = [3,0,2,1,4,5,6,7,8,10,9,11,12,13,14]
-    
+
     for index, src in enumerate(sources):
         if src['plot']:
             ax.scatter(src['x'], src['y'], marker=src['marker'],
@@ -91,7 +90,7 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                 s = str(src['name'])
                 xx = src['x']+dra*(xmax-xmin)
                 yy = src['y']+ddec*(ymax-ymin)
-            
+
                 # Draw a line between pointLabel and pointSource
                 # Keep a little distance to the source.
                 def DrawLine(pl,ps,ax,toskip=0.015*(ymax-ymin)):
@@ -155,7 +154,7 @@ if __name__ == "__main__":
                    help="Interval in degrees between parallels")
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
 
     # Fill 2D array
     xmin = -180.
@@ -190,9 +189,9 @@ if __name__ == "__main__":
       frot = 180.
       cxmin = xmax - 180.
       cxmax = xmin + 180.
-    
+
     # Read in the skymap and mask out empty pixels
-    skymap = np.load(prefix+args.mapFile)
+    skymap = np.load(utils.prefix+args.mapFile)
     # remove naughty values
     skymap[np.isnan(skymap)] = hp.UNSEEN
     skymap *= args.scale
@@ -207,10 +206,10 @@ if __name__ == "__main__":
     fysize = 4
     figsize = (fysize*faspect+2, fysize+2.75)
     fig = plt.figure(num=1,figsize=figsize)
-    
+
     tfig = plt.figure(num=2,figsize=figsize)
     rotimg = hp.cartview(-np.log10(skymap), fig=2, coord=coords, title="",\
-                         cmap=ps_map, cbar=False,\
+                         cmap=utils.ps_map, cbar=False,\
                          lonra=[cxmin,cxmax], latra=[ymin,ymax], #rot=rotMap,
                          notext=True, xsize=args.xsize,
                          return_projected_map=True)
@@ -232,7 +231,7 @@ if __name__ == "__main__":
                      'plotLabel': True
                     }
 
-    f = np.load(resource_dir+'hess_sources.npz')
+    f = np.load(utils.resource_dir+'hess_sources.npz')
     sources = []
     for i, name in enumerate(f['name']):
         print(name)
@@ -242,7 +241,7 @@ if __name__ == "__main__":
         src['Dec'] = f['dec'][i]
         src['name'] = name
         sources.append(src)
-        
+
     PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax)
 
     # Draw grid lines
@@ -263,13 +262,13 @@ if __name__ == "__main__":
                     cval+=360.
             elif args.coords=='C' and cval<0:
                 cval+=360
-            
+
             xtlbs.append('%g'%(cval))
     yts = np.arange(np.floor(ymin), np.ceil(ymax+args.dpar), args.dpar)[1:-1]
     print(yts)
 
     imgp = ax.imshow(rotimg,extent=[cxmax, cxmin, ymax,ymin],\
-                     vmin=0,vmax=4.5,cmap=ps_map)
+                     vmin=0,vmax=4.5,cmap=utils.ps_map)
     ax.grid(color='k', alpha=0.2)
     ax.xaxis.set_ticks(xts)
     ax.xaxis.set_ticklabels(xtlbs)
@@ -280,6 +279,6 @@ if __name__ == "__main__":
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     fig.colorbar(imgp, cax=cax, label='-log$_{10}$p')
-    plt.savefig(fig_dir+'TeVCat/HESS_srcs_w_labels.png')
-    plt.savefig(fig_dir+'paper/hess_sources.pdf')
+    plt.savefig(utils.fig_dir+'TeVCat/HESS_srcs_w_labels.png')
+    plt.savefig(utils.fig_dir+'paper/hess_sources.pdf')
     plt.close()

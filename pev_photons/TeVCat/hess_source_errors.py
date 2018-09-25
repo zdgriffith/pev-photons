@@ -8,8 +8,7 @@ import time
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 def error_profile(llh, ra, dec, fit, **kwargs):
 
@@ -47,14 +46,14 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    sources = np.load(resource_dir+'hess_sources.npz')
+    sources = np.load(utils.resource_dir+'hess_sources.npz')
 
     fit_arr = np.empty((len(sources['dec']),),
                        dtype=[('TS', np.float), ('nsources', np.float),
                               ('gamma', np.float)])
-    
+
     source_fits = {}
     for i, dec in enumerate(sources['dec']):
         source_fits[sources['name'][i]] = {}
@@ -62,7 +61,7 @@ if __name__ == "__main__":
         dec = np.radians(dec)
 
         TS, xmin = ps_llh.fit_source(ra, dec, scramble=False)
-        fit = dict({'TS':TS}, **xmin) 
+        fit = dict({'TS':TS}, **xmin)
         source_fits[sources['name'][i]]['gamma'] = error_profile(ps_llh, ra, dec, fit, gamma=np.arange(0.99, 4.01, 0.01))
         source_fits[sources['name'][i]]['nsources'] = error_profile(ps_llh, ra, dec, fit, nsources=np.arange(0, 100, 0.1))
-    np.save(prefix+'/TeVCat/fit_uncertainties.npy', source_fits)
+    np.save(utils.prefix+'/TeVCat/fit_uncertainties.npy', source_fits)

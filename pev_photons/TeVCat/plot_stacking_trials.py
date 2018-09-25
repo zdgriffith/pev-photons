@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 
-from pev_photons.utils.support import prefix, fig_dir, plot_setter, plot_style
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -19,14 +19,14 @@ if __name__ == "__main__":
                    help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
-    stack_true = np.load(prefix+'TeVCat/stacking_fit_result.npy')['TS']
+    stack_true = np.load(utils.prefix+'TeVCat/stacking_fit_result.npy')['TS']
     if args.use_original_trials:
         bg_trials = np.load('/data/user/zgriffith/pev_photons/TeVCat/stacking_trials.npy')
     else:
-        bg_trials = np.load(prefix+'TeVCat/stacking_trials.npy')
+        bg_trials = np.load(utils.prefix+'TeVCat/stacking_trials.npy')
     n_trials = len(bg_trials)
 
     #Plot chi2 distributions for each degree of freedom given
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     plt.ylim([0.5,n_trials])
     plt.yscale('log')
     l = plt.legend()
-    plot_setter(plt.gca(), l)
+    utils.plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(fig_dir+'TeVCat/stacking_trials.pdf')
+    plt.savefig(utils.fig_dir+'TeVCat/stacking_trials.pdf')
     plt.close()

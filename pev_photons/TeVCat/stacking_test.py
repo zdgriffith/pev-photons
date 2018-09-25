@@ -7,15 +7,14 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 def run_bg_trials(ps_llh, sources, args):
     """Run background trials for the H.E.S.S. stacking analysis"""
 
     trials = ps_llh.do_trials(args.bg_trials, src_ra=np.radians(sources['ra']),
                               src_dec=np.radians(sources['dec']))
-    np.save(prefix+'TeVCat/stacking_trials.npy', trials['TS'])
+    np.save(utils.prefix+'TeVCat/stacking_trials.npy', trials['TS'])
 
 def run_stacking_test(ps_llh, sources, args):
     """Run the H.E.S.S. stacking analysis"""
@@ -35,11 +34,11 @@ def run_stacking_test(ps_llh, sources, args):
     fit_arr['TS'][0] = out[0]
     fit_arr['gamma'][0] = out[1]['gamma']
     fit_arr['nsources'][0] = out[1]['nsources']
-    
+
     if args.extended:
-        np.save(prefix+'TeVCat/extended/stacking_fit_result.npy', fit_arr)
+        np.save(utils.prefix+'TeVCat/extended/stacking_fit_result.npy', fit_arr)
     else:
-        np.save(prefix+'TeVCat/stacking_fit_result.npy', fit_arr)
+        np.save(utils.prefix+'TeVCat/stacking_fit_result.npy', fit_arr)
 
 if __name__ == "__main__":
 
@@ -57,9 +56,9 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    sources = np.load(resource_dir+'hess_sources.npz')
+    sources = np.load(utils.resource_dir+'hess_sources.npz')
     if args.bg_trials:
         run_bg_trials(ps_llh, sources, args)
     else:

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import interpolate
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
+from pev_photons import utils
 from gamma_ray_survival import absorption_spline
 
 def plot_hgps_data(source, color, label):
@@ -24,7 +24,7 @@ def plot_hgps_data(source, color, label):
     E2 = source['Flux_Points_Energy'][4:6]**2
     x = source['Flux_Points_Energy'][4:6]
     y = E2*source['Flux_Points_Flux_UL'][4:6]
-    
+
     for index in [4, 5]:
         plt.plot([source['Flux_Points_Energy_Min'][index],
                   source['Flux_Points_Energy_Max'][index]],
@@ -91,7 +91,7 @@ def plot_data(data, label, colors, args):
     #Convert data from ergs to eV and from E^2*Flux to Flux
     data.T[1:] *= 0.624
 
-    #Plot in flux with just HESS, E^2*Flux with Fermi data 
+    #Plot in flux with just HESS, E^2*Flux with Fermi data
     if not args.addFermi:
         data.T[1:] /= data.T[0]**2
 
@@ -184,17 +184,17 @@ if __name__ == "__main__":
                    help='Option for an exponential cut-off.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     fig,ax = plt.subplots(1)
 
     #Data points
-    hess_data = np.loadtxt(resource_dir+'/hessJ1427_data.txt') 
+    hess_data = np.loadtxt(utils.resource_dir+'/hessJ1427_data.txt')
     plot_data(hess_data, 'H.E.S.S. data', colors, args)
     gamma = plot_fit('Best fit (H.E.S.S. data)', colors, args, 0)
     if args.addFermi:
-        fermi_data = np.loadtxt(resource_dir+'/hessJ1427_fermi_data.txt') 
+        fermi_data = np.loadtxt(utils.resource_dir+'/hessJ1427_fermi_data.txt')
         plot_data(fermi_data, 'Fermi data', colors, args)
         #combined_gamma = plot_fit('Best fit (combined H.E.S.S. and Fermi data)',
         combined_gamma = plot_fit('Best fit (H.E.S.S. + Fermi)',
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         plt.plot(b*1e-3, y0*b**(-gamma),
                  color=colors[4],label="IceCube 5-year 90$\%$ upper limit")
 
-    sources = np.load(prefix+'hgps_sources.npz')
+    sources = np.load(utils.prefix+'hgps_sources.npz')
     source = {key:sources[key][8] for key in sources.keys()}
     plot_hgps_data(source, 'r', label='New H.E.S.S. data')
     plot_new_fit(source, 'r', args, 0)
@@ -248,12 +248,12 @@ if __name__ == "__main__":
                       fontsize=16, prop={'weight':'bold'})
         plt.text(1,10**-20, 'IceCube Preliminary', color='r', fontsize=14)
 
-    plot_setter(plt.gca(),l)
+    utils.plot_setter(plt.gca(),l)
     plt.xlabel('Energy [TeV]', fontweight='bold')
     plt.xscale('log')
     plt.yscale('log')
     plt.tight_layout()
-    plt.savefig(fig_dir+'TeVCat/'+outFile)
+    plt.savefig(utils.fig_dir+'TeVCat/'+outFile)
     if args.addFermi:
-        plt.savefig(fig_dir+'paper/hess_J1427.pdf')
+        plt.savefig(utils.fig_dir+'paper/hess_J1427.pdf')
     plt.close()

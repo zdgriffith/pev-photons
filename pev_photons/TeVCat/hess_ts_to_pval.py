@@ -11,7 +11,7 @@ from glob import glob
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -27,23 +27,23 @@ if __name__ == "__main__":
                    help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
-    dec_pix = np.load(resource_dir+'dec_values_512.npz')
+    dec_pix = np.load(utils.resource_dir+'dec_values_512.npz')
     pixels = dec_pix['pix_list']
-    n_decs = len(pixels) 
+    n_decs = len(pixels)
 
-    sources = np.load(resource_dir+'hess_sources.npz')
+    sources = np.load(utils.resource_dir+'hess_sources.npz')
     src_pix = hp.ang2pix(512,
                          np.pi/2. - np.radians(sources['dec']),
                          np.radians(sources['ra']))
-    ts = np.load(prefix+'TeVCat/'+args.inFile)['TS']
+    ts = np.load(utils.prefix+'TeVCat/'+args.inFile)['TS']
     p_val = np.zeros(len(ts))
-    
+
     for dec_i in range(n_decs):
         print('{}/{}'.format(dec_i, n_decs))
         if args.use_original_trials:
             f_list = glob('/data/user/zgriffith/pev_photons/all_sky/dec_trials/dec_%s_job_*' % dec_i)
         else:
-            f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
+            f_list = glob(utils.prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
         trials = []
         for f in f_list:
             a = np.load(f)
@@ -55,4 +55,4 @@ if __name__ == "__main__":
                 p_val[i] = np.sum(np.greater(trials,ts[i]))/float(len(trials))
 
     print(p_val)
-    np.save(prefix + 'TeVCat/'+args.outFile, p_val)
+    np.save(utils.prefix+ 'TeVCat/'+args.outFile, p_val)

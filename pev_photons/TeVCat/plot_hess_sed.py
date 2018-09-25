@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import interpolate
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style, prefix
+from pev_photons import utils
 from gamma_ray_survival import absorption_spline
 
 def plot_data(source, color, label):
@@ -97,12 +97,12 @@ if __name__ == "__main__":
                    help='Index of the HESS source.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     fig,ax = plt.subplots(1)
 
-    sources = np.load(resource_dir+'hgps_sources.npz')
+    sources = np.load(utils.resource_dir+'hgps_sources.npz')
     source = {key:sources[key][args.index] for key in sources.keys()}
     gamma = plot_fit('Best fit (H.E.S.S. data)', source, colors, args, 0)
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     #IceCube Upper limit
     b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
-    sens = np.load(prefix+'/TeVCat/hess_sens.npz')
+    sens = np.load(utils.prefix+'/TeVCat/hess_sens.npz')
     y0 = sens['sensitivity'][args.index]*1e9
     y = y0*(x**(2-gamma))
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
 
     if args.Ecut:
-        flux_i = np.load(prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.index, args.Ecut))
+        flux_i = np.load(utils.prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.index, args.Ecut))
         y0 = flux_i*1e9
         y = y0*(x**(2-gamma))
 
@@ -138,11 +138,11 @@ if __name__ == "__main__":
     plt.ylabel(r'E$^2$dN/dE [cm$^{-2}$s$^{-1}$TeV]', fontweight='bold')
     l = ax.legend(loc='lower left')
 
-    plot_setter(plt.gca(),l)
+    utils.plot_setter(plt.gca(),l)
     plt.xlabel('Energy [TeV]', fontweight='bold')
     plt.xscale('log')
     plt.yscale('log')
-    plt.savefig(fig_dir+'TeVCat/hess_source_%s.png' % args.index, dpi=300)
+    plt.savefig(utils.fig_dir+'TeVCat/hess_source_%s.png' % args.index, dpi=300)
     if args.index==5:
-        plt.savefig(fig_dir+'paper/hess_J1356.pdf')
+        plt.savefig(utils.fig_dir+'paper/hess_J1356.pdf')
     plt.close()

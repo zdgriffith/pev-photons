@@ -7,8 +7,7 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -26,16 +25,16 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Load the dataset.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    sources = np.load(resource_dir+'hess_sources.npz')
+    sources = np.load(utils.resource_dir+'hess_sources.npz')
 
     fit_arr = np.empty((len(sources['dec']),),
                        dtype=[('TS', np.float), ('nsources', np.float),
                               ('gamma', np.float)])
-    
+
     for i, dec in enumerate(sources['dec']):
-    
+
         if args.extended:
             out = ps_llh.fit_source(np.radians(sources['ra'][i]),
                                     np.radians(dec),
@@ -51,6 +50,6 @@ if __name__ == "__main__":
         fit_arr['nsources'][i] = out[1]['nsources']
 
     if args.extended:
-        np.save(prefix+'TeVCat/extended/'+args.outFile+'.npy', fit_arr)
+        np.save(utils.prefix+'TeVCat/extended/'+args.outFile+'.npy', fit_arr)
     else:
-        np.save(prefix+'TeVCat/'+args.outFile+'.npy', fit_arr)
+        np.save(utils.prefix+'TeVCat/'+args.outFile+'.npy', fit_arr)
