@@ -10,8 +10,7 @@ import logging
 
 import healpy as hp
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def manual_scan(ps_llh, nside=args.nside, extension=args.extension):
     """Manually test for a point source at each pixel in the sky map.
@@ -37,11 +36,11 @@ def manual_scan(ps_llh, nside=args.nside, extension=args.extension):
         ts, xmin = ps_llh._scan(ra[mask], dec[mask],
                                 ts, xmin, mask,
                                 src_extension=np.radians(extension))
-        np.save(prefix+'/all_sky/ext/skymap_ext_%s.npy' % extension,
+        np.save(utils.prefix+'/all_sky/ext/skymap_ext_%s.npy' % extension,
                 ts)
     else:
         ts, xmin = ps_llh._scan(ra[mask], dec[mask], ts, xmin, mask)
-        np.save(prefix+'/all_sky/skymap.npy', ts)
+        np.save(utils.prefix+'/all_sky/skymap.npy', ts)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -71,26 +70,28 @@ if __name__ == "__main__":
         ts_list = np.full(args.bg_trials, np.nan)
         for trial in range(args.bg_trials):
             args.seed = np.random.randint(0, 10**6)
-            ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed,
-                                  llh_args={'scramble':True})
+            ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu,
+                                        seed=args.seed,
+                                        llh_args={'scramble':True})
             for i, scan in enumerate(ps_llh.all_sky_scan()):
                 if i > 0:
                     ts_list[trial] = scan[1]['South']['fit']['TS']
                     break
-            np.save(prefix+'all_sky/scan_trials/job_%s.npy' % args.job, ts_list)
+            np.save(utils.prefix+'all_sky/scan_trials/job_%s.npy' % args.job,
+                    ts_list)
     else:
         # Load the dataset.
-        ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+        ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
         # Set the logging output file.
         logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
-        logging.basicConfig(filename=prefix+'all_sky/scan.log',
+        logging.basicConfig(filename=utils.prefix+'all_sky/scan.log',
                             filemode='w', level=logging.INFO)
         if args.coarse_scan:
             for i, scan in enumerate(ps_llh.all_sky_scan()):
                 if i > 0:
                     m = scan[0]['TS']
                     break
-            np.save(prefix+args.outFile, m)
+            np.save(utils.prefix+args.outFile, m)
         else:
             manual_scan(ps_llh, nside=args.nside, extension=args.extension)
