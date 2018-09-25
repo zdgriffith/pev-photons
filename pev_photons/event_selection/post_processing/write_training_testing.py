@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Write training and testing files for each MC year of analysis 
+# Write training and testing files for each MC year of analysis
 ########################################################################
 
 import pandas as pd
 import numpy as np
 
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def write_files(year):
     """ write training and testing files for an MC year """
 
-    mc = pd.read_hdf(prefix+'resources/datasets/level3/{}_mc.hdf5'.format(year))
+    mc = pd.read_hdf(utils.prefix+'resources/datasets/level3/{}_mc.hdf5'.format(year))
 
     cut = mc['standard_filter_cut'] & mc['beta_cut'] & mc['laputop_cut']
     cut = cut & mc['Q_cut'] & mc['loudest_cut']
@@ -27,9 +27,9 @@ def write_files(year):
     is_training = np.random.choice(2, len(mc['laputop_E']),
                                    p=[1 - training_fraction, training_fraction])
 
-    mc[cut&is_training].to_hdf(prefix+'datasets/level3/{}_mc_training.hdf5'.format(year),
+    mc[cut&is_training].to_hdf(utils.prefix+'datasets/level3/{}_mc_training.hdf5'.format(year),
                                'dataframe', mode='w')
-    mc[cut&~is_training].to_hdf(prefix+'datasets/level3/{}_mc_testing.hdf5'.format(year),
+    mc[cut&~is_training].to_hdf(utils.prefix+'datasets/level3/{}_mc_testing.hdf5'.format(year),
                                 'dataframe', mode='w')
 
 if __name__ == "__main__":

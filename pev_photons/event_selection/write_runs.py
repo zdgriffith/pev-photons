@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 import argparse
 import os
 import glob
@@ -6,7 +6,7 @@ import json
 import re
 import numpy as np
 
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def clean_files(runFile, fileList):
     """Remove runs marked as bad from the file list."""
@@ -44,10 +44,10 @@ def get_data_files(year, burn_sample=False):
     file_list.sort()
 
     if burn_sample:
-        return clean_files(prefix+'/resources/run_files/burn_runs_%s.txt' % year,
+        return clean_files(utils.prefix+'/resources/run_files/burn_runs_%s.txt' % year,
                            file_list)
     else:
-        return clean_files(prefix+'/resources/run_files/non_burn_runs_%s.txt' % year,
+        return clean_files(utils.prefix+'/resources/run_files/non_burn_runs_%s.txt' % year,
                            file_list)
 
 def get_gcd_files(year, run_files):
@@ -72,17 +72,17 @@ if __name__ == "__main__":
 
     run_files = get_data_files(args.year, burn_sample=args.burn_sample)
     if args.burn_sample:
-        np.savetxt(prefix+'resources/run_files/{}_burn_run_files.txt'.format(args.year),
+        np.savetxt(utils.prefix+'resources/run_files/{}_burn_run_files.txt'.format(args.year),
                    run_files, fmt='%s')
     else:
-        np.savetxt(prefix+'resources/run_files/{}_good_run_files.txt'.format(args.year),
+        np.savetxt(utils.prefix+'resources/run_files/{}_good_run_files.txt'.format(args.year),
                    run_files, fmt='%s')
 
     gcd_dict = get_gcd_files(args.year, run_files)
 
     if args.burn_sample:
-        gcd_name = prefix+'resources/run_files/{}_burn_gcd_files.json'.format(args.year)
+        gcd_name = utils.prefix+'resources/run_files/{}_burn_gcd_files.json'.format(args.year)
     else:
-        gcd_name = prefix+'resources/run_files/{}_gcd_files.json'.format(args.year)
+        gcd_name = utils.prefix+'resources/run_files/{}_gcd_files.json'.format(args.year)
     with open(gcd_name, 'w') as f:
         json.dump(gcd_dict, f)

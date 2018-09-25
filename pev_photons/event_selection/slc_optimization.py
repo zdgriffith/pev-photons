@@ -9,14 +9,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import dashi
-from pev_photons.utils.support import fig_dir, resource_dir
-from pev_photons.utils.support import plot_setter, plot_style, plasma_map
+from pev_photons import utils
 
 def rhombus(width, depth, cos_zen, color):
     """plot a rhombus"""
 
     start = 4.8/(cos_zen+0.05)
-    end = start + 260/((cos_zen+0.05)*300) 
+    end = start + 260/((cos_zen+0.05)*300)
     plt.plot([start, end], [1, depth+1],
              color=color, label='Selection Region')
     plt.plot([start+width, end+width], [1,depth+1],
@@ -31,7 +30,7 @@ def slc_plot(f, cos_zen):
     dom_bins = np.arange(1,61,1)
     hist2d = dashi.histfactory.hist2d((f['time'].values/1000., f['dom'].values),
                                       (time_bins, dom_bins))
-    hist2d.imshow(cmap=plasma_map)
+    hist2d.imshow(cmap=utils.plasma_map)
 
     colors = plt.rcParams['axes.color_cycle']
     rhombus(1.8, 16, cos_zen, colors[2])
@@ -40,7 +39,7 @@ def slc_plot(f, cos_zen):
     plt.xlim([4.5, 10])
     plt.ylim([60, 1])
     l = plt.legend(loc='lower left', frameon=True)
-    plot_setter(plt.gca(),l)
+    utils.plot_setter(plt.gca(),l)
 
     plt.xlabel('t$_{pulse}$ - t$_{trigger}$ ($\mu s$)')
     plt.ylabel('Vertical DOM Number')
@@ -55,13 +54,13 @@ def slc_plot(f, cos_zen):
 
 if __name__ == "__main__":
     dashi.visual()
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
 
     # Has 1 row for each event
-    events = pd.read_hdf(resource_dir+'no_hlcs.hdf5', key='Laputop')
+    events = pd.read_hdf(utils.resource_dir+'no_hlcs.hdf5', key='Laputop')
 
     # Has 1 row for each pulse
-    pulses = pd.read_hdf(resource_dir+'no_hlcs.hdf5', key='slcs')
+    pulses = pd.read_hdf(utils.resource_dir+'no_hlcs.hdf5', key='slcs')
 
     zenith_bins = [0.80,0.85,0.90,0.95]
     cos_zen = np.cos(events['zenith'].values)

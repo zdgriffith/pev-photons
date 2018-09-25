@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from glob import glob
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 def get_weights(MC_dataset, energy, nstations):
     """ Create the MC weights for the given dataset generation parameters """
@@ -30,8 +30,8 @@ def get_weights(MC_dataset, energy, nstations):
                   + 300 * np.greater_equal(E, 1e7))
 
         return ((radius*100)**2)*(1-np.cos(np.radians(theta_max))**2)*np.pi**2
-    
-    events = np.load('/data/user/zgriffith/sim_files/'+MC_dataset+'_events.npy') 
+
+    events = np.load('/data/user/zgriffith/sim_files/'+MC_dataset+'_events.npy')
 
     def n_thrown(E):
         # Number of thrown events in an Ebin, normed by the size of the Ebin
@@ -51,11 +51,11 @@ def get_weights(MC_dataset, energy, nstations):
 
     weights = int_area(energy,max_zen)*energy/n_thrown(energy)
 
-    if MC_dataset == '12622': 
+    if MC_dataset == '12622':
         prescale = 2. * (np.less(nstations, 8) & np.greater(nstations, 3)) + 1.
         return weights/prescale
     else:
-        return weights 
+        return weights
 
 def set_to_names(dataset):
     """ Return the file names corresponding to a given dataset. """
@@ -82,7 +82,7 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
     -------
     df : Pandas dataframe
     """
-   
+
     with pd.HDFStore(input_file, mode='r') as store:
         series_size = store.get_storer('NStation').nrows
         # Dictionary of key: pd.Series pairs to get converted to pd.DataFrame
@@ -160,7 +160,7 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
             series_dict['srt_hlc_count'] = np.zeros(len(series_dict['twc_hlc_count']))
             series_dict['srt_slc_count'] = np.zeros(len(series_dict['twc_hlc_count']))
             series_dict['srt_nchannel'] = np.zeros(len(series_dict['twc_hlc_count']))
-            series_dict['srt_hlc_charge'] = np.zeros(len(series_dict['twc_hlc_count'])) 
+            series_dict['srt_hlc_charge'] = np.zeros(len(series_dict['twc_hlc_count']))
             series_dict['srt_slc_charge'] = np.zeros(len(series_dict['twc_hlc_count']))
 
         tr = np.greater(series_dict['srt_hlc_count'], 0)
@@ -189,7 +189,7 @@ def extract_dataframe(input_file, MC_dataset=None, processing=''):
                 series_dict[reco+'_{}'.format(key)] = laputop_params[key]
             for cut in lap_cut_keys:
                 series_dict[reco+'_'+cut] = store[reco+'_quality_cuts'][cut]
-            
+
 
             series_dict[reco+'_log10_s125'] = np.log10(series_dict[reco+'_s125'])
             series_dict[reco+'_energy'] = store[reco+'_E']['value']
@@ -221,7 +221,7 @@ def split_sample(df, processing, year):
     to store for the given processing.
     """
 
-    event_path = resource_dir+'/validation_mc_events/{}'.format(year)
+    event_path = utils.resource_dir+'/validation_mc_events/{}'.format(year)
     val_x = np.loadtxt(event_path+'_x.txt')
     val_y = np.loadtxt(event_path+'_y.txt')
     in_val = (np.in1d(df['true_x'].values, val_x)
@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
     set_name, file_name = set_to_names(args.MC_dataset)
 
-    pre = os.path.join(prefix, 'datasets', args.processing)
+    pre = os.path.join(utils.prefix, 'datasets', args.processing)
     file_list = glob('{}/post_processing/{}/{}/*.hdf5'.format(pre, args.year, set_name))
     out_file = '{}/dataframes/{}/{}.hdf5'.format(pre, args.year, file_name)
 

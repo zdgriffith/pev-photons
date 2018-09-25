@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 ########################################################################
-# 
+#
 ########################################################################
 
 import pandas as pd
 import numpy as np
 from sklearn.externals import joblib
 
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def prediction(f, selection, year, cut_val):
     hard_trainer = joblib.load('/data/user/zgriffith/rf_models/'+year+'/final/forest_2.0.pkl')
@@ -17,7 +17,7 @@ def prediction(f, selection, year, cut_val):
 
     feats = [
                 'charges',
-                'laputop_ic', 
+                'laputop_ic',
                 'llh_ratio',
                 's125',
                 'laputop_zen',
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     files = ['2012_mc.hdf5', '2012_mc_qgs.hdf5']
     for fname in files:
-        mc = pd.read_hdf(prefix+'resources/datasets/level3/'+fname)
+        mc = pd.read_hdf(utils.prefix+'resources/datasets/level3/'+fname)
 
         cut = mc['standard_filter_cut']&mc['beta_cut']&mc['laputop_cut']
         cut = cut&mc['Q_cut']&mc['loudest_cut']&np.greater_equal(mc['Nstations'],5)
@@ -71,9 +71,9 @@ if __name__ == "__main__":
         mc['Laputop_zenith'] = mc['laputop_zen']
         mc['Laputop_E'] = mc['laputop_E']
         mc['Laputop_opening_angle'] = np.radians(mc['opening_angle'])
-        
-        mc.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_quality.hdf5', 'dataframe', mode='w')
+
+        mc.to_hdf(utils.prefix+'datasets/systematics/hadronic_models/2012/'+out+'_quality.hdf5', 'dataframe', mode='w')
         ps = prediction(mc, 'ps', '2012', 0.7)
-        ps.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_ps.hdf5', 'dataframe', mode='w')
+        ps.to_hdf(utils.prefix+'datasets/systematics/hadronic_models/2012/'+out+'_ps.hdf5', 'dataframe', mode='w')
         gal = prediction(mc, 'galactic', '2012', 0.7)
-        gal.to_hdf(prefix+'datasets/systematics/hadronic_models/2012/'+out+'_diffuse.hdf5', 'dataframe', mode='w')
+        gal.to_hdf(utils.prefix+'datasets/systematics/hadronic_models/2012/'+out+'_diffuse.hdf5', 'dataframe', mode='w')

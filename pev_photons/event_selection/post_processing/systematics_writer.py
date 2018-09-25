@@ -11,7 +11,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 def check_testing(x, y, E, events):
     a = np.any((np.isclose(events['primary_x'].values[:,np.newaxis],x)
@@ -37,8 +37,8 @@ def get_weights(sim, energy):
                   + 300*np.greater_equal(E,10**7))
 
         return ((radius*100)**2)*(1-np.cos(np.radians(theta_max))**2)*np.pi**2
-    
-    events = np.load('/data/user/zgriffith/sim_files/'+sim+'_events.npy') 
+
+    events = np.load('/data/user/zgriffith/sim_files/'+sim+'_events.npy')
 
     def n_thrown(E):
         # Number of thrown events in an Ebin, normed by the size of the Ebin
@@ -129,11 +129,11 @@ if __name__ == "__main__":
     p.add_argument('--systematics', action="store_true", default = False, dest='systematics',
             help='Is this a systematics set?')
     args = p.parse_args()
-    
+
     if args.systematics:
-        file_prefix = prefix+'datasets/systematics/'
+        file_prefix = utils.prefix+'datasets/systematics/'
     else:
-        file_prefix = prefix+'datasets/'
+        file_prefix = utils.prefix+'datasets/'
     if args.isMC:
         file_list = glob.glob(os.path.join(file_prefix, args.dataset, '*.hdf5'))
     else:

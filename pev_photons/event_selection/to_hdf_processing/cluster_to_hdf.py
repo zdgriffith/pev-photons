@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 import argparse
 import os
 import sys
@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 startTime = datetime.now()
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
+from pev_photons import utils
 
 def write_job(script, batches, gcd_file, year,
               out_dir, out_name, dag_name, isMC=False,
@@ -63,9 +63,9 @@ def write_job(script, batches, gcd_file, year,
             break
         else:
             arg = script+' '+arg
-            dag.write('JOB {} {}/icerec.submit\n'.format(job, resource_dir))
+            dag.write('JOB {} {}/icerec.submit\n'.format(job, utils.resource_dir))
             dag.write('VARS {} ARGS=\"{}\"\n'.format(job, arg))
-            dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(job, dag_dir, dag_name))
+            dag.write('VARS {} log_dir=\"{}/logs/{}\"\n'.format(job, utils.dag_dir, dag_name))
             dag.write('VARS {} out_dir=\"{}/dagman/{}\"\n'.format(job, prefix, dag_name))
             job += 1
     return job
@@ -73,7 +73,7 @@ def write_job(script, batches, gcd_file, year,
 
 def get_data_batches(files, batch_length):
     """Construct batches for each run of data.
-    
+
     Parameters
     ----------
     files : array-like, shape = [n_files]
@@ -107,17 +107,17 @@ def get_data_batches(files, batch_length):
 def get_data_files(year, systematics=False, training=False):
     files = []
     if systematics:
-        run_files = prefix+'resources/run_files/{}_systematic_run_files.txt'.format(year)
+        run_files = utils.prefix+'resources/run_files/{}_systematic_run_files.txt'.format(year)
     elif training:
-        run_files = prefix+'resources/run_files/{}_burn_run_files.txt'.format(year)
+        run_files = utils.prefix+'resources/run_files/{}_burn_run_files.txt'.format(year)
     with open(run_files) as f:
         for fname in f:
             files.append(fname[:-1])
     if training:
-        with open(prefix+'resources/run_files/{}_burn_gcd_files.json'.format(year)) as f:
+        with open(utils.prefix+'resources/run_files/{}_burn_gcd_files.json'.format(year)) as f:
             gcd_files = json.load(f)
     else:
-        with open(prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
+        with open(utils.prefix+'resources/run_files/{}_gcd_files.json'.format(year)) as f:
             gcd_files = json.load(f)
     return files, gcd_files
 
@@ -159,9 +159,9 @@ if __name__ == "__main__":
 
         if args.rm_old:
             print('Deleting '+dag_name+' files...')
-            os.system('rm '+os.path.join(dag_dir, dag_name)+'*')
-            os.system('rm '+os.path.join(prefix, 'dagman', dag_name)+'*')
-        dag_file = os.path.join(dag_dir, dag_name+'.dag')
+            os.system('rm '+os.path.join(utils.dag_dir, dag_name)+'*')
+            os.system('rm '+os.path.join(utils.prefix, 'dagman', dag_name)+'*')
+        dag_file = os.path.join(utils.dag_dir, dag_name+'.dag')
         dag = open(dag_file, "w+")
 
     if args.systematics:
@@ -173,16 +173,16 @@ if __name__ == "__main__":
 
     job = 0
     if isMC:
-        if args.MC_dataset in next(os.walk(prefix+'datasets/level3/'))[1]:
-            files = glob.glob(prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
-            gcd_file = os.path.join(prefix, 'datasets/level3/GCD/IT_{}_GCD.i3.gz'.format(args.year))
+        if args.MC_dataset in next(os.walk(utils.prefix+'datasets/level3/'))[1]:
+            files = glob.glob(utils.prefix+'datasets/level3/%s/*.i3.gz' % args.MC_dataset)
+            gcd_file = os.path.join(utils.prefix, 'datasets/level3/GCD/IT_{}_GCD.i3.gz'.format(args.year))
         else:
             path = '/data/ana/CosmicRay/IceTop_level3/sim/IC86.'+args.year
             files = glob.glob(os.path.join(path, '{}/*.i3.gz'.format(args.MC_dataset)))
             gcd_file = os.path.join(path, 'GCD/Level3_{}_GCD.i3.gz'.format(args.dataset))
 
         batches = [files[i:i+args.n] for i in range(0, len(files), args.n)]
-        out_dir = prefix+'datasets/{}/post_processing/{}/{}/'.format(ext, args.year, args.MC_dataset)
+        out_dir = utils.prefix+'datasets/{}/post_processing/{}/{}/'.format(ext, args.year, args.MC_dataset)
         write_job(script, batches, gcd_file, args.year, out_dir,
                   out_name=args.MC_dataset, dag_name=dag_name,
                   isMC=isMC, test=args.test, systematics=args.systematics,
@@ -191,7 +191,7 @@ if __name__ == "__main__":
         files, gcd_files = get_data_files(args.year, systematics=args.systematics,
                                           training=args.training)
         run_batches = get_data_batches(files, args.n)
-        out_dir = prefix+'datasets/{}/post_processing/{}/data/'.format(ext, args.year)
+        out_dir = utils.prefix+'datasets/{}/post_processing/{}/data/'.format(ext, args.year)
         for i, (run, batches) in enumerate(run_batches.iteritems()):
             gcd_file = gcd_files[run]
             job = write_job(script, batches, gcd_file, args.year, out_dir,

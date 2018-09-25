@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 ########################################################################
 # Submit a dagman to the cluster for Level 3 processing of IceTop Data.
@@ -8,8 +8,7 @@ import argparse
 import os
 import glob
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev_photons import utils
 
 def getL2GCD(config):
     """ Retrieve the Level 2 GCD filename for simulation
@@ -40,16 +39,16 @@ if __name__ == "__main__":
                    help='Number of files to run per batch.')
     args = p.parse_args()
 
-    dag_maker = DagMaker(name='level3_processing', temp_dir=dag_dir)
+    dag_maker = DagMaker(name='level3_processing', temp_dir=utils.dag_dir)
     if args.rm_old:
-        dag_maker.remove_old(prefix=prefix)
+        dag_maker.remove_old(utils.prefix=utils.prefix)
 
     bool_args = ['isMC', 'waveforms', 'do_inice']
 
     # Get config and simulation files
     config = 'IC86.' + args.year
     L2_GCD = getL2GCD(config)
-    L3_GCD = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz' 
+    L3_GCD = '/data/user/zgriffith/Level3/GCDs/IT_'+args.year+'_GCD.i3.gz'
     static_args = {'dataset': args.dataset, 'detector': config,
                    'L2_gcdfile': L2_GCD, 'L3_gcdfile': L3_GCD}
 
@@ -59,6 +58,6 @@ if __name__ == "__main__":
 
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'level3_processing.py'),
                           static_args=static_args, bool_args=bool_args, iters=iters,
-                          submit_file=os.path.join(resource_dir, 'icerec.submit'),
-                          test=args.test, prefix=prefix)
+                          submit_file=os.path.join(utils.resource_dir, 'icerec.submit'),
+                          test=args.test, prefix=utils.prefix)
     os.system(ex)

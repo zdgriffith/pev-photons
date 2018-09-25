@@ -16,13 +16,13 @@ from icecube import coinc_twc, static_twc, SeededRTCleaning
 from icecube.tableio import I3TableWriter
 from icecube.hdfwriter import I3HDFTableService
 from icecube.recclasses import I3LaputopParams, LaputopParameter
-from icecube.icetop_Level3_scripts.functions import count_stations 
+from icecube.icetop_Level3_scripts.functions import count_stations
 from icecube.frame_object_diff.segments import uncompress
 
 from pev_photons.event_selection.llh_ratio_scripts.llh_ratio_i3_module import IceTop_LLH_Ratio
 from pev_photons.event_selection.icecube_cleaning import icecube_cleaning
 from pev_photons.event_selection.run_laputop import run_laputop
-from pev_photons.utils.support import resource_dir
+from pev_photons import utils
 
 def select_keys(isMC=False, store_extra=False, recos=['Laputop']):
     """ Determine which keys get stored in the HDF file. """
@@ -71,7 +71,7 @@ def base_quality_cuts(frame):
         quality_cuts[key] = cuts[key]
 
     if 'IceTopHLCSeedRTPulses' in frame:
-        nstation = count_stations(dataclasses.I3RecoPulseSeriesMap.from_frame(frame, 'IceTopHLCSeedRTPulses')) 
+        nstation = count_stations(dataclasses.I3RecoPulseSeriesMap.from_frame(frame, 'IceTopHLCSeedRTPulses'))
         if 'NStation' not in frame:
             frame.Put('NStation', icetray.I3Int(nstation))
         quality_cuts['NStation_cut'] = (frame['NStation'] >= 5)
@@ -210,7 +210,7 @@ def apply_random_forest(frame, random_forests, isMC=False, reco='Laputop'):
         for alpha in ['2.0', '2.7', '3.0']:
             frame[reco+'_alpha_'+alpha+'_score'] = dataclasses.I3Double(0)
         return
-        
+
     for alpha in ['2.0', '2.7', '3.0']:
         score = random_forests['alpha_'+alpha].predict_proba(features).T[1][0]
         frame['{}_alpha_{}_score'.format(reco, alpha)] = dataclasses.I3Double(score)
@@ -226,7 +226,7 @@ def cut_events(frame, recos=[], threshold=0.7):
 
 def main(in_files, out_file, year, isMC=False, systematics=False,
          run_migrad=False, store_extra=False, training=False):
-    
+
     tray = I3Tray()
     tray.AddModule('I3Reader', 'Reader', FilenameList=in_files)
     tray.AddSegment(uncompress, 'uncompress')
@@ -269,7 +269,7 @@ def main(in_files, out_file, year, isMC=False, systematics=False,
         tray.AddModule(IceTop_LLH_Ratio, 'IceTop_LLH_ratio_'+reco)(
                        ('Track', reco), ('Output', reco+'_IceTopLLHRatio'),
                        ('TwoDPDFPickleYear', year),
-                       ('GeometryHDF5', resource_dir+'/geometry.h5'),
+                       ('GeometryHDF5', utils.resource_dir+'/geometry.h5'),
                        ('checkQuality', True),
                        ('highEbins', True))
         if not training:
