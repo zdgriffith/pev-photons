@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-from pev_photons.utils.support import prefix, plot_style, fig_dir, plot_setter
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -22,15 +22,15 @@ if __name__ == "__main__":
                    help='Use the original background trials rather those you generated on your own.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
-    hotspot = np.load(prefix+'all_sky/hotspot.npy')['TS'][0]
+    hotspot = np.load(utils.prefix+'all_sky/hotspot.npy')['TS'][0]
 
     if args.use_original_trials:
         job_list = glob('/data/user/zgriffith/pev_photons/all_sky/all_sky_trials/full_*.npy')
     else:
-        job_list = glob(prefix+'all_sky/all_sky_trials/full_*.npy')
+        job_list = glob(utils.prefix+'all_sky/all_sky_trials/full_*.npy')
 
     bg_trials = []
     for job in job_list:
@@ -62,10 +62,10 @@ if __name__ == "__main__":
     plt.ylabel('Trials')
     plt.yscale('log')
     l = plt.legend(loc=0)
-    plot_setter(plt.gca(), l)
+    utils.plot_setter(plt.gca(), l)
     plt.xlim([0,50])
     plt.ylim([0.5,Ntrials])
     plt.tight_layout()
-    plt.savefig(fig_dir+'all_sky/all_sky_trials.png')
-    plt.savefig(fig_dir+'paper/all_sky_trials.pdf')
+    plt.savefig(utils.fig_dir+'all_sky/all_sky_trials.png')
+    plt.savefig(utils.fig_dir+'paper/all_sky_trials.pdf')
     plt.close()

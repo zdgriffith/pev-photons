@@ -9,8 +9,7 @@ import numpy as np
 import logging
 
 from skylab.ps_injector import PointSourceInjector
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 logging.basicConfig(filename='scan.log', filemode='w', level=logging.INFO)
 logging.getLogger("skylab.ps_llh.PointSourceLLH").setLevel(logging.INFO)
@@ -26,7 +25,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Initialization of multi-year LLH object.
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
     dec_list = np.radians(np.linspace(-84.,-54.,10))
     for index in [2.0,2.7]:
@@ -46,5 +45,5 @@ if __name__ == "__main__":
             sens[j] = result[0]["flux"][0]
             disc[j] = result[0]["flux"][1]
 
-            np.save(prefix+'all_sky/sens_index_%s.npy' % index, sens)
-            np.save(prefix+'all_sky/disc_index_%s.npy' % index, disc)
+            np.save(utils.prefix+'all_sky/sens_index_%s.npy' % index, sens)
+            np.save(utils.prefix+'all_sky/disc_index_%s.npy' % index, disc)

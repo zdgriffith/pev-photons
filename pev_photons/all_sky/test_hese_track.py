@@ -9,8 +9,7 @@ import numpy as np
 import healpy as hp
 import pandas as pd
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 def bg_trials(ps_llh, ra, dec, n_trials=10):
     """ Produce background TS trials for the HESE track event.
@@ -28,7 +27,7 @@ def bg_trials(ps_llh, ra, dec, n_trials=10):
     trials = ps_llh.do_trials(n_trials, src_ra=ra,
                               src_dec=dec)
 
-    np.save(prefix+'all_sky/hese_track_trials.npy',
+    np.save(utils.prefix+'all_sky/hese_track_trials.npy',
              trials['TS'])
 
 def test_source(ps_llh, ra, dec):
@@ -53,7 +52,7 @@ def test_source(ps_llh, ra, dec):
     source['nsources'] = fit[1]['nsources']
     source['gamma'] = fit[1]['gamma']
 
-    np.save(prefix+'all_sky/hese_track.npy', source)
+    np.save(utils.prefix+'all_sky/hese_track.npy', source)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -67,12 +66,12 @@ if __name__ == "__main__":
                    help='Number of trials')
     args = p.parse_args()
 
-    events = pd.read_hdf(resource_dir+'HESE.hdf5')
+    events = pd.read_hdf(utils.resource_dir+'HESE.hdf5')
     events = events[~events['is_cascade']]
     ra = np.radians(events['ra'].values[0])
     dec = np.radians(events['dec'].values[0])
 
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
     if args.n_trials is not None:
         test_source(ps_llh, ra, dec, n_trials=args.n_trials)
     else:

@@ -7,8 +7,7 @@
 import argparse
 import os
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev_photons import utils
 
 if __name__ == "__main__":
 
@@ -24,14 +23,14 @@ if __name__ == "__main__":
                    help='The number of trials run per job.')
     args = p.parse_args()
 
-    dag_maker = DagMaker(name='all_sky_trials', temp_dir=dag_dir)
+    dag_maker = utils.DagMaker(name='all_sky_trials', temp_dir=utils.dag_dir)
     if args.rm_old:
-        dag_maker.remove_old(prefix=prefix)
+        dag_maker.remove_old(prefix=utils.prefix)
 
     static_args = {'bg_trials': args.nTrials}
     iters = {'job': range(args.nJobs)}
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'all_sky_scan.py'),
                           static_args=static_args, iters=iters,
-                          submit_file=os.path.join(resource_dir, 'basic.submit'),
-                          test=args.test, prefix=prefix)
+                          submit_file=os.path.join(utils.resource_dir, 'basic.submit'),
+                          test=args.test, prefix=utils.prefix)
     os.system(ex)

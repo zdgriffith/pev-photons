@@ -9,7 +9,7 @@ import numpy as np
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -31,8 +31,8 @@ if __name__ == "__main__":
 
     pix_list = []
     for dec in unique_decs[mask]:
-        pix_list.append(pix[np.equal(dec_list,dec)]) 
+        pix_list.append(pix[np.equal(dec_list,dec)])
 
-    np.savez(prefix+args.outFile,
+    np.savez(utils.prefix+args.outFile,
              pix_list=pix_list,
              decs=unique_decs[mask])

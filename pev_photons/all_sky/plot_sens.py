@@ -12,12 +12,11 @@ import matplotlib.pyplot as plt
 from scipy import interpolate
 from glob import glob
 
-from pev_photons.utils.support import prefix, resource_dir
-from pev_photons.utils.support import fig_dir, plot_setter, plot_style
+from pev_photons import utils
 
 def plot_hess_sources(args):
     # Load source fluxes and errors
-    sources = np.load(resource_dir+'hgps_sources.npz')
+    sources = np.load(utils.resource_dir+'hgps_sources.npz')
 
     # Calculate flux and errors
     middle = sources['flux']*1000**(-sources['alpha'])*1e-12
@@ -34,7 +33,7 @@ def plot_hess_sources(args):
     if args.no_absorption:
         ratio = 1
     else:
-        surv = np.loadtxt(resource_dir+'gamma_survival_vs_distance.txt')
+        surv = np.loadtxt(utils.resource_dir+'gamma_survival_vs_distance.txt')
         surv = surv.T
         spline = scipy.interpolate.InterpolatedUnivariateSpline(surv[0],
                                                                 surv[1], k=2)
@@ -56,7 +55,7 @@ def plot_hess_sources(args):
                  lw=6, elinewidth=0, capthick=0, capwidth=0, alpha=0.4)
 
     if args.plot_hess_sens:
-        hess_sens = np.load(prefix+'TeVCat/hess_sens.npz')
+        hess_sens = np.load(utils.prefix+'TeVCat/hess_sens.npz')
         plt.scatter(sources['dec'], hess_sens['sensitivity']*1e3,
                     color=colors[3], marker='*', label='H.E.S.S. 90% limits')
 
@@ -70,14 +69,14 @@ def plot_sens(args):
         kinds = ['sens', 'disc']
         for i, index in enumerate(indices):
             for j, kind in enumerate(kinds):
-                flux = np.load(prefix+'all_sky/%s_index_%s.npy' % (kind, index))
+                flux = np.load(utils.prefix+'all_sky/%s_index_%s.npy' % (kind, index))
                 plt.plot(dec_list, flux*(1e3),
                          color=colors[i], ls=linestyle[j],
                          label='E$^{-%s}$ %s' % (index, kind_labels[j]))
     else:
         for i, index in enumerate(indices):
             arrs = []
-            files = glob(prefix+'all_sky/sens_jobs/index_%s/dec*' % index)
+            files = glob(utils.prefix+'all_sky/sens_jobs/index_%s/dec*' % index)
             for fname in files:
                 a = np.load(fname)
                 arrs.append([item for item in a[0]])
@@ -103,7 +102,7 @@ if __name__ == "__main__":
                    help='if True, plot HESS 90% limits.')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = plt.rcParams['axes.color_cycle']
 
     plot_sens(args)
@@ -116,6 +115,6 @@ if __name__ == "__main__":
     plt.yscale('log')
     l = plt.legend(loc='upper left')
     plot_setter(plt.gca(),l)
-    plt.savefig(fig_dir+'all_sky/sensitivity.png', bbox_inches='tight')
-    plt.savefig(fig_dir+'paper/sensitivity.pdf', bbox_inches='tight')
+    plt.savefig(utils.fig_dir+'all_sky/sensitivity.png', bbox_inches='tight')
+    plt.savefig(utils.fig_dir+'paper/sensitivity.pdf', bbox_inches='tight')
     plt.close()

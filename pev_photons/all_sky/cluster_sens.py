@@ -8,8 +8,7 @@
 import argparse
 import os
 
-from pev_photons.utils.support import prefix, resource_dir, dag_dir
-from pev_photons.utils.cluster_support import DagMaker
+from pev_photons import utils
 
 if __name__ == "__main__":
 
@@ -21,9 +20,9 @@ if __name__ == "__main__":
                    help='Remove old dag files?')
     args = p.parse_args()
 
-    dag_maker = DagMaker(name='ps_sensitivity', temp_dir=dag_dir)
+    dag_maker = utils.DagMaker(name='ps_sensitivity', temp_dir=utils.dag_dir)
     if args.rm_old:
-        dag_maker.remove_old(prefix=prefix)
+        dag_maker.remove_old(prefix=utils.prefix)
 
     indices = [2.0, 2.7] # each of the spectral indices to submit
     dec_bounds = [-85, -53.4] # the range in declination to test
@@ -31,6 +30,6 @@ if __name__ == "__main__":
              'dec': range(int((dec_bounds[1] - dec_bounds[0])*10))}
 
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'sens_on_cluster.py'),
-                          submit_file=os.path.join(resource_dir, 'basic.submit'),
-                          iters=iters, test=args.test, prefix=prefix)
+                          submit_file=os.path.join(utils.resource_dir, 'basic.submit'),
+                          iters=iters, test=args.test, prefix=utils.prefix)
     os.system(ex)

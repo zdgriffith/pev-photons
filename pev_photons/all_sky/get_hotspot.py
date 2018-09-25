@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Get the position of the hottest spot in a map 
+# Get the position of the hottest spot in a map
 ########################################################################
 
 import argparse
 import numpy as np
 import healpy as hp
 
-from pev_photons.utils.load_datasets import load_dataset
-from pev_photons.utils.support import prefix
+from pev_photons import utils
 from pev_photons.TeVCat.hess_source_errors import error_profile
 
 def test_hotspot(ps_llh, ra, dec, errors=False):
@@ -21,7 +20,7 @@ def test_hotspot(ps_llh, ra, dec, errors=False):
                               ('gamma', np.float)])
 
     TS, xmin = ps_llh.fit_source(ra, dec, scramble = False)
-    fit = dict({'TS':TS}, **xmin) 
+    fit = dict({'TS':TS}, **xmin)
 
     hotspot['ra'] = np.degrees(ra)
     hotspot['dec'] = np.degrees(dec)
@@ -38,12 +37,12 @@ def test_hotspot(ps_llh, ra, dec, errors=False):
     pairs = [hotspot.dtype.names[i]+': %0.2f' % val for i, val in enumerate(hotspot[0])]
     for pair in pairs:
         print(pair)
-    np.save(prefix+'all_sky/hotspot.npy', hotspot)
+    np.save(utils.prefix+'all_sky/hotspot.npy', hotspot)
 
 
 def get_hotspot_direction():
     """ returns the direction in right ascension and declination. """
-    m = np.load(prefix+'all_sky/skymap.npy')
+    m = np.load(utils.prefix+'all_sky/skymap.npy')
     npix = len(m)
     nside = hp.npix2nside(npix)
     theta, ra = hp.pix2ang(nside, range(npix))
@@ -66,6 +65,6 @@ if __name__ == "__main__":
                    help='rng seed')
     args = p.parse_args()
 
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
     ra, dec = get_hotspot_direction()
     test_hotspot(ps_llh, ra, dec, errors=True)

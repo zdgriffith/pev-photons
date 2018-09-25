@@ -7,8 +7,7 @@
 import argparse
 import numpy as np
 
-from pev_photons.utils.support import prefix
-from pev_photons.utils.load_datasets import load_dataset
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -27,11 +26,11 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     #Initialization of multi-year LLH object
-    ps_llh = load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
+    ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    decs = np.load(prefix+'all_sky/dec_values_512.npz')['decs']
+    decs = np.load(utils.prefix+'all_sky/dec_values_512.npz')['decs']
 
     trials = psllh.do_trials(args.n_trials, src_ra=np.pi,
                              src_dec=decs[args.dec_i])
-    np.save(prefix+'all_sky/dec_trials/dec_%s_job_%s.npy' % (args.dec_i, args.job),
+    np.save(utils.prefix+'all_sky/dec_trials/dec_%s_job_%s.npy' % (args.dec_i, args.job),
             trials['TS'])

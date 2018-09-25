@@ -12,7 +12,7 @@ from glob import glob
 
 import healpy as hp
 
-from pev_photons.utils.support import prefix, resource_dir
+from pev_photons import utils
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
@@ -23,16 +23,16 @@ if __name__ == "__main__":
                          'rather those you generated on your own.'))
     args = p.parse_args()
 
-    inFile = os.path.join(prefix, 'all_sky/skymap.npy')
-    outFile = os.path.join(prefix, 'all_sky/p_value_skymap.npy')
+    inFile = os.path.join(utils.prefix, 'all_sky/skymap.npy')
+    outFile = os.path.join(utils.prefix, 'all_sky/p_value_skymap.npy')
 
     # File which contains the pixels of the skymap which have
     # unique declination values.
-    dec_pix = np.load(resource_dir+'dec_values_512.npz')
+    dec_pix = np.load(utils.resource_dir+'dec_values_512.npz')
     pixels = dec_pix['pix_list']
 
     ts_map = np.load(inFile)
-    n_decs = len(pixels) 
+    n_decs = len(pixels)
     pval_map = np.ones_like(ts_map)
 
     # For each unique declination, calculate the fraction of bg trials
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         if args.use_original_trials:
             f_list = glob('/data/user/zgriffith/pev_photons/all_sky/dec_trials/dec_%s_job_*' % dec_i)
         else:
-            f_list = glob(prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
+            f_list = glob(utils.prefix+'all_sky/dec_trials/dec_%s_job_*' % dec_i)
         trials = []
         for f in f_list:
             a = np.load(f)
