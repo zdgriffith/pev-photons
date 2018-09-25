@@ -12,24 +12,24 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import dashi
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons import utils
 
 @profile
 def final_sample(args, year, sel, level, label):
     f = {'level3':{}, 'level4':{}}
     if level == 'level3':
         if label == 'Data':
-            f = pd.read_hdf(resource_dir+'datasets/quality_energies/'+year+'.hdf5')
+            f = pd.read_hdf(utils.resource_dir+'datasets/quality_energies/'+year+'.hdf5')
             return np.log10(f['laputop_E']), np.ones(f.shape[0])
         else:
-            f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
+            f = pd.read_hdf(utils.resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
             return np.log10(f['laputop_E']), f['weights']
     else:
         if label == 'Data':
-            f = np.load(resource_dir+'datasets/'+year+'_exp_'+sel+'.npy')
+            f = np.load(utils.resource_dir+'datasets/'+year+'_exp_'+sel+'.npy')
             return f['logE'], np.ones(f.shape[0])
         else:
-            f = np.load(resource_dir+'datasets/'+year+'_mc_'+sel+'.npy')
+            f = np.load(utils.resource_dir+'datasets/'+year+'_mc_'+sel+'.npy')
             return f['logE'], f['ow']
 
 @profile
@@ -94,14 +94,14 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     dashi.visual()
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
 
     labels = [' (point source selection)', ' (galactic plane selection)']
     for i, sel in enumerate(['ps','diffuse']):
         passing_fraction(args, sel=sel, suffix=labels[i])
 
     l = plt.legend(bbox_to_anchor = (0, 0.65), loc='center left')
-    plot_setter(plt.gca(),l)
+    utils.plot_setter(plt.gca(),l)
 
     plt.xlim([5.7,8])
     plt.ylim([10**-5,1])
@@ -109,6 +109,6 @@ if __name__ == "__main__":
     plt.xlabel(r'log(E$_{\textrm{reco}}$/GeV)')
     plt.ylabel('Passing Fraction')
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/passing_vs_energy.png')
-    plt.savefig(fig_dir+'paper/passing_vs_energy.pdf')
+    plt.savefig(utils.fig_dir+'performance_checks/passing_vs_energy.png')
+    plt.savefig(utils.fig_dir+'paper/passing_vs_energy.pdf')
     plt.close()

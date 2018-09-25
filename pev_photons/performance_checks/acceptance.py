@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from pev_photons.utils.support import resource_dir, prefix, fig_dir, plot_style
+from pev_photons import utils
 
 def n_thrown(E, theta_min):
-    df = pd.read_hdf(prefix+'datasets/corsika/10042.hdf5')
+    df = pd.read_hdf(utils.prefix+'datasets/corsika/10042.hdf5')
     vals, E_edges, zen_edges = np.histogram2d(np.log10(df['energy'].values), np.degrees(df['zenith'].values),
                                               bins=(np.arange(5,8.1,0.1), np.arange(0,46,1)))
     E_indices = np.floor(10 * np.log10(E)) - 50
@@ -32,10 +32,10 @@ def int_area(E, theta):
     return (np.pi*radius**2)*solid_angle/n_thrown(E, theta_min)
 
 if __name__ == "__main__":
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     fig, ax = plt.subplots()
 
-    gammas = pd.read_hdf(prefix+'/datasets/training/dataframes/2012/gamma_mc.hdf5')
+    gammas = pd.read_hdf(utils.prefix+'/datasets/training/dataframes/2012/gamma_mc.hdf5')
 
     labels = ['IC86', 'IC86 (in-ice contained)']
     for i, label in enumerate(labels):
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         Y = np.array([bins,bins]).T.flatten()
         ax.plot(X, Y, label=label)
 
-    ic40 = np.loadtxt(resource_dir+'ic40.txt')
+    ic40 = np.loadtxt(utils.resource_dir+'ic40.txt')
     x_e = x_e[0:41]
     left,right = x_e[:-1], x_e[1:]
     X = np.array([left,right]).T.flatten()
@@ -64,6 +64,6 @@ if __name__ == "__main__":
     ax.set_ylabel('Acceptance (m$^2$sr)')
     ax.legend(loc='upper left')
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/acceptance.png', dpi=300)
-    plt.savefig(fig_dir+'paper/acceptance.pdf', bbox_inches='tight')
+    plt.savefig(utils.fig_dir+'performance_checks/acceptance.png', dpi=300)
+    plt.savefig(utils.fig_dir+'paper/acceptance.pdf', bbox_inches='tight')
     plt.close()

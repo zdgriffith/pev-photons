@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ########################################################################
-# Plot the effective area for gamma-ray simulation 
+# Plot the effective area for gamma-ray simulation
 # over each of the 5 years used in the analysis
 ########################################################################
 
@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons import utils
 
 def sigmoid_flat(energy, p0, p1, p2):
     return p0 / (1 + np.exp(-p1*np.log10(energy) + p2))
@@ -61,12 +61,12 @@ def effective_area(args, logE, year, w, color):
     if year == '2011':
         n_gen = 60000
     else:
-        events = np.load(resource_dir+'datasets/level3/'+year+'_mc_total_events.npy')
+        events = np.load(utils.resource_dir+'datasets/level3/'+year+'_mc_total_events.npy')
         n_gen  = events[:].astype('float')
 
     area = E_hist/n_gen
     error = np.sqrt(error_hist)/n_gen
-    
+
     #Plot bins unless told not to
     if not args.noBins:
         line = ax0.errorbar(bin_centers, area,
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     # Plotting set up
-    plt.style.use(plot_style)
+    plt.style.use(utils.plot_style)
     colors = ['#250000', '#630000', '#a00000', '#dd2800', '#ff7a00', '#ffcd9a']
 
     fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios':[3, 1]})
@@ -111,21 +111,21 @@ if __name__ == "__main__":
     lines = []
     years = ['2011', '2012', '2013', '2014', '2015']
     for i, year in enumerate(years):
-        f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(utils.resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
 
         # Reweight events with <8 stations triggered for 2011 due to filter
         if year == '2011':
             w = (2*(np.greater(f['Nstations'],3)&np.less(f['Nstations'],8))+1.)
         else:
             w = np.ones(len(f['Nstations']))
-            
+
         vals, x, line = effective_area(args, np.log10(f['primary_E']),
                                        year, w, colors[i])
         comp.append(vals)
         lines.append(line)
 
     for i, c in enumerate(comp):
-        ratio = c/comp[1] 
+        ratio = c/comp[1]
         ax1.plot(x, ratio, color=colors[i])
 
     ax0.set_xticklabels([])
@@ -141,10 +141,10 @@ if __name__ == "__main__":
 
     l = plt.figlegend(lines, years, loc='upper center', frameon=False,
                    bbox_to_anchor=(0.5,    # horizontal
-                                   0.415), # vertical 
+                                   0.415), # vertical
                    ncol=5, fancybox=False)
-    plot_setter(plt.gca(),l)
+    utils.plot_setter(plt.gca(),l)
 
-    plt.savefig(fig_dir+'performance_checks/eff_area_comp.png')
-    #plt.savefig(fig_dir+'paper/eff_area_comp.pdf')
+    plt.savefig(utils.fig_dir+'performance_checks/eff_area_comp.png')
+    #plt.savefig(utils.fig_dir+'paper/eff_area_comp.pdf')
     plt.close()

@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from pev_photons.utils.support import resource_dir, fig_dir, plot_setter, plot_style
+from pev_photons import utils
 
 def find_nearest(array,value):
     """ Returns the nearest bin value. """
@@ -31,7 +31,7 @@ def error(f, label, key, x_bins):
     bin_size = x_bins[1]-x_bins[0]
 
     if key in ['laputop_E', 'primary_E']:
-        vals = np.log10(f[key]) 
+        vals = np.log10(f[key])
     else:
         vals = f[key]
 
@@ -42,7 +42,7 @@ def error(f, label, key, x_bins):
     bin_center = bin_edges[:-1] + bin_size/2.
 
     sigmas = [bin_sigmas[find_nearest(bin_center, val)] for val in vals]
-    
+
     avg = np.average(sigmas, weights=f['weights']*f['primary_E']**-2.0)
     plt.step(bin_edges, np.append(bin_sigmas[0], bin_sigmas),
              label=label+r', $\langle\sigma\rangle$ = %.2f$^{\circ}$' % avg)
@@ -57,14 +57,14 @@ if __name__ == "__main__":
                    help='file name')
     args = p.parse_args()
 
-    plt.style.use(plot_style)
-    
+    plt.style.use(utils.plot_style)
+
     # Plot only the first and last years for readibility
     years = ['2011', '2015']
 
     E_bins = np.arange(5.7, 8.1, 0.1)
     for i, year in enumerate(years):
-        f = pd.read_hdf(resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
+        f = pd.read_hdf(utils.resource_dir+'datasets/level3/'+year+'_mc_quality.hdf5')
         error(f, year, 'primary_E', E_bins)
 
     plt.xlabel(r'log(E$_{\textrm{\textsc{mc}}}$/GeV)')
@@ -72,8 +72,8 @@ if __name__ == "__main__":
     plt.ylim([0.1,0.6])
     plt.ylabel('Angular Resolution [$^{\circ}$]')
     l = plt.legend()
-    plot_setter(plt.gca(), l)
+    utils.plot_setter(plt.gca(), l)
     plt.tight_layout()
-    plt.savefig(fig_dir+'performance_checks/ang_res_years.png')
-    plt.savefig(fig_dir+'paper/ang_res_years.pdf')
+    plt.savefig(utils.fig_dir+'performance_checks/ang_res_years.png')
+    plt.savefig(utils.fig_dir+'paper/ang_res_years.pdf')
     plt.close()
