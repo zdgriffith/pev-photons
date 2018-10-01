@@ -10,7 +10,7 @@ from mpl_toolkits.basemap import Basemap
 import healpy as hp
 import pandas as pd
 
-from pev_photons import utils
+from .support import resource_dir
 
 class PolarSkyMap(object):
     """ Class for plotting sky maps using Basemap projected from the Pole.
@@ -114,7 +114,7 @@ class PolarSkyMap(object):
 
     def plot_HESE(self):
         """ Plot HESE Cascades """
-        events = pd.read_hdf(utils.resource_dir+'HESE.hdf5')
+        events = pd.read_hdf(resource_dir+'HESE.hdf5')
 
         sc = self.basemap.scatter(events[events['is_cascade']]['ra'].values,
                                   events[events['is_cascade']]['dec'].values,
