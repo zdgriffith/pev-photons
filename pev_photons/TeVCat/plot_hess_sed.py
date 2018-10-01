@@ -24,8 +24,8 @@ def plot_data(source, color, label):
 #Calculate upper and lower flux bounds
 def flux_calc(E, E0, phi0, phi_unc, gamma, gamma_unc):
     flip = np.greater(E, E0)  # Flip the index unc. below normalization.
-    return ((phi0 + phi_unc)*(E0**(-gamma))
-           *(E/E0)**(2 - (gamma + gamma_unc*(-1)**flip)))
+    return ((phi0 + phi_unc)*(E**(2))
+           *(E/E0)**(-(gamma + gamma_unc*(-1)**flip)))
 
 #Plot the best fits to the source flux.
 def plot_fit(label, source, colors, args, index):
@@ -60,18 +60,20 @@ def plot_fit(label, source, colors, args, index):
 
     for flux in [phi, phi_stat_high, phi_stat_low,
                  phi_sys_high, phi_sys_low]:
-            #if args.Ecut is not None:
-            #    flux *= np.exp(-E/args.Ecut)
+            if args.Ecut is not None:
+                flux *= np.exp(-E/args.Ecut)
             if not args.no_absorption:
                 flux *= absorption_spline(E)
 
     # The center line of the flux fit.
     plt.plot(E, phi, label=label, color=color, linestyle='-', zorder=index)
 
+    '''
     if args.Ecut is not None:
         phi *= np.exp(-E/args.Ecut)
         plt.plot(E, phi, label='{} TeV cut off'.format(args.Ecut),
                  linestyle='-.', zorder=index)
+    '''
 
     #The statistical uncertainty bound.
     plt.fill_between(E, phi_stat_low, phi_stat_high,
@@ -111,6 +113,8 @@ if __name__ == "__main__":
     #IceCube Upper limit
     b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
+
+    '''
     sens = np.load(utils.prefix+'/TeVCat/hess_sens.npz')
     y0 = sens['sensitivity'][args.index]*1e9
     y = y0*(x**(2-gamma))
@@ -120,14 +124,17 @@ if __name__ == "__main__":
     #Arrow
     plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
     plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
+    '''
 
     if args.Ecut:
         flux_i = np.load(utils.prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.index, args.Ecut))
-        y0 = flux_i*1e9
+        y0 = flux_i*1e3
+        y0 *= (1e3)**gamma
         y = y0*(x**(2-gamma))
 
         plt.plot(b, y0*b**(2 - gamma),
-                 color=colors[1], ls='-.',
+                 #color=colors[1], ls='-.',
+                 color=colors[1], ls='-',
                  label="IceCube UL ({} TeV cut off)".format(args.Ecut))
         #Arrow
         plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
