@@ -25,11 +25,12 @@ if __name__ == "__main__":
         dag_maker.remove_old(prefix=utils.prefix)
 
     indices = [2.0, 2.7] # each of the spectral indices to submit
-    dec_bounds = [-85, -53.4] # the range in declination to test
+    dec_bounds = [-85.0, -53.4] # the range in declination to test
     iters = {'index': indices,
-             'dec': range(int((dec_bounds[1] - dec_bounds[0])*10))}
+             'dec': [i/10. for i in range(int(dec_bounds[0]*10), int(dec_bounds[1]*10))]}
 
+    print(iters['dec'])
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'sens_on_cluster.py'),
-                          submit_file=os.path.join(utils.resource_dir, 'basic.submit'),
+                          submit_file=os.path.join(utils.resource_dir, 'py2v3.submit'),
                           iters=iters, test=args.test, prefix=utils.prefix)
     os.system(ex)
