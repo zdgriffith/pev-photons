@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # Load the dataset.
     ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    hess = np.load(utils.prefix+'resources/hgps_sources.npz')
+    hess = np.load(utils.prefix+'resources/hess_sources.npz')
     sens = list()
 
     for i, alpha in enumerate(hess['alpha']):
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             sens.append(np.nan)
         else:
             dec = np.radians(hess['dec'][i])
-            inj= PointSourceInjector(alpha, E0=1e6,
+            inj= PointSourceInjector(alpha, E0=2e6,
                                      sinDec_bandwidth=np.sin(np.radians(2)))
             inj.fill(dec, ps_llh.exp, ps_llh.mc, ps_llh.livetime)
             result = ps_llh.weighted_sensitivity([0.5], [0.9],
