@@ -8,15 +8,15 @@ import numpy as np
 
 from skylab.datasets import Datasets
 from skylab.llh_models import EnergyLLH
-
-from .support import prefix
-
 from skylab.template import Template
 from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
+from .support import prefix
+from .gamma_ray_survival import apply_absorption
+
 def load_dataset(name, ncpu=1, seed=1, alpha=2.0, template_name=None,
-                 llh_args={'scramble':False}, model_args={}):
+                 absorption=False, llh_args={'scramble':False}, model_args={}):
     """ Creates a MultiTemplateLLH object from the final cut level gamma-ray
     analysis event files
 
@@ -71,6 +71,8 @@ def load_dataset(name, ncpu=1, seed=1, alpha=2.0, template_name=None,
                               twodim_range=[energy_range, sinDec_range],
                               sinDec_bins=sinDec_bins,
                               sinDec_range=sinDec_range, **model_args)
+        if absorption:
+            mc['ow'] *= apply_absorption(mc['trueE']*10**-3, absorption)
 
         if name == 'point_source':
             llh_year = PointSourceLLH(exp, mc, livetime, llh_model, **llh_args)
