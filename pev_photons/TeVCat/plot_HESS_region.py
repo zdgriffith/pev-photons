@@ -114,7 +114,8 @@ def PlotSources(sources, coords, ax, frot, xmin, xmax, ymin, ymax):
                     horizontalalignment = 'right'
                 if src['position'] == 't':
                     xx = GetFractionalX(itop[index],ntop,src['position'])
-                    yy = ymin + 0.75 * (ymax-ymin)
+                    #yy = ymin + 0.75 * (ymax-ymin)
+                    yy = ymin + 0.65 * (ymax-ymin)
                     #itop += 1
                     DrawLine([xx + offset, yy], [src['x'], src['y']], ax)
                     horizontalalignment = 'left'
@@ -147,7 +148,7 @@ if __name__ == "__main__":
     p.add_argument("--catLabelsAngle", type=float,
                    default=30., help="Oriantation of catalog labels.")
     p.add_argument("--catLabelsSize", type=float,
-                   default=12., help="Size of catalog labels.")
+                   default=18., help="Size of catalog labels.")
     p.add_argument("--dmer", type=float, default=2.,
                    help="Interval in degrees between meridians.")
     p.add_argument("--dpar", type=float,default=1.,
@@ -234,7 +235,6 @@ if __name__ == "__main__":
     f = np.load(utils.resource_dir+'hess_sources.npz')
     sources = []
     for i, name in enumerate(f['name']):
-        print(name)
         #if i == 0 or i >2:
         src = copy.deepcopy(defaultsource)
         src['RA'] = f['ra'][i]
@@ -265,20 +265,20 @@ if __name__ == "__main__":
 
             xtlbs.append('%g'%(cval))
     yts = np.arange(np.floor(ymin), np.ceil(ymax+args.dpar), args.dpar)[1:-1]
-    print(yts)
 
     imgp = ax.imshow(rotimg,extent=[cxmax, cxmin, ymax,ymin],\
                      vmin=0,vmax=4.5,cmap=utils.ps_map)
     ax.grid(color='k', alpha=0.2)
+    ax.tick_params(axis='both', which='major', pad=5, labelsize=23)
     ax.xaxis.set_ticks(xts)
     ax.xaxis.set_ticklabels(xtlbs)
     ax.yaxis.set_ticks(yts)
-    ax.set_xlabel('l [$^\circ$]')
-    ax.set_ylabel('b [$^\circ$]')
+    ax.set_xlabel('l [$^\circ$]', fontsize=30)
+    ax.set_ylabel('b [$^\circ$]', fontsize=30)
     plt.gca().invert_yaxis()
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     fig.colorbar(imgp, cax=cax, label='-log$_{10}$p')
     plt.savefig(utils.fig_dir+'TeVCat/HESS_srcs_w_labels.png')
-    plt.savefig(utils.fig_dir+'paper/hess_sources.pdf')
+    plt.savefig(utils.fig_dir+'paper/hess_sources.pdf', bbox_inches='tight')
     plt.close()
