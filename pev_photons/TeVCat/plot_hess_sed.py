@@ -106,27 +106,34 @@ if __name__ == "__main__":
 
     sources = np.load(utils.resource_dir+'hgps_sources.npz')
     source = {key:sources[key][args.index] for key in sources.keys()}
-    gamma = plot_fit('Best fit (H.E.S.S. data)', source, colors, args, 0)
 
-    plot_data(source, colors[0], label='H.E.S.S. data')
+    gamma = plot_fit('H.E.S.S. Fit Extrapolation (No cut off)', source, colors, args, 0)
+    plot_data(source, colors[0], label='H.E.S.S. Data')
 
     #IceCube Upper limit
     b = np.array([0.712*10**3,3.84*10**3])  # The 5% to 95% energy range.
     x = 10**np.mean(np.log10(b))  # Center point for which to put the arrow.
 
-    '''
     sens = np.load(utils.prefix+'/TeVCat/hess_sens.npz')
     y0 = sens['sensitivity'][args.index]*1e9
     y = y0*(x**(2-gamma))
 
     plt.plot(b, y0*b**(2 - gamma),
-             color=colors[1],label="IceCube 5-year 90$\%$ upper limit")
+             #color=colors[1],label="IceCube 5-year 90$\%$ upper limit")
+             color=colors[1],label="IceCube Sensitivity (No cut off)")
+    flux = np.load(utils.prefix+'TeVCat/absorption/source_{}.npy'.format(args.index))
+    y0 = flux*1e3
+    y0 *= (1e3)**gamma
+    plt.plot(b, y0*b**(2 - gamma), ls='-.',
+             #color=colors[1],label="IceCube 5-year 90$\%$ upper limit")
+             color=colors[1],label="IceCube Sensitivity (No cut off + Absorption)")
     #Arrow
     plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
     plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
-    '''
 
     if args.Ecut:
+        gamma = plot_fit('H.E.S.S. Fit Extrapolation ({} TeV cut off)'.format(args.Ecut),
+                         source, colors, args, 0)
         flux_i = np.load(utils.prefix+'TeVCat/cut_off/{}_Ecut_{}.npy'.format(args.index, args.Ecut))
         y0 = flux_i*1e3
         y0 *= (1e3)**gamma
@@ -135,7 +142,7 @@ if __name__ == "__main__":
         plt.plot(b, y0*b**(2 - gamma),
                  #color=colors[1], ls='-.',
                  color=colors[1], ls='-',
-                 label="IceCube UL ({} TeV cut off)".format(args.Ecut))
+                 label="IceCube Sensitivity ({} TeV cut off)".format(args.Ecut))
         #Arrow
         plt.plot([x, x], [y, 0.6*y], linewidth=2, color=colors[1])
         plt.scatter(x, 0.6*y, marker="v", color=colors[1], s=10)
@@ -143,7 +150,10 @@ if __name__ == "__main__":
     plt.xlim([3*10**-1, 10**4])
     plt.ylim([10**-16, 10**-10])
     plt.ylabel(r'E$^2$dN/dE [cm$^{-2}$s$^{-1}$TeV]', fontweight='bold')
-    l = ax.legend(loc='lower left')
+    handles, labels = ax.get_legend_handles_labels()
+    #l = ax.legend(loc='lower left')
+    order = [2,0,1]
+    l = ax.legend([handles[idx] for idx in order], [labels[idx] for idx in order], loc='lower left')
 
     utils.plot_setter(plt.gca(),l)
     plt.xlabel('Energy [TeV]', fontweight='bold')
