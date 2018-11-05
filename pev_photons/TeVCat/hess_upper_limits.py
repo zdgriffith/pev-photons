@@ -52,4 +52,4 @@ if __name__ == "__main__":
     a['name'] = hess['name']
     a['sensitivity'] = sens
 
-    np.savez(utils.prefix+'TeVCat/hess_sens_utils_absorption.npz', **a)
+    np.savez(utils.prefix+'TeVCat/hess_upper_limits_w_abs.npz', **a)
