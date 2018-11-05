@@ -24,7 +24,12 @@ if __name__ == "__main__":
     if args.rm_old:
         dag_maker.remove_old(prefix=utils.prefix)
 
-    iters = {'source': range(15), 'Ecut':range(10, 1010, 10)}
+    #iters = {'source': range(15), 'Ecut':range(100, 10100, 100)}
+    #iters = {'source': [0,1,3,4,5,6,8,9,10,11,12,13,14,15], 'Ecut':range(100, 10100, 100)}
+    #iters = {'source': [0,1,3,4,5,6,8,9,10,11,12,13,14,15], 'Ecut':range(10100, 20100, 100)}
+    iters = {'source': [1,5], 'Ecut':range(20100, 30100, 100)}
+    #iters = {'source': [13], 'Ecut':range(1000, 10100, 100)}
+    #iters = {'source': [3, 5, 10], 'Ecut':range(950, 1350, 10)}
 
     ex = dag_maker.submit(script=os.path.join(os.getcwd(), 'hess_cut_off.py'),
                           iters=iters,
