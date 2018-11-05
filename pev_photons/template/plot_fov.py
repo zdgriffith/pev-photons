@@ -41,7 +41,7 @@ def get_fermi_pi0_map():
 def plot_IC_FOV(ax, config='86'):
     """ Plot the Icecube FOV for different configurations. """
     params = {'max_dec': {'86':np.arccos(0.8), '40': np.radians(30)},
-              'color': {'86':colors[1], '40': colors[0]},
+              'color': {'86':colors[0], '40': colors[1]},
               'y': {'86':11, '40': -55.5}}
 
     dec, ra = np.meshgrid(np.linspace(0., params['max_dec'][config], 100) - np.pi/2.,
@@ -55,15 +55,17 @@ def plot_IC_FOV(ax, config='86'):
     hull = ConvexHull(points)
     ax.plot(points[hull.vertices,0], points[hull.vertices,1],
             c=params['color'][config], lw=2, ls='--')
-    ax.text(x=-50, y=params['y'][config],
+    #ax.text(x=-50, y=params['y'][config],
+    ax.text(x=-45, y=params['y'][config],
             s='IC-{}'.format(config), color=params['color'][config],
-            fontsize=30, fontweight='bold')
+            fontsize=40, fontweight='bold')
 
 def plot_rectangular_FOV(ax, exp='cm'):
     """ Plot the FOV for other experiments. """
     params = {'lon': {'cm': [50, 200], 'argo': [25, 100], '40': [285, 320]},
-              'color': {'cm':'lawngreen', 'argo': 'magenta', '40':colors[0]},
-              'x': {'cm': 150, 'argo': 75, '40':-50},
+              'color': {'cm':'magenta', 'argo': 'green', '40':'green'},
+              #'x': {'cm': 150, 'argo': 75, '40':-50},
+              'x': {'cm': 165, 'argo': 90, '40':-50},
               'y': {'cm': 7, 'argo': 7, '40':-55.5},
               'label': {'cm': 'CASA-MIA', 'argo': 'ARGO-YBJ', '40':'IC-40'}}
 
@@ -84,13 +86,15 @@ def plot_rectangular_FOV(ax, exp='cm'):
         ax.plot([lon1, 180], [-5, -5], lw=2,
                 c=params['color'][exp], ls='--')
     else:
+        lon1 += 1.9
         ax.plot([lon1, lon2], [-5, -5], lw=2,
                 c=params['color'][exp], ls='--')
         ax.plot([lon1, lon2], [5, 5], lw=2,
                 c=params['color'][exp], ls='--')
     ax.text(x=params['x'][exp], y=params['y'][exp],
             s=params['label'][exp], color=params['color'][exp],
-            fontsize=30, fontweight='bold')
+            fontsize=40, fontweight='bold')
+
 
 if __name__ == "__main__":
 
@@ -99,19 +103,19 @@ if __name__ == "__main__":
     colors = plt.rcParams['axes.color_cycle']
 
     im = ax.imshow(get_fermi_pi0_map(), extent=[180,-180,-90,90], origin='lower',
-                   interpolation='none', cmap='Greys', norm=LogNorm())
+                   interpolation='none', cmap='Greys', norm=LogNorm(), alpha=0.7)
 
     plot_IC_FOV(ax, config='40')
     plot_IC_FOV(ax, config='86')
     plot_rectangular_FOV(ax, exp='cm')
     plot_rectangular_FOV(ax, exp='argo')
 
-    plt.xticks(fontsize=30)
-    plt.yticks(fontsize=30)
+    ax.tick_params(axis='both', which='major', pad=10, labelsize=38)
     ax.set_xlim([180, -180])
     ax.set_ylim([-90, 90])
-    ax.set_xlabel('Galactic Longitude [$^{\circ}$]', fontsize=30)
-    ax.set_ylabel('Galactic Latitude [$^{\circ}$]', fontsize=30)
+    ax.set_xlabel('Galactic Longitude [$^{\circ}$]', fontsize=40)
+    ax.set_ylabel('Galactic Latitude [$^{\circ}$]', fontsize=40)
 
     plt.savefig(utils.fig_dir+'template/FOV_comparison.png')
     plt.savefig(utils.fig_dir+'paper/FOV_comparison.pdf')
+    plt.savefig(utils.fig_dir+'paper/FOV_comparison.eps')
