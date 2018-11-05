@@ -42,23 +42,18 @@ if __name__ == "__main__":
 
     filename = utils.prefix+'/template/'+args.year+'/'+args.name+'_exp.npy'
     hmap = np.load(filename)
-    #hmap = hp.ud_grade(hmap.item()['signal_x_acceptance_map'], nside_out=512)
-    hmap = hp.ud_grade(hmap.item()['bkg_acceptance_map'], nside_out=512)
+    hmap = hp.ud_grade(hmap.item()['signal_x_acceptance_map'], nside_out=512)
     hmap = len(hmap)*hmap/np.sum(hmap[np.isfinite(hmap)])
     scatter_args = {'cmap':utils.plasma_map,
-                    #'norm':LogNorm(vmin=5*10**-2, vmax=np.max(hmap)),
-                    'norm':LogNorm(vmin=1, vmax=50),
+                    'norm':LogNorm(vmin=5*10**-2, vmax=np.max(hmap)),
                     's':2**3, 'lw':0, 'zorder':0, 'rasterized':True}
 
-    #skymap.plot_sky_map(hmap, coord='G', colorbar_label='-log$_{10}$p',
     skymap.plot_sky_map(hmap, coord='G', colorbar_label='Magnitude [A.U.]',
                         **scatter_args)
 
     ax.legend()
-    #plt.savefig(utils.fig_dir+'template/'+args.name+'_x_acc.png',
-    #            bbox_inches='tight')
-    plt.savefig(utils.fig_dir+'template/background_map.pdf',
+    plt.savefig(utils.fig_dir+'template/'+args.name+'_x_acc.png',
                 bbox_inches='tight')
-    #if args.name == 'fermi_pi0':
-    #    plt.savefig(utils.fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
+    if args.name == 'fermi_pi0':
+        plt.savefig(utils.fig_dir+'paper/fermi_pi0_x_acc.pdf', bbox_inches='tight')
     plt.close()
