@@ -149,8 +149,8 @@ if __name__=="__main__":
     ebin = ebins[9]
     zenbin = zenbins[2]
 
-    xlabels = {'q_r': 'Log(Tank Charge/ VEM)'}
-    ylabels = {'q_r': 'Log(Lateral Distance/ m)'}
+    xlabels = {'q_r': 'log$_{10}$(Lateral Distance/m)'}
+    ylabels = {'q_r': 'log$_{10}$(Tank Charge/VEM)'}
 
     q,t,r,rung,eventidg,logs125g,coszeng = get_events(s125_low=float(ebin)-0.1, 
                                                       s125_high=float(ebin),
