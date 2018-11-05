@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # Initialization of multi-year LLH object.
     ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed)
 
-    inj= PointSourceInjector(args.index, E0=10**6,
+    inj= PointSourceInjector(args.index, E0=2*10**6,
                              sinDec_bandwidth=np.sin(np.radians(2)))
     inj.fill(np.radians(args.dec), ps_llh.exp, ps_llh.mc, ps_llh.livetime)
 
@@ -44,5 +44,5 @@ if __name__ == "__main__":
     flux['dec'] = args.dec
     flux['sens'] = result[0]['flux'][0]
     flux['disc'] = result[0]['flux'][1]
-    np.save(utils.prefix+'all_sky/sens_jobs/index_%s/dec_%s.npy' % (args.index, args.dec),
+    np.save(utils.prefix+'all_sky/sens_jobs/2_pev/index_%s/dec_%s.npy' % (args.index, args.dec),
             flux)
