@@ -64,7 +64,7 @@ def plot_fit(ax, label, source, color, index, Ecut=None, absorption=None):
             if Ecut is not None:
                 flux *= np.exp(-E/Ecut)
             if absorption is not None:
-                flux *= utils.apply_absorption(E, source['distance'])
+                flux *= utils.apply_source_absorption(E, index)
 
     # The center line of the flux fit.
     if Ecut is not None:
@@ -81,7 +81,7 @@ def plot_fit(ax, label, source, color, index, Ecut=None, absorption=None):
     else:
         ax.plot(E, phi, label='Flux Extrap. '+label, color=color, linestyle='--', zorder=0)
 
-def plot_limit(ax, E0, value, gamma, color, label, source, Ecut=None, absorption=None):
+def plot_limit(ax, E0, value, gamma, color, label, source, index, Ecut=None, absorption=None):
     """Plot the IceCube upper limit."""
 
 
@@ -91,7 +91,7 @@ def plot_limit(ax, E0, value, gamma, color, label, source, Ecut=None, absorption
     y_band = value*b**(2)
     y_band *= (b/E0)**-gamma
     if absorption is not None:
-        y_band *= utils.apply_absorption(b, source['distance'])
+        y_band *= utils.apply_source_absorption(b, index)
         #y_band *= absorption_distance(source['distance'])/absorption_distance(8.5)
     if Ecut is not None:
         y_band *= np.exp(-b / Ecut)
@@ -107,7 +107,7 @@ def plot_limit(ax, E0, value, gamma, color, label, source, Ecut=None, absorption
     y = value*x**(2)
     y *= (x/E0)**-gamma
     if absorption is not None:
-        y *= utils.apply_absorption(x, source['distance'])
+        y *= utils.apply_source_absorption(x, index)
     if Ecut is not None:
         y *= np.exp(-x / Ecut)
         ax.plot([x, x], [y, 0.7*y], linewidth=2, color=color)
@@ -135,8 +135,8 @@ if __name__ == "__main__":
 
     plot_data(args.index, colors[0], label='H.E.S.S. Data')
 
-    label_a = r'($\gamma$=%.2f, No E$_{\small\textrm{cut}}$, CMB Absorp.)' % source['alpha']
-    label_b = r'($\gamma$=%.2f, E$_{\small\textrm{cut}}$=%s TeV, CMB Absorp.)' % (source['alpha'], int(args.Ecut))
+    label_a = r'($\gamma$=%.2f, No E$_{\small\textrm{cut}}$, Absorp.)' % source['alpha']
+    label_b = r'($\gamma$=%.2f, E$_{\small\textrm{cut}}$=%s TeV, Absorp.)' % (source['alpha'], int(args.Ecut))
 
     plot_fit(ax, label=label_a,
              source=source, color=colors[0], index=args.index,
@@ -146,13 +146,13 @@ if __name__ == "__main__":
              source=source, color=colors[0], index=args.index,
              Ecut=args.Ecut, absorption=True)
 
-    ic_fit = np.load(utils.prefix+'/TeVCat/hess_sens_utils_absorption.npz')
+    ic_fit = np.load(utils.prefix+'/TeVCat/hess_upper_limits_w_abs.npz')
     plot_limit(ax, E0=2.0e3, value=ic_fit['sensitivity'][args.index]*1e3, gamma=source['alpha'],
-               color=colors[1], source=source, label=label_a, absorption=True)
+               color=colors[1], source=source, index=args.index, label=label_a, absorption=True)
 
-    cut_sens = np.load(utils.prefix+'TeVCat/cut_off_utils/{}_Ecut_{}_sens.npy'.format(args.index, int(args.Ecut)))
+    cut_sens = np.load(utils.prefix+'TeVCat/cut_off_abs/{}_Ecut_{}_sens.npy'.format(args.index, int(args.Ecut)))
     plot_limit(ax, E0=2.0e3, value=cut_sens*1e3, gamma=source['alpha'],
-               color=colors[1], source=source, label=label_b, Ecut=args.Ecut, absorption=True)
+               color=colors[1], source=source, index=args.index, label=label_b, Ecut=args.Ecut, absorption=True)
 
     handles, labels = ax.get_legend_handles_labels()
     #l = ax.legend(loc='lower left', fontsize=14, handlelength=1.3)

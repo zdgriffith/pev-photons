@@ -30,9 +30,13 @@ if __name__ == "__main__":
     fit_results = np.load(utils.prefix+'/TeVCat/hess_sources_fit_results.npy')
     sens = list()
 
+    sens = [7.657617242452869e-24, 2.7304727994415014e-23, np.nan, 2.259330985257297e-23, 5.92613483213227e-23, 3.4360151527930374e-23, 1.5241082738222587e-23, np.nan, 1.5457640234906488e-23, 3.595018172491272e-23, 7.540583568871267e-23, 5.669469367311802e-23, 2.062918871346691e-23, 8.771097115529437e-23]
+    a = dict()
     for i, alpha in enumerate(hess['alpha']):
+        if i != 14:
+            continue
         ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed,
-                                    absorption=hess['distance'][i])
+                                    absorption=i)
         if np.isnan(alpha):
             sens.append(np.nan)
         else:
@@ -42,13 +46,13 @@ if __name__ == "__main__":
             inj.fill(dec, ps_llh.exp, ps_llh.mc, ps_llh.livetime)
 
             s, sens_err = sensitivity_flux(ts=fit_results['TS'][i], p=0.9, llh=ps_llh,
-                                           inj=inj, fguess=1e-23, nstep=10,
+                                           #inj=inj, fguess=1e-23, nstep=10,
+                                           inj=inj, fguess=1e-22, nstep=10,
                                            path='/home/zgriffith/public_html/pev_photons/TeVCat/',
                                            **{'src_ra':np.pi, 'src_dec':dec})
             sens.append(s)
             print(sens)
 
-    a = dict()
     a['name'] = hess['name']
     a['sensitivity'] = sens
 

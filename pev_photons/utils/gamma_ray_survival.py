@@ -21,3 +21,11 @@ def apply_absorption(E, distance):
         return np.min([E_spline(E)*(dist_spline(distance)/dist_spline(8.5)), 1])
     else:
         return np.min([E_spline(E)*(dist_spline(distance)/dist_spline(8.5)), [1]*len(E)], axis=0)
+
+def apply_source_absorption(E, index):
+    energy = np.load(resource_dir+'absorption/energy.npy')
+    survival = np.load(resource_dir+'absorption/survival_%s.npy' % index)
+    E_spline = scipy.interpolate.InterpolatedUnivariateSpline(energy*10**-12,
+                                                              survival, k=2)
+    
+    return E_spline(E)

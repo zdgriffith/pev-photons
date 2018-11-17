@@ -13,7 +13,7 @@ from skylab.template_llh import TemplateLLH, MultiTemplateLLH
 from skylab.ps_llh import PointSourceLLH, MultiPointSourceLLH
 
 from .support import prefix
-from .gamma_ray_survival import apply_absorption
+from .gamma_ray_survival import apply_source_absorption
 
 def load_dataset(name, ncpu=1, seed=1, alpha=2.0, template_name=None,
                  absorption=False, llh_args={'scramble':False}, model_args={}):
@@ -72,7 +72,7 @@ def load_dataset(name, ncpu=1, seed=1, alpha=2.0, template_name=None,
                               sinDec_bins=sinDec_bins,
                               sinDec_range=sinDec_range, **model_args)
         if absorption:
-            mc['ow'] *= apply_absorption(mc['trueE']*10**-3, absorption)
+            mc['ow'] *= apply_source_absorption(mc['trueE']*10**-3, absorption)
 
         if name == 'point_source':
             llh_year = PointSourceLLH(exp, mc, livetime, llh_model, **llh_args)

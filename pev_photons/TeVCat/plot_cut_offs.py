@@ -33,25 +33,27 @@ if __name__ == "__main__":
     E = np.arange(100, 50000, 0.1)
     cut_offs = np.load(utils.prefix+'TeVCat/hess_cut_offs.npy')
     for i, (j, k) in enumerate(product(range(row_n), range(col_n))):
-        if i in [1,5]:
+        if i in [5]:
             Ecut = np.array(range(100, 30100, 100))
         else:
             Ecut = np.array(range(100, 20100, 100))
-        continue
         ax[j, k].set_title(hess['name'][i], fontsize=12)
         if i in [2,7]:
             ax[j, k].text(25, 0.5, 'N/A', fontsize=25)
             continue
         flux = hess['flux'][i]*(2e3)**(-hess['alpha'][i])
         flux *= np.exp(-2e3 / E)*1e-12
-        flux *= utils.apply_absorption(2e3, hess['distance'][i])
+        flux *= utils.apply_source_absorption(2e3, i)
 
         sens = []
         disc = []
         for E_i in Ecut:
-            flux_i = np.load(utils.prefix+'TeVCat/cut_off_utils/{}_Ecut_{}_sens.npy'.format(i, E_i))
+            try:
+                flux_i = np.load(utils.prefix+'TeVCat/cut_off_abs/{}_Ecut_{}_sens.npy'.format(i, E_i))
+            except:
+                flux_i = np.load(utils.prefix+'TeVCat/cut_off_abs/{}_Ecut_{}_sens.npy'.format(i, E_i-100))
             flux_i *= np.exp(-2e3 / E_i)
-            flux_i *= utils.apply_absorption(2e3, hess['distance'][i])
+            flux_i *= utils.apply_source_absorption(2e3, i)
             sens.append(flux_i*1e3)
  
         ax[j, k].plot(E*1e-3, flux, label='$\Phi_{HESS}$(2 PeV)')
@@ -71,5 +73,5 @@ if __name__ == "__main__":
         ax[j, k].set_ylim([3e-23, 5e-19])
 
     plt.tight_layout()
-    plt.savefig(utils.fig_dir+'TeVCat/cut_offs_2pev_utils.png', dpi=300)
+    plt.savefig(utils.fig_dir+'TeVCat/cut_offs_2pev_abs.png', dpi=300)
     plt.close()

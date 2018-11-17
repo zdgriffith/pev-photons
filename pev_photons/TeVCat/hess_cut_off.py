@@ -30,7 +30,7 @@ if __name__ == "__main__":
     hess = np.load(utils.prefix+'resources/hess_sources.npz')
     # Load the dataset.
     ps_llh = utils.load_dataset('point_source', ncpu=args.ncpu, seed=args.seed,
-                                absorption=hess['distance'][args.source])
+                                absorption=args.source)
 
     fit_results = np.load(utils.prefix+'/TeVCat/hess_sources_fit_results.npy')
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
                                       inj=inj, fguess=flux_i, nstep=10,
                                       **{'src_ra':np.pi, 'src_dec':dec})
 
-    np.save(utils.prefix+'TeVCat/cut_off_utils/{}_Ecut_{}_sens.npy'.format(args.source, args.Ecut), sens)
+    np.save(utils.prefix+'TeVCat/cut_off_abs/{}_Ecut_{}_sens.npy'.format(args.source, args.Ecut), sens)
 
     '''
     result = ps_llh.weighted_sensitivity([0.5, 2.87e-7], [0.9, 0.5],
