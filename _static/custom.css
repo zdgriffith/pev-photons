@@ -1,0 +1,45 @@
+
+.wy-nav-side p.caption {
+  color: #F5F5F5;
+  font-size: 85%;
+}
+
+/*.wy-nav-side, div.wy-side-nav-search {*/
+.wy-side-nav-search {
+  background-color: #544f87;
+  /*background: #343131;*/
+}
+
+.wy-nav-top {
+  background: #544f87;
+}
+
+/* Sidebar link click color */
+.toctree-l1 > a:active {
+  background-color: #abb2c7 !important;
+  color: rgb(252, 252, 252) !important;
+}
+
+.toctree-l1 > a:hover {
+  background-color: #abb2c7;
+  color: rgb(252, 252, 252);
+}
+
+.wy-side-nav-search input[type="text"] {
+  border: 0px;
+}
+
+div.highlight {
+  background: #f8f8f8;
+}
+
+.rst-content div.figure p.caption {
+  font-style: normal;
+  border-style: solid;
+  border-color: #dfdfdf;
+  padding: 5px;
+}
+
+.wy-table thead, .rst-content table.docutils thead, .rst-content table.field-list thead {
+    background-color: #abb2c7;
+}

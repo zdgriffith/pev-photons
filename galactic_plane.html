@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Galactic Plane &mdash; pev-photons 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Performance Checks" href="performance_checks.html" />
+    <link rel="prev" title="H.E.S.S. Source Searches" href="hess_source_search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pev-photons
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Set Up</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="all_sky_search.html">All-Sky Search</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hess_source_search.html">H.E.S.S. Source Searches</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Galactic Plane</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#template-construction">Template Construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#template-analysis">Template Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sensitivity-calculation">Sensitivity Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plots">Plots</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance_checks.html">Performance Checks</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pev-photons</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Galactic Plane</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/galactic_plane.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="galactic-plane">
+<span id="id1"></span><h1>Galactic Plane<a class="headerlink" href="#galactic-plane" title="Permalink to this headline">¶</a></h1>
+<p>The following scripts reproduce the section of the analysis which searches for diffuse emission from the galactic plane.  All scripts are within the <code class="docutils literal notranslate"><span class="pre">pev-photons/template</span></code> directory.</p>
+<div class="section" id="template-construction">
+<h2>Template Construction<a class="headerlink" href="#template-construction" title="Permalink to this headline">¶</a></h2>
+<p>To construct the template objects for each year of data, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python template_builder.py --year all
+</pre></div>
+</div>
+<p>This creates a structured numpy array <code class="docutils literal notranslate"><span class="pre">{prefix}/template/{year}/fermi_pi0_exp.npy</span></code> with all the fields required by the template method.</p>
+<p>To plot the Fermi <span class="math notranslate nohighlight">\(\pi^0\)</span> template convolved with detector acceptance (Figure 12 in the paper), execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python plot_template_x_acc.py
+</pre></div>
+</div>
+<div class="figure" id="id2">
+<a class="reference internal image-reference" href="_images/fermi_pi0_x_acc.png"><img alt="Fermi pi0 template convolved with detector acceptance" src="_images/fermi_pi0_x_acc.png" style="width: 508.5px; height: 402.5px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 12</strong>:  The Fermi-LAT <span class="math notranslate nohighlight">\(\pi^0\)</span> decay spatial template multiplied by the detector acceptance for the data year 2012.</span></p>
+</div>
+</div>
+<div class="section" id="template-analysis">
+<h2>Template Analysis<a class="headerlink" href="#template-analysis" title="Permalink to this headline">¶</a></h2>
+<p>To run the likelihood test with the Fermi <span class="math notranslate nohighlight">\(\pi^0\)</span> template, execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python run_gp_analysis.py
+</pre></div>
+</div>
+<p>This creates the structured numpy array <code class="docutils literal notranslate"><span class="pre">{prefix}/template/fermi_pi0_fit_result.npy</span></code>, which includes the test statistic and <span class="math notranslate nohighlight">\(n_s\)</span> values from the fit.</p>
+<p>To produce a background trial test statistic ensemble, <strong>on submitter</strong>, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python cluster_bg_trials.py
+</pre></div>
+</div>
+<p>The 10,000 trials produced are stored in <code class="docutils literal notranslate"><span class="pre">{prefix}/template/trials/fermi_pi0</span></code>.  Then the p-value can be calculated via:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python p_value_calc.py
+</pre></div>
+</div>
+<p>This adds the p-value to the fit results file created earlier.  To skip generating your own trials, add the <code class="docutils literal notranslate"><span class="pre">--use-original-trials</span></code> option.  Your result should match the following table:</p>
+<table border="1" class="colwidths-auto docutils" id="id3">
+<caption><span class="caption-text">Fermi Template Fit Result</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Test Statistic</th>
+<th class="head">p-value</th>
+<th class="head"><span class="math notranslate nohighlight">\(n_s\)</span></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0.22</td>
+<td>0.276</td>
+<td>150.70</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="sensitivity-calculation">
+<h2>Sensitivity Calculation<a class="headerlink" href="#sensitivity-calculation" title="Permalink to this headline">¶</a></h2>
+<p>To determine the sensitivity to the required level of precision (~1% uncertainty), we run signal injection trials on the cluster.  First, we determine a reasonable range of injection points with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python sensitivity_test.py
+</pre></div>
+</div>
+<p>Which runs 100 trials per injection point.  This step can be ommitted if you simply wish to compare final results.  Next, we run 10,000 trials at each injection points on the cluster.  <strong>On submitter</strong>, execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python cluster_sens_trials.py
+</pre></div>
+</div>
+<p>Finally, perform a <span class="math notranslate nohighlight">\(\chi^2\)</span> fit on the fraction of trials above 0 as a function of the number of injected events with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python sens_fit.py
+</pre></div>
+</div>
+<p>This yields the <span class="math notranslate nohighlight">\(n_s\)</span> value which corresponds to a fraction of trials above 0 at 0.90 with 1% precision and calculates the corresponding flux.  The output (stored at <code class="docutils literal notranslate"><span class="pre">{prefix}/template/fermi_pi0_sens.npy</span></code>, should match the following table:</p>
+<table border="1" class="colwidths-auto docutils" id="id4">
+<caption><span class="caption-text">Fermi Template Sensitivity Result</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math notranslate nohighlight">\(n_s\)</span></th>
+<th class="head"><span class="math notranslate nohighlight">\(n_s\)</span> error</th>
+<th class="head">Flux [<span class="math notranslate nohighlight">\(GeV^{−1}cm^{-2}s^{-1}\)</span>]</th>
+<th class="head">Flux error</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>491.2</td>
+<td>2.3</td>
+<td>2.63e-22</td>
+<td>1.23e-24</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="plots">
+<h2>Plots<a class="headerlink" href="#plots" title="Permalink to this headline">¶</a></h2>
+<p>To produce a plot with ARGO-YBJ, CASA-MIA, IC-40, and IC-86 fields-of-view overlaid on the Fermi <span class="math notranslate nohighlight">\(\pi^0\)</span> skymap (figure 13(left) in the paper), run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python plot_fov.py
+</pre></div>
+</div>
+<div class="figure" id="id5">
+<a class="reference internal image-reference" href="_images/FOV_comparison.png"><img alt="Experimental FOV comparisons" src="_images/FOV_comparison.png" style="width: 700.0px; height: 350.0px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 13 (left)</strong>:  The respective field of views of CASA-MIA, ARGO-YBJ, IC-40, and this analysis overlaid on a map of the <span class="math notranslate nohighlight">\(\pi^0\)</span> decay component of the Fermi-LAT galactic plane diffuse emission model.</span></p>
+</div>
+<p>To produce the plot comparing upper limits on the normalization of the Fermi pi0 decay emission model (figure 13(right) in the paper), run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python plot_galactic_limit.py --fermi_limit
+</pre></div>
+</div>
+<div class="figure" id="id6">
+<a class="reference internal image-reference" href="_images/fermi_integrated_limit.png"><img alt="Fermi pi0 template flux limit" src="_images/fermi_integrated_limit.png" style="width: 400.0px; height: 300.0px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 13 (right)</strong>:  The IceCube 90% confidence level upper limit on the flux from the <span class="math notranslate nohighlight">\(\pi^0\)</span> decay component of the Fermi-LAT galactic plane diffuse emission model in our field of view as compared to results from ARGO-YBJ, CASA-MIA, and IC-40. Dotted lines show the E <span class="math notranslate nohighlight">\(^{-3.0}\)</span> spectrum, used for obtaining IceCube upper limits, over the energy range containing 5% to 95% events in the final sample. Also shown are unattenuated and attenuated flux predictions from Vernetto 2017.</span></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Zachary Griffith
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
